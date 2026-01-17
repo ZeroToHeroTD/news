@@ -15,7 +15,7 @@ function btnClick() {
             animationStarted = true;
             startGalaxyAnimation();
         }
-    }, 800); // container fade-out
+    }, 1200); // container fade-out
 }
 
 /* =============================
