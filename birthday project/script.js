@@ -15,11 +15,11 @@ function btnClick() {
             animationStarted = true;
             startGalaxyAnimation();
         }
-    }, 800); // faster transition for mobile
+    }, 600); // shorter for mobile
 }
 
 /* ============================= 
-   🌌 GALAXY ANIMATION (Mobile Friendly) 
+   🌌 GALAXY ANIMATION (Compact & Mobile Friendly) 
 ============================= */
 
 function startGalaxyAnimation() {
@@ -40,15 +40,16 @@ function startGalaxyAnimation() {
     let stars = [];
     let particles = [];
     let phase = 0;
-    let zoomSpeed = 20; // slower for mobile
-    let mainStar = { alpha: 1 };
+    let zoomSpeed = Math.min(window.innerWidth, window.innerHeight) / 35; // adaptive zoom
+    const centerX = window.innerWidth / 2;
+    const centerY = window.innerHeight / 2;
 
-    const starCount = Math.floor(window.innerWidth / 1.5); // dynamic for mobile
+    const starCount = Math.floor(window.innerWidth / 1.5);
     for (let i = 0; i < starCount; i++) {
         stars.push({
-            x: Math.random() * canvas.width - canvas.width / 2,
-            y: Math.random() * canvas.height - canvas.height / 2,
-            z: Math.random() * canvas.width
+            x: Math.random() * window.innerWidth - centerX,
+            y: Math.random() * window.innerHeight - centerY,
+            z: Math.random() * window.innerWidth
         });
     }
 
@@ -65,7 +66,7 @@ function startGalaxyAnimation() {
             this.y = y;
             this.vx = vx;
             this.vy = vy;
-            this.life = 120;
+            this.life = 100;
         }
         update() {
             this.x += this.vx;
@@ -79,34 +80,31 @@ function startGalaxyAnimation() {
     }
 
     function explodeHeart(x, y) {
-        const scale = Math.min(window.innerWidth, window.innerHeight) / 35;
+        const scale = Math.min(window.innerWidth, window.innerHeight) / 40; // compact scale
         for (let t = 0; t < Math.PI * 2; t += 0.04) {
             const p = heart(t);
             particles.push(new Particle(
                 x,
                 y,
-                p.x * scale * 0.015, // compact
-                p.y * scale * 0.015
+                p.x * scale * 0.02, // tight spread
+                p.y * scale * 0.02
             ));
         }
     }
 
     function animate() {
         ctx.fillStyle = "rgba(0,0,0,0.35)";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        const centerX = canvas.width / 2 / (window.devicePixelRatio || 1);
-        const centerY = canvas.height / 2 / (window.devicePixelRatio || 1);
+        ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
 
         // STARFIELD
         if (phase === 0) {
             for (let s of stars) {
                 s.z -= zoomSpeed;
-                if (s.z < 1) s.z = canvas.width;
+                if (s.z < 1) s.z = window.innerWidth;
 
-                const sx = (s.x / s.z) * canvas.width + centerX;
-                const sy = (s.y / s.z) * canvas.height + centerY;
-                const r = (1 - s.z / canvas.width) * 2;
+                const sx = (s.x / s.z) * window.innerWidth + centerX;
+                const sy = (s.y / s.z) * window.innerHeight + centerY;
+                const r = (1 - s.z / window.innerWidth) * 2;
 
                 ctx.beginPath();
                 ctx.arc(sx, sy, r, 0, Math.PI * 2);
@@ -114,28 +112,26 @@ function startGalaxyAnimation() {
                 ctx.fill();
             }
 
-            zoomSpeed *= 0.97;
+            zoomSpeed *= 0.95;
 
-            ctx.fillStyle = `rgba(255,255,255,${mainStar.alpha})`;
+            ctx.fillStyle = "white";
             ctx.beginPath();
             ctx.arc(centerX, centerY, 3, 0, Math.PI * 2);
             ctx.fill();
 
             if (zoomSpeed < 0.5) {
                 phase = 1;
-                setTimeout(() => {
-                    document.getElementById("line1").classList.add("show");
-                }, 1200);
+                document.getElementById("line1").classList.add("show"); // line1 shows immediately
             }
         }
 
-        // SHOW LINE 1 AND EXPLODE HEART
+        // SHOW LINE 1 AND THEN HEART
         if (phase === 1) {
             setTimeout(() => {
                 document.getElementById("line1").classList.remove("show");
-                explodeHeart(centerX, centerY);
+                explodeHeart(centerX, centerY); // compact center explosion
                 phase = 2;
-            }, 3000); // shorter for mobile
+            }, 1500); // short delay, mobile-friendly
             phase = 1.5;
         }
 
@@ -147,7 +143,7 @@ function startGalaxyAnimation() {
                 if (p.life <= 0) particles.splice(i, 1);
             });
 
-            if (phase === 2 && particles.length < 30) {
+            if (phase === 2 && particles.length < 20) {
                 document.getElementById("line2").classList.add("show");
                 phase = 3;
             }
