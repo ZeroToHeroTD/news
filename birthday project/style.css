@@ -209,12 +209,13 @@ body {
     }
 
     #line1 {
-        top: 40%; 
+        top: 55%; 
         font-size: 1rem;
     }
 
     #line2 {
         font-size: 1.4rem;
+        top: 55%;
     }
 
     #line2 img {
