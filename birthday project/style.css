@@ -52,7 +52,7 @@ body {
 .container {
     width: 90%;
     max-width: 420px;
-    height: 75vh;
+    height: 85vh;
     display: flex;
     justify-content: center;
     align-items: center;
