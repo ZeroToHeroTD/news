@@ -215,9 +215,12 @@ body {
 
     #line2 {
         font-size: 1.4rem;
-        top: 70%;
     }
 
+    #line2 text{
+        top: auto;
+    }
+    
     #line2 img {
         width: 200px;
         height: 180px;
