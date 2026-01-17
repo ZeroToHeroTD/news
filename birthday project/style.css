@@ -235,7 +235,7 @@ body {
         top: 40%; 
         width: 90%; 
         left: 50%;
-        transform: translate(-40%, -50%);
+        transform: translate(-50%, -50%);
         font-size: 1.1rem;
     }
 
@@ -248,7 +248,7 @@ body {
         
         top: 40%; 
         left: 50%;
-        transform: translate(-40%, -50%);
+        transform: translate(-50%, -50%);
         width: 100%;
     }
     
