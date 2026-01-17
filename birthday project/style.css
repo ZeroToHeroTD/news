@@ -19,16 +19,17 @@ body {
     position: relative;
 }
 
+/* ========================
+   PAGES
+======================== */
 .page {
     position: absolute;
     inset: 0;
     width: 100vw;
     height: 100vh;
-
     display: flex;
     justify-content: center;
     align-items: center;
-
     background: linear-gradient(
         135deg,
         #FFB6C1 0%,
@@ -36,7 +37,6 @@ body {
         #F28FB8 65%,
         #E97BAC 100%
     );
-
     text-align: center;
     visibility: hidden;
     transform: translateY(40px) scale(0.96);
@@ -49,6 +49,9 @@ body {
     transition-delay: 0s;
 }
 
+/* ========================
+   PAGE1 CONTAINER
+======================== */
 .container {
     width: 90%;
     max-width: 420px;
@@ -111,6 +114,9 @@ body {
     transition: transform 2s ease-in-out;
 }
 
+/* ========================
+   PAGE2
+======================== */
 #page2 {
     background: black;
     display: flex;
@@ -126,6 +132,9 @@ body {
     height: 100%;
 }
 
+/* ========================
+   TEXT ELEMENTS
+======================== */
 .text {
     position: absolute;
     width: 90%;
@@ -133,7 +142,7 @@ body {
     text-align: center;
     color: white;
     opacity: 0;
-    transition: opacity 3s ease;
+    transition: opacity 2s ease; /* faster fade */
     pointer-events: none;
     z-index: 2;
     left: 50%;
@@ -141,7 +150,7 @@ body {
 }
 
 #line1 {
-    top: 45%;
+    top: 40%; 
     font-size: 1.2rem;
 }
 
@@ -153,11 +162,11 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 5px; /* space between image and text */
+    gap: 5px; 
 }
 
 #line2 img {
-    width: 270 px;
+    width: 270px;
     height: 250px;
     border-radius: 15px;
     opacity: 0;
@@ -169,25 +178,34 @@ body {
     opacity: 1;
 }
 
-/* Responsive adjustments */
+/* ========================
+   RESPONSIVE
+======================== */
 @media (max-width: 480px) {
     .container h2 {
         font-size: 1.2rem;
     }
+
     .container p {
         font-size: 0.95rem;
     }
+
     .btn {
         padding: 10px 20px;
         font-size: 1rem;
     }
+
     #line1 {
-        top: 35%; /* move it slightly higher so it fits */
+        top: 30%; /* ensure visible on mobile */
         font-size: 1rem;
     }
 
     #line2 {
         font-size: 1.4rem;
     }
-    
+
+    #line2 img {
+        width: 200px;
+        height: 180px;
+    }
 }

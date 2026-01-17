@@ -90,9 +90,11 @@ function startGalaxyAnimation() {
         }
     }
 
-    const line1Delay = isMobile ? 2000 : 1500; 
-    const heartDelay = isMobile ? 2500 : 2000;
-    let line1TimeoutDone = false;
+    // Adjusted delays
+    const line1Visible = isMobile ? 3000 : 2500; // line1 stays visible
+    const heartDelay = isMobile ? 1800 : 1200; // extra pause before heart
+
+    let line1Shown = false;
 
     function animate() {
         ctx.fillStyle = "rgba(0,0,0,0.35)";
@@ -120,25 +122,29 @@ function startGalaxyAnimation() {
         ctx.arc(centerX, centerY, 3, 0, Math.PI * 2);
         ctx.fill();
 
-        // =====================
-        // LINE1 APPEARANCE AFTER STARFIELD SLOWS DOWN
-        // =====================
-        if (phase === 0 && zoomSpeed < 2 && !line1TimeoutDone) {
-            phase = 1;
+        // =======================
+        // LINE1 APPEARS ON MOBILE + DESKTOP
+        // =======================
+        if (!line1Shown && zoomSpeed < (isMobile ? 3.5 : 2)) { 
             const line1 = document.getElementById("line1");
-            line1.classList.add("show"); // fade in
+            line1.classList.add("show");
+            line1Shown = true;
 
+            // line1 stays visible for a bit, then fade out + heart delay
             setTimeout(() => {
-                line1.classList.remove("show"); // fade out
-                explodeHeart(centerX, centerY); // heart explosion
-                phase = 2;
-            }, line1Delay);
-            line1TimeoutDone = true;
+                line1.classList.remove("show");
+
+                setTimeout(() => {
+                    explodeHeart(centerX, centerY);
+                    phase = 2;
+                }, heartDelay);
+
+            }, line1Visible);
         }
 
-        // =====================
-        // PARTICLE ANIMATION + LINE2
-        // =====================
+        // =======================
+        // PARTICLE ANIMATION + LINE2 IMAGE
+        // =======================
         if (phase >= 2) {
             particles.forEach((p, i) => {
                 p.update();
@@ -146,7 +152,6 @@ function startGalaxyAnimation() {
                 if (p.life <= 0) particles.splice(i, 1);
             });
 
-            // show line2 with image
             if (phase === 2 && particles.length < 20) {
                 const line2 = document.getElementById("line2");
                 line2.classList.add("show");
