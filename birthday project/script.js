@@ -4,14 +4,13 @@ const page2 = document.getElementById("page2");
 
 let animationStarted = false;
 
+// === BUTTON CLICK HANDLER ===
 function btnClick() {
-    // === MUSIC INTEGRATION START ===
     const music = document.getElementById("bg-music");
     if (music) {
-        music.volume = 0; // Start silent for fade-in
-        music.play().catch(err => console.log("Audio blocked or file missing:", err));
+        music.volume = 0;
+        music.play().catch(err => console.log("Audio blocked:", err));
         
-        // Smoothly increase volume to 60% over 2 seconds
         let vol = 0;
         const fadeInInterval = setInterval(() => {
             if (vol < 0.6) {
@@ -20,9 +19,8 @@ function btnClick() {
             } else {
                 clearInterval(fadeInInterval);
             }
-        }, 100);
+        }, 200);
     }
-    // === MUSIC INTEGRATION END ===
 
     container1.classList.add("fade-out");
 
@@ -37,10 +35,12 @@ function btnClick() {
     }, 1200);
 }
 
+// === IMPROVED TYPEWRITER EFFECT ===
 function typeWriter(element, text, speed, callback) {
     let i = 0;
-    element.innerHTML = ""; 
-    element.classList.add("show"); 
+    element.innerHTML = "";
+    element.style.opacity = "1";
+    element.classList.add("show");
     
     function type() {
         if (i < text.length) {
@@ -48,12 +48,13 @@ function typeWriter(element, text, speed, callback) {
             i++;
             setTimeout(type, speed);
         } else if (callback) {
-            callback();
+            setTimeout(callback, 1500); // 1.5s delay before triggering next step
         }
     }
     type();
 }
 
+// === GALAXY ANIMATION ===
 function startGalaxyAnimation() {
     const canvas = document.getElementById("canvas");
     const ctx = canvas.getContext("2d");
@@ -62,10 +63,8 @@ function startGalaxyAnimation() {
         const dpr = window.devicePixelRatio || 1;
         canvas.width = window.innerWidth * dpr;
         canvas.height = window.innerHeight * dpr;
-        ctx.setTransform(1, 0, 0, 1, 0, 0);
         ctx.scale(dpr, dpr);
     }
-
     resizeCanvas();
     window.addEventListener("resize", resizeCanvas);
 
@@ -75,170 +74,163 @@ function startGalaxyAnimation() {
 
     let stars = [];
     let particles = [];
-    let phase = 0;
-    let zoomSpeed = Math.min(window.innerWidth, window.innerHeight) / 60;
+    let shockwaves = [];
+    let phase = 0; 
+    let zoomSpeed = 45; 
+    let frame = 0;
+    let heartForming = false;
+    let heartFading = false;
+    let sequenceStarted = false;
 
-    // Background Stars
-    const starCount = Math.floor(window.innerWidth / 1.5);
+    // Star Setup
+    const starCount = isMobile ? 600 : 1200;
     for (let i = 0; i < starCount; i++) {
         stars.push({
-            x: Math.random() * window.innerWidth - centerX,
-            y: Math.random() * window.innerHeight - centerY,
-            z: Math.random() * window.innerWidth
+            x: (Math.random() - 0.5) * 2000,
+            y: (Math.random() - 0.5) * 2000,
+            z: Math.random() * 2000,
+            px: 0, py: 0
         });
     }
 
-    // Heart Math
     function heart(t) {
         return {
             x: 16 * Math.sin(t) ** 3,
-            y: -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t))
+            y: -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t))
         };
     }
 
-    // === UPDATED PARTICLE SYSTEM ===
     class Particle {
-        constructor(x, y, targetX, targetY) {
-            this.x = x;
-            this.y = y;
+        constructor(targetX, targetY) {
+            this.x = centerX;
+            this.y = centerY;
             this.targetX = targetX;
             this.targetY = targetY;
-            
-            // PHYSICS
             const angle = Math.random() * Math.PI * 2;
-            const speed = Math.random() * 25 + 8; // Very high initial speed for "Huge" effect
-            
+            const speed = Math.random() * 8 + 4;
             this.vx = Math.cos(angle) * speed;
             this.vy = Math.sin(angle) * speed;
-            
-            // TIMING
-            this.friction = 0.94; // Higher friction so they drift longer
-            this.timer = 0;
-            // They wait 100-130 frames (approx 2 seconds) before forming
-            this.driftDelay = Math.random() * 30 + 100; 
-            
-            this.life = 400; // Live longer
-            
-            // COLORS
-            this.hue = Math.random() * 360; // Start as RAINBOW
+            this.hue = Math.random() * 60 + 300;
+            this.finalHue = 340; 
             this.saturation = 100;
             this.lightness = 60;
-            this.finalHue = 340; // The Pink/Red color of the heart
+            this.alpha = 1;
+            this.friction = 0.94; 
+            this.lerpSpeed = 0.06;
         }
-
         update() {
-            this.timer++;
-
-            // 1. EXPLOSION & DRIFT PHASE
-            this.vx *= this.friction;
-            this.vy *= this.friction;
             this.x += this.vx;
             this.y += this.vy;
+            this.vx *= this.friction;
+            this.vy *= this.friction;
 
-            // 2. FORMATION PHASE (Only after driftDelay)
-            if (this.timer > this.driftDelay) {
-                // Ease towards target position (heart shape)
-                this.x += (this.targetX - this.x) * 0.06;
-                this.y += (this.targetY - this.y) * 0.06;
-
-                // Gradually fade color from Rainbow -> Pink
-                const diff = this.finalHue - this.hue;
-                // Handle hue wrapping (shortest path to pink)
-                if (Math.abs(diff) > 180) {
-                     if (this.hue > this.finalHue) this.hue += 2;
-                     else this.hue -= 2;
-                } else {
-                     this.hue += diff * 0.05;
-                }
-                
-                // Make them brighter as they form the heart
-                if(this.lightness < 80) this.lightness += 0.5;
+            if (heartForming) {
+                this.x += (this.targetX - this.x) * this.lerpSpeed;
+                this.y += (this.targetY - this.y) * this.lerpSpeed;
+                this.hue += (this.finalHue - this.hue) * 0.05;
+                // Breathing
+                this.x += Math.sin(frame * 0.05 + this.y) * 0.2;
             }
 
-            // Keep Hue within 0-360
-            if (this.hue > 360) this.hue -= 360;
-            if (this.hue < 0) this.hue += 360;
-
-            this.life--;
+            if (heartFading) {
+                this.alpha -= 0.015;
+            }
         }
-
         draw() {
-            ctx.fillStyle = `hsl(${this.hue}, ${this.saturation}%, ${this.lightness}%)`;
-            // Make particles slightly smaller for a "glitter" effect
-            ctx.fillRect(this.x, this.y, 2, 2); 
+            if (this.alpha <= 0) return;
+            ctx.fillStyle = `hsla(${this.hue}, ${this.saturation}%, ${this.lightness}%, ${this.alpha})`;
+            ctx.fillRect(this.x, this.y, 2, 2);
         }
     }
 
-    function createFireworkToHeart(x, y) {
-        const scale = Math.min(window.innerWidth, window.innerHeight) / 45;
-        
-        // High density for explosion
-        for (let t = 0; t < Math.PI * 2; t += 0.01) {
+    function prepareHeart() {
+        const scale = Math.min(window.innerWidth, window.innerHeight) / (isMobile ? 55 : 45);
+        for (let t = 0; t < Math.PI * 2; t += 0.015) { 
             const p = heart(t);
-            const targetX = x + (p.x * scale);
-            const targetY = y + (p.y * scale);
-            particles.push(new Particle(x, y, targetX, targetY));
+            particles.push(new Particle(centerX + p.x * scale, centerY + p.y * scale));
         }
     }
-
-    let line1Shown = false;
-    const message = "On this day, the universe received what it didn’t even know it was missing - you";
 
     function animate() {
-        ctx.fillStyle = "rgba(0,0,0,0.2)"; // Lower opacity trail for longer streaks
+        frame++;
+        ctx.fillStyle = "rgba(0, 0, 0, 0.25)"; 
         ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
 
+        // 1. Sliding Stars
         for (let s of stars) {
-            s.z -= zoomSpeed;
-            if (s.z < 1) s.z = window.innerWidth;
-            const sx = (s.x / s.z) * window.innerWidth + centerX;
-            const sy = (s.y / s.z) * window.innerHeight + centerY;
-            const r = (1 - s.z / window.innerWidth) * 2;
-            ctx.beginPath();
-            ctx.arc(sx, sy, r, 0, Math.PI * 2);
-            ctx.fillStyle = "white";
-            ctx.fill();
+            s.z -= zoomSpeed; 
+            if (s.z <= 1) { s.z = 2000; s.x = (Math.random() - 0.5) * 2000; s.y = (Math.random() - 0.5) * 2000; s.px = 0; s.py = 0; }
+            const scale = 1000 / s.z;
+            const sx = s.x * scale + centerX;
+            const sy = s.y * scale + centerY;
+            if (s.px !== 0) {
+                ctx.strokeStyle = `rgba(255, 255, 255, ${Math.min(1, scale / 4)})`;
+                ctx.lineWidth = Math.min(3, scale * 1.5);
+                ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(s.px, s.py); ctx.stroke();
+            }
+            s.px = sx; s.py = sy;
         }
 
-        if (zoomSpeed > 0.5) zoomSpeed *= 0.97;
+        if (zoomSpeed > 1) zoomSpeed *= 0.985;
 
-        ctx.fillStyle = "white";
-        ctx.beginPath();
-        ctx.arc(centerX, centerY, 3, 0, Math.PI * 2);
-        ctx.fill();
+        // 2. Center Pulse
+        if (phase < 2) {
+            const p = 1 + 0.3 * Math.sin(frame * 0.15);
+            ctx.beginPath(); ctx.arc(centerX, centerY, 5 * p, 0, Math.PI*2);
+            ctx.fillStyle = "white"; ctx.fill();
+        }
 
-        if (!line1Shown && zoomSpeed < (isMobile ? 3.5 : 2)) {
-            line1Shown = true;
-            phase = 1;
+        // 3. Sequence Controller
+        if (!sequenceStarted && zoomSpeed < 4) {
+            sequenceStarted = true;
             const line1 = document.getElementById("line1");
-            
-            typeWriter(line1, message, 50, () => {
+            const finalLine = document.getElementById("final-birthday-text");
+            const line2Box = document.getElementById("line2");
+
+            // Sentence 1
+            typeWriter(line1, "On this day, the universe received what it didn’t even know it was missing - you", 50, () => {
+                line1.style.opacity = "0";
                 setTimeout(() => {
-                    line1.classList.remove("show");
-                    setTimeout(() => {
-                        createFireworkToHeart(centerX, centerY);
-                        phase = 2;
-                    }, 800);
-                }, 2000);
+                    // Sentence 2
+                    typeWriter(line1, "Every star led me to you...", 60, () => {
+                        line1.style.opacity = "0";
+                        setTimeout(() => {
+                            // Heart Explosion
+                            phase = 2;
+                            prepareHeart();
+                            shockwaves.push({r: 0, a: 1});
+                            setTimeout(() => { heartForming = true; }, 700);
+
+                            // Let heart show, then fade out and show Happy Birthday
+                            setTimeout(() => {
+                                heartFading = true;
+                                setTimeout(() => {
+                                    line2Box.classList.add("show");
+                                    typeWriter(finalLine, "happy birthday, my love.", 80);
+                                }, 1000);
+                            }, 4000); 
+
+                        }, 1000);
+                    });
+                }, 1000);
             });
         }
+
+        // 4. Shockwaves & Particles
+        shockwaves.forEach((sw, i) => {
+            sw.r += 20; sw.a *= 0.94;
+            if(sw.a < 0.01) shockwaves.splice(i, 1);
+            else {
+                ctx.beginPath(); ctx.arc(centerX, centerY, sw.r, 0, Math.PI*2);
+                ctx.strokeStyle = `rgba(255, 100, 150, ${sw.a})`; ctx.stroke();
+            }
+        });
 
         if (phase === 2) {
-            particles.forEach((p, i) => {
-                p.update();
-                p.draw();
-                if (p.life <= 0) particles.splice(i, 1);
-            });
-
-            if (particles.length < 10) {
-                const line2 = document.getElementById("line2");
-                line2.classList.add("show");
-                const img = line2.querySelector("img");
-                if (img) img.style.opacity = "1";
-                phase = 3;
-            }
+            particles.forEach(p => { p.update(); p.draw(); });
         }
+
         requestAnimationFrame(animate);
     }
     animate();
-}
+};

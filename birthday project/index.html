@@ -6,18 +6,16 @@
     <title>Birthday Present</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-    <link rel="icon" href="icon.jpg" type="image/jpg">
 </head>
 <body>
     <audio id="bg-music" loop>
-    <source src="Illumoria.mp3" type="audio/mpeg">
-    Your browser does not support the audio element.
+        <source src="Illumoria.mp3" type="audio/mpeg">
     </audio>
 
     <section class="page active" id="page1">
         <div class="container" id="container1">
             <div class="img-container">
-                <img src="cat.gif" alt="error">
+                <img src="cat.gif" alt="cute gif">
             </div>
             <div class="container-text">
                 <h2>Hello aweng,<br>this is specially made for you.</h2>
@@ -27,19 +25,15 @@
         </div>
     </section>
 
-  <section class="page" id="page2">
-    <canvas id="canvas"></canvas>
-
-    <div id="line1" class="text"></div>
-
-    <div id="line2" class="text">
-        <div class="img-container">
-            <img src="cutie.gif" alt="error">
+    <section class="page" id="page2">
+        <canvas id="canvas"></canvas>
+        <div id="line1" class="text"></div>
+        
+        <div id="line2" class="text">
+            <h2 id="final-birthday-text"></h2>
         </div>
-            Happy Birthday, my love.
-        </div>
-</section>
+    </section>
     
+    <script src="script.js"></script>
 </body>
-<script src="script.js"></script>
 </html>

@@ -168,7 +168,7 @@ body {
 }
 
 #line2 {
-    top: 25%;
+    top: 50%;
     font-size: 1.8rem;
     font-weight: 600;
     display: flex;
@@ -185,6 +185,14 @@ body {
     opacity: 0;
     transition: opacity 1s ease-in-out;
     object-fit: cover;
+}
+
+#line2 h2{
+    font-size: 20px;
+    font-family: 'Poppins', sans-serif;
+    color:#f3d3d3;
+    letter-spacing: normal;
+
 }
 
 .show {
@@ -250,7 +258,7 @@ body {
         margin-bottom: 10px; 
     }
 
-    #line2 p {
+    #line2 h2{
         font-size: 1.2rem;
         margin: 0;     
         width: 100%;
