@@ -216,10 +216,6 @@ body {
     #line2 {
         font-size: 1.4rem;
     }
-
-    #line2 text{
-        top: auto;
-    }
     
     #line2 img {
         width: 200px;
