@@ -258,5 +258,11 @@ body {
         margin-bottom: 10px; 
     }
 
+    #line2 h2{
+        top: 50%;
+        width: 100%;
+        transform: translate(-50%, -50%);
+        left: 50%
+    }
 }
 };
