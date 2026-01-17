@@ -90,8 +90,8 @@ function startGalaxyAnimation() {
         }
     }
 
-    const line1Delay = isMobile ? 1500 : 1500;
-    const heartDelay = isMobile ? 3000 : 2500;
+    const line1Delay = isMobile ? 2000 : 1500; 
+    const heartDelay = isMobile ? 2500 : 2000;
     let line1TimeoutDone = false;
 
     function animate() {
@@ -99,44 +99,46 @@ function startGalaxyAnimation() {
         ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
 
         // STARFIELD
-        if (phase === 0) {
-            for (let s of stars) {
-                s.z -= zoomSpeed;
-                if (s.z < 1) s.z = window.innerWidth;
+        for (let s of stars) {
+            s.z -= zoomSpeed;
+            if (s.z < 1) s.z = window.innerWidth;
 
-                const sx = (s.x / s.z) * window.innerWidth + centerX;
-                const sy = (s.y / s.z) * window.innerHeight + centerY;
-                const r = (1 - s.z / window.innerWidth) * 2;
+            const sx = (s.x / s.z) * window.innerWidth + centerX;
+            const sy = (s.y / s.z) * window.innerHeight + centerY;
+            const r = (1 - s.z / window.innerWidth) * 2;
 
-                ctx.beginPath();
-                ctx.arc(sx, sy, r, 0, Math.PI * 2);
-                ctx.fillStyle = "white";
-                ctx.fill();
-            }
-
-            zoomSpeed *= 0.97;
-
-            ctx.fillStyle = "white";
             ctx.beginPath();
-            ctx.arc(centerX, centerY, 3, 0, Math.PI * 2);
+            ctx.arc(sx, sy, r, 0, Math.PI * 2);
+            ctx.fillStyle = "white";
             ctx.fill();
-
-            // Show line1 only once
-            if (zoomSpeed < 0.5 && phase === 0 && !line1TimeoutDone) {
-                phase = 1;
-                const line1 = document.getElementById("line1");
-                line1.classList.add("show");
-
-                setTimeout(() => {
-                    line1.classList.remove("show");
-                    explodeHeart(centerX, centerY);
-                    phase = 2;
-                }, line1Delay + 800); // slightly longer on mobile
-                line1TimeoutDone = true;
-            }
         }
 
-        // PARTICLE ANIMATION AND SHOW LINE2 + IMAGE
+        zoomSpeed *= 0.97;
+
+        ctx.fillStyle = "white";
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, 3, 0, Math.PI * 2);
+        ctx.fill();
+
+        // =====================
+        // LINE1 APPEARANCE AFTER STARFIELD SLOWS DOWN
+        // =====================
+        if (phase === 0 && zoomSpeed < 2 && !line1TimeoutDone) {
+            phase = 1;
+            const line1 = document.getElementById("line1");
+            line1.classList.add("show"); // fade in
+
+            setTimeout(() => {
+                line1.classList.remove("show"); // fade out
+                explodeHeart(centerX, centerY); // heart explosion
+                phase = 2;
+            }, line1Delay);
+            line1TimeoutDone = true;
+        }
+
+        // =====================
+        // PARTICLE ANIMATION + LINE2
+        // =====================
         if (phase >= 2) {
             particles.forEach((p, i) => {
                 p.update();
@@ -144,6 +146,7 @@ function startGalaxyAnimation() {
                 if (p.life <= 0) particles.splice(i, 1);
             });
 
+            // show line2 with image
             if (phase === 2 && particles.length < 20) {
                 const line2 = document.getElementById("line2");
                 line2.classList.add("show");
