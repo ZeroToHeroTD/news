@@ -18,9 +18,6 @@ function btnClick() {
     }, 1200);
 }
 
-/* ============================= 
-   🌌 GALAXY ANIMATION
-============================= */
 function startGalaxyAnimation() {
     const canvas = document.getElementById("canvas");
     const ctx = canvas.getContext("2d");
@@ -38,10 +35,8 @@ function startGalaxyAnimation() {
 
     const centerX = window.innerWidth / 2;
     const centerY = window.innerHeight / 2;
-
     const isMobile = window.innerWidth < 768;
 
-    // STARFIELD
     let stars = [];
     let particles = [];
     let phase = 0;
@@ -95,9 +90,9 @@ function startGalaxyAnimation() {
         }
     }
 
-    // Slightly faster timings
-    const line1Delay = isMobile ? 2500 : 1500; // faster than before
-    const heartDelay = isMobile ? 3000 : 2500; // faster heart explosion
+    const line1Delay = isMobile ? 2500 : 1500;
+    const heartDelay = isMobile ? 3000 : 2500;
+    let line1TimeoutDone = false;
 
     function animate() {
         ctx.fillStyle = "rgba(0,0,0,0.35)";
@@ -126,20 +121,19 @@ function startGalaxyAnimation() {
             ctx.arc(centerX, centerY, 3, 0, Math.PI * 2);
             ctx.fill();
 
-            if (zoomSpeed < 0.5 && phase === 0) {
+            // Show line1 only once
+            if (zoomSpeed < 0.5 && phase === 0 && !line1TimeoutDone) {
                 phase = 1;
-                document.getElementById("line1").classList.add("show");
-            }
-        }
+                const line1 = document.getElementById("line1");
+                line1.classList.add("show");
 
-        // SHOW LINE1 THEN HEART
-        if (phase === 1) {
-            setTimeout(() => {
-                document.getElementById("line1").classList.remove("show");
-                explodeHeart(centerX, centerY);
-                phase = 2;
-            }, heartDelay);
-            phase = 1.5;
+                setTimeout(() => {
+                    line1.classList.remove("show");
+                    explodeHeart(centerX, centerY);
+                    phase = 2;
+                }, line1Delay + 800); // slightly longer on mobile
+                line1TimeoutDone = true;
+            }
         }
 
         // PARTICLE ANIMATION AND SHOW LINE2 + IMAGE
@@ -154,7 +148,6 @@ function startGalaxyAnimation() {
                 const line2 = document.getElementById("line2");
                 line2.classList.add("show");
 
-                // Ensure image inside line2 also fades in
                 const img = line2.querySelector("img");
                 if (img) img.style.opacity = "1";
 
