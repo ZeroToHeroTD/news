@@ -261,9 +261,8 @@ body {
     #line2 h2{
         align-self: center;
         display: flex;
-        border: 1px solid;
         position: absolute; 
-        top: -80px;
+        top: -100px;
     }
 }
 };
