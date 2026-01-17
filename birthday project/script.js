@@ -96,7 +96,7 @@ function startGalaxyAnimation() {
     }
 
     // Slightly faster timings
-    const line1Delay = isMobile ? 2500 : 1500; // faster than before
+    const line1Delay = isMobile ? 2000 : 1500; // faster than before
     const heartDelay = isMobile ? 3000 : 2500; // faster heart explosion
 
     function animate() {
