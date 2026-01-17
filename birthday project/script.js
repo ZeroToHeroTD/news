@@ -90,7 +90,7 @@ function startGalaxyAnimation() {
         }
     }
 
-    const line1Delay = isMobile ? 2500 : 1500;
+    const line1Delay = isMobile ? 1500 : 1500;
     const heartDelay = isMobile ? 3000 : 2500;
     let line1TimeoutDone = false;
 
@@ -131,7 +131,7 @@ function startGalaxyAnimation() {
                     line1.classList.remove("show");
                     explodeHeart(centerX, centerY);
                     phase = 2;
-                }, line1Delay + 400); // slightly longer on mobile
+                }, line1Delay + 800); // slightly longer on mobile
                 line1TimeoutDone = true;
             }
         }
