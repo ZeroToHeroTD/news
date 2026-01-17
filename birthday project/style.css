@@ -19,9 +19,7 @@ body {
     position: relative;
 }
 
-/* ========================
-   PAGES
-======================== */
+
 .page {
     position: absolute;
     inset: 0;
@@ -49,9 +47,7 @@ body {
     transition-delay: 0s;
 }
 
-/* ========================
-   PAGE1 CONTAINER
-======================== */
+
 .container {
     width: 90%;
     max-width: 420px;
@@ -114,9 +110,7 @@ body {
     transition: transform 2s ease-in-out;
 }
 
-/* ========================
-   PAGE2
-======================== */
+
 #page2 {
     background: black;
     display: flex;
@@ -132,9 +126,7 @@ body {
     height: 100%;
 }
 
-/* ========================
-   TEXT ELEMENTS
-======================== */
+
 .text {
     position: absolute;
     width: 90%;
@@ -142,7 +134,7 @@ body {
     text-align: center;
     color: white;
     opacity: 0;
-    transition: opacity 2s ease; /* faster fade */
+    transition: opacity 2s ease; 
     pointer-events: none;
     z-index: 2;
     left: 50%;
@@ -178,9 +170,7 @@ body {
     opacity: 1;
 }
 
-/* ========================
-   RESPONSIVE
-======================== */
+
 @media (max-width: 480px) {
     .container h2 {
         font-size: 1.2rem;
@@ -196,7 +186,7 @@ body {
     }
 
     #line1 {
-        top: 55%; /* ensure visible on mobile */
+        top: 55%; 
         font-size: 1rem;
     }
 
