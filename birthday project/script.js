@@ -131,7 +131,7 @@ function startGalaxyAnimation() {
                     line1.classList.remove("show");
                     explodeHeart(centerX, centerY);
                     phase = 2;
-                }, line1Delay + 800); // slightly longer on mobile
+                }, line1Delay + 400); // slightly longer on mobile
                 line1TimeoutDone = true;
             }
         }
