@@ -259,9 +259,11 @@ body {
     }
 
     #line2 h2{
-        top: 50%;
-        width: 100%;
-        left: 50%
+        align-self: center;
+        display: flex;
+        border: 1px solid;
+        position: absolute; 
+        top: -80px;
     }
 }
 };
