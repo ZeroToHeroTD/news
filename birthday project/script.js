@@ -78,7 +78,7 @@ function startGalaxyAnimation() {
     let phase = 0;
     let zoomSpeed = Math.min(window.innerWidth, window.innerHeight) / 60;
 
-    // Create background stars
+    // Background Stars
     const starCount = Math.floor(window.innerWidth / 1.5);
     for (let i = 0; i < starCount; i++) {
         stars.push({
@@ -88,7 +88,7 @@ function startGalaxyAnimation() {
         });
     }
 
-    // Heart math formula
+    // Heart Math
     function heart(t) {
         return {
             x: 16 * Math.sin(t) ** 3,
@@ -96,7 +96,7 @@ function startGalaxyAnimation() {
         };
     }
 
-    // === NEW PARTICLE SYSTEM ===
+    // === UPDATED PARTICLE SYSTEM ===
     class Particle {
         constructor(x, y, targetX, targetY) {
             this.x = x;
@@ -104,60 +104,79 @@ function startGalaxyAnimation() {
             this.targetX = targetX;
             this.targetY = targetY;
             
-            // EXPLOSION PHYSICS
+            // PHYSICS
             const angle = Math.random() * Math.PI * 2;
-            const speed = Math.random() * 20 + 5; // Huge explosion speed
+            const speed = Math.random() * 25 + 8; // Very high initial speed for "Huge" effect
             
             this.vx = Math.cos(angle) * speed;
             this.vy = Math.sin(angle) * speed;
             
-            this.friction = 0.92; // How fast they slow down to form the heart
-            this.life = 300; // Lasts longer
-            this.hue = 40; // Start Gold/Yellow
+            // TIMING
+            this.friction = 0.94; // Higher friction so they drift longer
+            this.timer = 0;
+            // They wait 100-130 frames (approx 2 seconds) before forming
+            this.driftDelay = Math.random() * 30 + 100; 
+            
+            this.life = 400; // Live longer
+            
+            // COLORS
+            this.hue = Math.random() * 360; // Start as RAINBOW
             this.saturation = 100;
-            this.lightness = 80;
+            this.lightness = 60;
+            this.finalHue = 340; // The Pink/Red color of the heart
         }
 
         update() {
-            // Apply simple physics
+            this.timer++;
+
+            // 1. EXPLOSION & DRIFT PHASE
             this.vx *= this.friction;
             this.vy *= this.friction;
-
             this.x += this.vx;
             this.y += this.vy;
 
-            // COLOR TRANSITION: From Gold Explosion -> Pink Heart
-            if (this.hue > 0) this.hue -= 2; // Fade hue to Red/Pink (0-340 range)
-            if (this.hue < 0) this.hue = 340; // Loop to pink range
-            if (this.lightness > 60) this.lightness -= 0.5;
+            // 2. FORMATION PHASE (Only after driftDelay)
+            if (this.timer > this.driftDelay) {
+                // Ease towards target position (heart shape)
+                this.x += (this.targetX - this.x) * 0.06;
+                this.y += (this.targetY - this.y) * 0.06;
 
-            // THE MAGIC: Pull particles to heart shape when they slow down
-            if (Math.abs(this.vx) < 1.5 && Math.abs(this.vy) < 1.5) {
-                 this.x += (this.targetX - this.x) * 0.08;
-                 this.y += (this.targetY - this.y) * 0.08;
+                // Gradually fade color from Rainbow -> Pink
+                const diff = this.finalHue - this.hue;
+                // Handle hue wrapping (shortest path to pink)
+                if (Math.abs(diff) > 180) {
+                     if (this.hue > this.finalHue) this.hue += 2;
+                     else this.hue -= 2;
+                } else {
+                     this.hue += diff * 0.05;
+                }
+                
+                // Make them brighter as they form the heart
+                if(this.lightness < 80) this.lightness += 0.5;
             }
+
+            // Keep Hue within 0-360
+            if (this.hue > 360) this.hue -= 360;
+            if (this.hue < 0) this.hue += 360;
 
             this.life--;
         }
 
         draw() {
             ctx.fillStyle = `hsl(${this.hue}, ${this.saturation}%, ${this.lightness}%)`;
-            ctx.fillRect(this.x, this.y, 2.5, 2.5); // Slightly larger particles
+            // Make particles slightly smaller for a "glitter" effect
+            ctx.fillRect(this.x, this.y, 2, 2); 
         }
     }
 
     function createFireworkToHeart(x, y) {
         const scale = Math.min(window.innerWidth, window.innerHeight) / 45;
         
-        // Increase loop density for a "Huge" explosion (0.015 step)
-        for (let t = 0; t < Math.PI * 2; t += 0.015) {
+        // High density for explosion
+        for (let t = 0; t < Math.PI * 2; t += 0.01) {
             const p = heart(t);
-            
-            // Calculate where the particle SHOULD end up (The Heart)
             const targetX = x + (p.x * scale);
             const targetY = y + (p.y * scale);
-
-            // Create particle at center (x,y)
             particles.push(new Particle(x, y, targetX, targetY));
         }
     }
@@ -166,11 +185,9 @@ function startGalaxyAnimation() {
     const message = "On this day, the universe received what it didn’t even know it was missing - you";
 
     function animate() {
-        // Slightly darker trails for better fireworks contrast
-        ctx.fillStyle = "rgba(0,0,0,0.25)"; 
+        ctx.fillStyle = "rgba(0,0,0,0.2)"; // Lower opacity trail for longer streaks
         ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
 
-        // Draw Stars (Background)
         for (let s of stars) {
             s.z -= zoomSpeed;
             if (s.z < 1) s.z = window.innerWidth;
@@ -185,31 +202,27 @@ function startGalaxyAnimation() {
 
         if (zoomSpeed > 0.5) zoomSpeed *= 0.97;
 
-        // Center Star
         ctx.fillStyle = "white";
         ctx.beginPath();
         ctx.arc(centerX, centerY, 3, 0, Math.PI * 2);
         ctx.fill();
 
-        // PHASE 1: Text Typing
         if (!line1Shown && zoomSpeed < (isMobile ? 3.5 : 2)) {
             line1Shown = true;
             phase = 1;
             const line1 = document.getElementById("line1");
-
+            
             typeWriter(line1, message, 50, () => {
                 setTimeout(() => {
                     line1.classList.remove("show");
                     setTimeout(() => {
-                        // PHASE 2: Trigger the Huge Firework
                         createFireworkToHeart(centerX, centerY);
                         phase = 2;
-                    }, 1000); // Shorter wait before boom
+                    }, 800);
                 }, 2000);
             });
         }
 
-        // PHASE 2: Particles Animation
         if (phase === 2) {
             particles.forEach((p, i) => {
                 p.update();
@@ -217,7 +230,6 @@ function startGalaxyAnimation() {
                 if (p.life <= 0) particles.splice(i, 1);
             });
 
-            // Transition to Final Message
             if (particles.length < 10) {
                 const line2 = document.getElementById("line2");
                 line2.classList.add("show");
