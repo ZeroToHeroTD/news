@@ -232,10 +232,10 @@ body {
     }
 
    #line1 {
-        top: 50%; 
+        top: 40%; 
         width: 90%; 
         left: 50%;
-        transform: translate(-50%, -50%);
+        transform: translate(-40%, -40%);
         font-size: 1.1rem;
     }
 
@@ -246,9 +246,9 @@ body {
         align-items: center;
         justify-content: center;
         
-        top: 50%; 
+        top: 40%; 
         left: 50%;
-        transform: translate(-50%, -50%);
+        transform: translate(-40%, -40%);
         width: 100%;
     }
     
