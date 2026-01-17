@@ -232,7 +232,7 @@ body {
     }
 
    #line1 {
-        top: 40%; 
+        top: 60%; 
         width: 90%; 
         left: 50%;
         transform: translate(-50%, -50%);
@@ -246,7 +246,7 @@ body {
         align-items: center;
         justify-content: center;
         
-        top: 40%; 
+        top: 60%; 
         left: 50%;
         transform: translate(-50%, -50%);
         width: 100%;
