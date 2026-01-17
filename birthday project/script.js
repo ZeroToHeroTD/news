@@ -91,7 +91,7 @@ function startGalaxyAnimation() {
     }
 
     // Adjusted delays
-    const line1Visible = isMobile ? 2800 : 3200; // line1 stays visible
+    const line1Visible = isMobile ? 3000 : 2500; // line1 stays visible
     const heartDelay = isMobile ? 1800 : 1200; // extra pause before heart
 
     let line1Shown = false;
