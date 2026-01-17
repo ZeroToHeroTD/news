@@ -208,18 +208,53 @@ body {
         font-size: 1rem;
     }
 
-    #line1 {
-        top: 55%; 
+ 
+@media (max-width: 480px) {
+    .container h2 {
+        font-size: 1.2rem;
+    }
+
+    .container p {
+        font-size: 0.95rem;
+    }
+
+    .btn {
+        padding: 10px 20px;
         font-size: 1rem;
     }
 
+   #line1 {
+        top: 50%; 
+        width: 90%; 
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 1.1rem;
+    }
+
     #line2 {
-        font-size: 1.4rem;
+   
+        display: flex;
+        flex-direction: column; 
+        align-items: center;
+        justify-content: center;
+        
+        top: 50%; 
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 100%;
     }
     
     #line2 img {
-        width: 200px;
-        height: 180px;
+        width: 180px;  
+        height: auto; 
+        margin-bottom: 10px; 
     }
 
+    #line2 p {
+        font-size: 1.2rem;
+        margin: 0;     
+        width: 100%;
+        text-align: center;
+    }
+}
 };
