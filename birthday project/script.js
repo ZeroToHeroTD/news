@@ -15,11 +15,11 @@ function btnClick() {
             animationStarted = true;
             startGalaxyAnimation();
         }
-    }, 1800);
+    }, 800); // faster transition for mobile
 }
 
-/* =============================
-   🌌 GALAXY ANIMATION
+/* ============================= 
+   🌌 GALAXY ANIMATION (Mobile Friendly) 
 ============================= */
 
 function startGalaxyAnimation() {
@@ -30,7 +30,7 @@ function startGalaxyAnimation() {
         const dpr = window.devicePixelRatio || 1;
         canvas.width = window.innerWidth * dpr;
         canvas.height = window.innerHeight * dpr;
-        ctx.setTransform(1, 0, 0, 1, 0, 0); // reset transform
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
         ctx.scale(dpr, dpr);
     }
 
@@ -40,10 +40,10 @@ function startGalaxyAnimation() {
     let stars = [];
     let particles = [];
     let phase = 0;
-    let zoomSpeed = 28;
-    let mainStar = { alpha: 1, glow: 0 };
+    let zoomSpeed = 20; // slower for mobile
+    let mainStar = { alpha: 1 };
 
-    const starCount = Math.min(900, window.innerWidth); // reduce for small screens
+    const starCount = Math.floor(window.innerWidth / 1.5); // dynamic for mobile
     for (let i = 0; i < starCount; i++) {
         stars.push({
             x: Math.random() * canvas.width - canvas.width / 2,
@@ -65,7 +65,7 @@ function startGalaxyAnimation() {
             this.y = y;
             this.vx = vx;
             this.vy = vy;
-            this.life = 140;
+            this.life = 120;
         }
         update() {
             this.x += this.vx;
@@ -79,14 +79,14 @@ function startGalaxyAnimation() {
     }
 
     function explodeHeart(x, y) {
-        const scale = Math.min(canvas.width, canvas.height) / 40; // compact scale
+        const scale = Math.min(window.innerWidth, window.innerHeight) / 35;
         for (let t = 0; t < Math.PI * 2; t += 0.04) {
             const p = heart(t);
             particles.push(new Particle(
                 x,
                 y,
-                p.x * scale * 0.02, // reduce spread
-                p.y * scale * 0.02
+                p.x * scale * 0.015, // compact
+                p.y * scale * 0.015
             ));
         }
     }
@@ -98,6 +98,7 @@ function startGalaxyAnimation() {
         const centerX = canvas.width / 2 / (window.devicePixelRatio || 1);
         const centerY = canvas.height / 2 / (window.devicePixelRatio || 1);
 
+        // STARFIELD
         if (phase === 0) {
             for (let s of stars) {
                 s.z -= zoomSpeed;
@@ -113,38 +114,40 @@ function startGalaxyAnimation() {
                 ctx.fill();
             }
 
-            zoomSpeed *= 0.965;
+            zoomSpeed *= 0.97;
 
             ctx.fillStyle = `rgba(255,255,255,${mainStar.alpha})`;
             ctx.beginPath();
             ctx.arc(centerX, centerY, 3, 0, Math.PI * 2);
             ctx.fill();
 
-            if (zoomSpeed < 0.6) {
+            if (zoomSpeed < 0.5) {
                 phase = 1;
                 setTimeout(() => {
                     document.getElementById("line1").classList.add("show");
-                }, 1500);
+                }, 1200);
             }
         }
 
+        // SHOW LINE 1 AND EXPLODE HEART
         if (phase === 1) {
             setTimeout(() => {
                 document.getElementById("line1").classList.remove("show");
                 explodeHeart(centerX, centerY);
                 phase = 2;
-            }, 5000);
+            }, 3000); // shorter for mobile
             phase = 1.5;
         }
 
+        // PARTICLE ANIMATION
         if (phase >= 2) {
             particles.forEach((p, i) => {
                 p.update();
                 p.draw();
                 if (p.life <= 0) particles.splice(i, 1);
             });
-            
-            if (phase === 2 && particles.length < 40) {
+
+            if (phase === 2 && particles.length < 30) {
                 document.getElementById("line2").classList.add("show");
                 phase = 3;
             }
@@ -155,4 +158,3 @@ function startGalaxyAnimation() {
 
     animate();
 }
-
