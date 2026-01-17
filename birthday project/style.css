@@ -150,7 +150,7 @@ body {
 }
 
 #line1 {
-    top: 50%; 
+    top: 55%; 
     font-size: 1.2rem;
 }
 
@@ -196,7 +196,7 @@ body {
     }
 
     #line1 {
-        top: 30%; /* ensure visible on mobile */
+        top: 55%; /* ensure visible on mobile */
         font-size: 1rem;
     }
 
