@@ -113,6 +113,10 @@ body {
 
 #page2 {
     background: black;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 #page2 canvas {
@@ -137,14 +141,28 @@ body {
 }
 
 #line1 {
-    top: 40%;
+    top: 50%;
     font-size: 1.2rem;
 }
 
 #line2 {
-    top: 50%;
+    top: 25%;
     font-size: 1.8rem;
     font-weight: 600;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px; /* space between image and text */
+}
+
+#line2 img {
+    width: 270 px;
+    height: 250px;
+    border-radius: 15px;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+    object-fit: cover;
 }
 
 .show {

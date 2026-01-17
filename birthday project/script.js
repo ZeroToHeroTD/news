@@ -7,23 +7,20 @@ let animationStarted = false;
 function btnClick() {
     container1.classList.add("fade-out");
 
-    // wait for container fade + move-up (1.8s) before showing page2
     setTimeout(() => {
         page1.classList.remove("active");
         page2.classList.add("active");
 
-        // start galaxy animation only after page2 is visible
         if (!animationStarted) {
             animationStarted = true;
             startGalaxyAnimation();
         }
-    }, 1200); // match CSS animation duration
+    }, 1200);
 }
 
 /* ============================= 
-   🌌 GALAXY ANIMATION (Compact & Mobile-Friendly)
+   🌌 GALAXY ANIMATION
 ============================= */
-
 function startGalaxyAnimation() {
     const canvas = document.getElementById("canvas");
     const ctx = canvas.getContext("2d");
@@ -48,7 +45,7 @@ function startGalaxyAnimation() {
     let stars = [];
     let particles = [];
     let phase = 0;
-    let zoomSpeed = Math.min(window.innerWidth, window.innerHeight) / 60; // slower zoom
+    let zoomSpeed = Math.min(window.innerWidth, window.innerHeight) / 60;
 
     const starCount = Math.floor(window.innerWidth / 1.5);
     for (let i = 0; i < starCount; i++) {
@@ -59,7 +56,6 @@ function startGalaxyAnimation() {
         });
     }
 
-    // Heart shape
     function heart(t) {
         return {
             x: 16 * Math.sin(t) ** 3,
@@ -87,8 +83,8 @@ function startGalaxyAnimation() {
     }
 
     function explodeHeart(x, y) {
-        const scale = Math.min(window.innerWidth, window.innerHeight) / 50; // tight, compact
-        for (let t = 0; t < Math.PI * 2; t += 0.03) { // more particles
+        const scale = Math.min(window.innerWidth, window.innerHeight) / 50;
+        for (let t = 0; t < Math.PI * 2; t += 0.03) {
             const p = heart(t);
             particles.push(new Particle(
                 x,
@@ -99,9 +95,9 @@ function startGalaxyAnimation() {
         }
     }
 
-    // Timings for mobile / desktop
-    const line1Delay = isMobile ? 4000 : 2000; // show line1 longer on mobile
-    const heartDelay = isMobile ? 5000 : 3500; // heart explosion later on mobile
+    // Slightly faster timings
+    const line1Delay = isMobile ? 2500 : 1500; // faster than before
+    const heartDelay = isMobile ? 3000 : 2500; // faster heart explosion
 
     function animate() {
         ctx.fillStyle = "rgba(0,0,0,0.35)";
@@ -132,21 +128,21 @@ function startGalaxyAnimation() {
 
             if (zoomSpeed < 0.5 && phase === 0) {
                 phase = 1;
-                document.getElementById("line1").classList.add("show"); // show line1
+                document.getElementById("line1").classList.add("show");
             }
         }
 
-        // SHOW LINE1 AND THEN HEART
+        // SHOW LINE1 THEN HEART
         if (phase === 1) {
             setTimeout(() => {
                 document.getElementById("line1").classList.remove("show");
-                explodeHeart(centerX, centerY); // compact explosion
+                explodeHeart(centerX, centerY);
                 phase = 2;
             }, heartDelay);
             phase = 1.5;
         }
 
-        // PARTICLE ANIMATION
+        // PARTICLE ANIMATION AND SHOW LINE2 + IMAGE
         if (phase >= 2) {
             particles.forEach((p, i) => {
                 p.update();
@@ -155,7 +151,13 @@ function startGalaxyAnimation() {
             });
 
             if (phase === 2 && particles.length < 20) {
-                document.getElementById("line2").classList.add("show");
+                const line2 = document.getElementById("line2");
+                line2.classList.add("show");
+
+                // Ensure image inside line2 also fades in
+                const img = line2.querySelector("img");
+                if (img) img.style.opacity = "1";
+
                 phase = 3;
             }
         }
