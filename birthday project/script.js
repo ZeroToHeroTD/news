@@ -206,7 +206,7 @@ function startGalaxyAnimation() {
                                 heartFading = true;
                                 setTimeout(() => {
                                     line2Box.classList.add("show");
-                                    typeWriter(finalLine, "happy birthday, my love.", 80);
+                                    typeWriter(finalLine, "happy valentines, my love.", 80);
                                 }, 1000);
                             }, 4000); 
 
