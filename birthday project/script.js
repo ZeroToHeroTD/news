@@ -4,7 +4,7 @@ const page2 = document.getElementById("page2");
 
 let animationStarted = false;
 
-// === BUTTON CLICK HANDLER ===
+
 function btnClick() {
     const music = document.getElementById("bg-music");
     if (music) {
@@ -35,7 +35,7 @@ function btnClick() {
     }, 1200);
 }
 
-// === IMPROVED TYPEWRITER EFFECT ===
+
 function typeWriter(element, text, speed, callback) {
     let i = 0;
     element.innerHTML = "";
@@ -48,13 +48,13 @@ function typeWriter(element, text, speed, callback) {
             i++;
             setTimeout(type, speed);
         } else if (callback) {
-            setTimeout(callback, 1500); // 1.5s delay before triggering next step
+            setTimeout(callback, 1500); 
         }
     }
     type();
 }
 
-// === GALAXY ANIMATION ===
+
 function startGalaxyAnimation() {
     const canvas = document.getElementById("canvas");
     const ctx = canvas.getContext("2d");
@@ -82,7 +82,7 @@ function startGalaxyAnimation() {
     let heartFading = false;
     let sequenceStarted = false;
 
-    // Star Setup
+
     const starCount = isMobile ? 600 : 1200;
     for (let i = 0; i < starCount; i++) {
         stars.push({
@@ -128,7 +128,7 @@ function startGalaxyAnimation() {
                 this.x += (this.targetX - this.x) * this.lerpSpeed;
                 this.y += (this.targetY - this.y) * this.lerpSpeed;
                 this.hue += (this.finalHue - this.hue) * 0.05;
-                // Breathing
+             
                 this.x += Math.sin(frame * 0.05 + this.y) * 0.2;
             }
 
@@ -156,7 +156,7 @@ function startGalaxyAnimation() {
         ctx.fillStyle = "rgba(0, 0, 0, 0.25)"; 
         ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
 
-        // 1. Sliding Stars
+
         for (let s of stars) {
             s.z -= zoomSpeed; 
             if (s.z <= 1) { s.z = 2000; s.x = (Math.random() - 0.5) * 2000; s.y = (Math.random() - 0.5) * 2000; s.px = 0; s.py = 0; }
@@ -173,35 +173,35 @@ function startGalaxyAnimation() {
 
         if (zoomSpeed > 1) zoomSpeed *= 0.985;
 
-        // 2. Center Pulse
+
         if (phase < 2) {
             const p = 1 + 0.3 * Math.sin(frame * 0.15);
             ctx.beginPath(); ctx.arc(centerX, centerY, 5 * p, 0, Math.PI*2);
             ctx.fillStyle = "white"; ctx.fill();
         }
 
-        // 3. Sequence Controller
+
         if (!sequenceStarted && zoomSpeed < 4) {
             sequenceStarted = true;
             const line1 = document.getElementById("line1");
             const finalLine = document.getElementById("final-birthday-text");
             const line2Box = document.getElementById("line2");
 
-            // Sentence 1
+
             typeWriter(line1, "On this day, the universe received what it didn’t even know it was missing - you", 50, () => {
                 line1.style.opacity = "0";
                 setTimeout(() => {
-                    // Sentence 2
+
                     typeWriter(line1, "Every star led me to you...", 60, () => {
                         line1.style.opacity = "0";
                         setTimeout(() => {
-                            // Heart Explosion
+
                             phase = 2;
                             prepareHeart();
                             shockwaves.push({r: 0, a: 1});
                             setTimeout(() => { heartForming = true; }, 700);
 
-                            // Let heart show, then fade out and show Happy Birthday
+
                             setTimeout(() => {
                                 heartFading = true;
                                 setTimeout(() => {
@@ -216,7 +216,7 @@ function startGalaxyAnimation() {
             });
         }
 
-        // 4. Shockwaves & Particles
+
         shockwaves.forEach((sw, i) => {
             sw.r += 20; sw.a *= 0.94;
             if(sw.a < 0.01) shockwaves.splice(i, 1);
