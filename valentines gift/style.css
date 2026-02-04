@@ -258,27 +258,49 @@ footer {
 /* =====================
    Responsive Tweaks
 ===================== */
+
+/* Tablet View (approx 2-3 images visible) */
 @media (max-width: 1024px) {
   #page1 h1 { font-size: 2.5rem; }
   #page2 h2 { font-size: 2rem; }
   #page3 h2 { font-size: 2rem; }
-  .carousel-track img { width: min(25vw, 220px); }
+  
+  /* Increased width to roughly 30% of screen */
+  .carousel-track img { width: 30vw; } 
 }
 
+/* Small Tablet / Large Phone (approx 2 images visible) */
 @media (max-width: 768px) {
   .page { padding: 40px 5vw; }
   #page1 h1 { font-size: 2.2rem; }
   #page2 h2 { font-size: 1.8rem; }
   #page3 h2 { font-size: 1.8rem; }
-  .carousel-track { gap: 4vw; }
-  .carousel-track img { width: min(35vw, 180px); }
+  .carousel-track { gap: 1.5rem; }
+  
+  /* Increased width to 40% of screen so 2 fit side-by-side */
+  .carousel-track img { width: 40vw; } 
 }
 
+/* Mobile View (The important part!) */
 @media (max-width: 480px) {
+    .page {
+    min-height: auto; 
+    padding: 3rem 1.5rem; 
+  }
+  
   #page1 h1 { font-size: 1.8rem; }
   #page2 h2 { font-size: 1.5rem; }
   #page3 h2 { font-size: 1.5rem; }
-  .carousel-track { gap: 6vw; }
-  .carousel-track img { width: min(45vw, 140px); }
+  .carousel-track { gap: 1rem; }
+
+  /* CHANGED: Set width to 75vw (75% of screen width).
+     This makes one large image prominent, with the next one peeking out.
+  */
+  .carousel-track img { 
+    width: 75vw; 
+    max-width: 350px; /* Cap it so it doesn't get absurdly huge */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2); /* Slightly softer shadow for mobile */
+  }
+  
   footer { font-size: 0.8rem; padding: 1.5rem; }
 }
