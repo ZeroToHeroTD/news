@@ -1,55 +1,147 @@
+document.addEventListener("DOMContentLoaded", () => {
   const track = document.querySelector(".carousel-track");
-  const distance = track.scrollWidth / 2;
-
-  gsap.to(track, {
-    x: -distance,
-    duration: 50,     // higher = slower
-    ease: "none",
-    repeat: -1
-  });   
-
-  document.addEventListener("DOMContentLoaded", () => {
-  const images = document.querySelectorAll(".carousel-track img");
+  const images = track.querySelectorAll("img");
   const lightbox = document.querySelector(".lightbox");
   const lightboxImg = document.querySelector(".lightbox-img");
+  const prevBtn = document.querySelector(".lightbox-prev");
+  const nextBtn = document.querySelector(".lightbox-next");
+  const toggle = document.querySelector("#darkModeToggle");
 
-  images.forEach(img => {
+  let currentIndex = 0;
+
+
+  const distance = track.scrollWidth / 2;
+
+
+  const carouselAnimation = gsap.to(track, {
+    x: -distance,
+    duration: 50,      
+    ease: "none",
+    repeat: -1
+  });
+
+
+  Draggable.create(track, {
+    type: "x",
+    edgeResistance: 0.85,
+    inertia: true,
+    bounds: { minX: -distance, maxX: 0 }, 
+    onPress: () => carouselAnimation.pause(),  
+    onRelease: () => carouselAnimation.play()  
+  });
+
+
+  images.forEach((img, index) => {
     img.addEventListener("click", () => {
+      currentIndex = index;
       lightboxImg.src = img.src;
-
-      gsap.to(lightbox, {
-        opacity: 1,
-        pointerEvents: "auto",
-        duration: 0.3
-      });
-
-      gsap.fromTo(
-        lightboxImg,
-        { scale: 0.8 },
-        { scale: 1, duration: 0.5, ease: "power3.out" }
-      );
+      lightbox.classList.add("show");
+      carouselAnimation.pause(); 
     });
   });
 
-  // close on background click
-  lightbox.addEventListener("click", () => {
-    gsap.to(lightbox, {
-      opacity: 0,
-      pointerEvents: "none",
-      duration: 0.3
-    });
-  });
 
-  // close on ESC
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") {
-      gsap.to(lightbox, {
-        opacity: 0,
-        pointerEvents: "none",
-        duration: 0.3
-      });
+  lightbox.addEventListener("click", (e) => {
+    if (e.target === lightbox) {
+      lightbox.classList.remove("show");
+      carouselAnimation.play(); 
     }
   });
+
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && lightbox.classList.contains("show")) {
+      lightbox.classList.remove("show");
+      carouselAnimation.play();
+    }
+
+
+    if (lightbox.classList.contains("show")) {
+      if (e.key === "ArrowLeft") prevBtn.click();
+      if (e.key === "ArrowRight") nextBtn.click();
+    }
+  });
+
+
+  prevBtn.addEventListener("click", () => {
+    currentIndex = (currentIndex - 1 + images.length) % images.length;
+    lightboxImg.src = images[currentIndex].src;
+  });
+
+
+  nextBtn.addEventListener("click", () => {
+    currentIndex = (currentIndex + 1) % images.length;
+    lightboxImg.src = images[currentIndex].src;
+  });
+
+
+  let startX = 0;
+  lightboxImg.addEventListener("touchstart", (e) => {
+    startX = e.touches[0].clientX;
+  });
+
+  lightboxImg.addEventListener("touchend", (e) => {
+    const endX = e.changedTouches[0].clientX;
+    const diff = startX - endX;
+    if (diff > 50) nextBtn.click();
+    else if (diff < -50) prevBtn.click();
+  });
+
+
+  window.addEventListener("scroll", () => {
+    const footer = document.querySelector("footer");
+    const scrollTop = window.scrollY;
+    const windowHeight = window.innerHeight;
+    const docHeight = document.body.scrollHeight;
+
+    if (scrollTop + windowHeight >= docHeight - 50) {
+      footer.classList.add("show");
+    } else {
+      footer.classList.remove("show");
+    }
+  });
+
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  document.querySelectorAll(".page").forEach((page) => {
+    gsap.from(page, {
+      opacity: 0,
+      y: 50,
+      duration: 1,
+      ease: "power2.out",
+      scrollTrigger: {
+        trigger: page,
+        start: "top 80%",
+        toggleActions: "play none none none"
+      }
+    });
+  });
+
+  gsap.from(".carousel-track img", {
+    opacity: 0,
+    y: 30,
+    duration: 0.8,
+    stagger: 0.1,
+    ease: "power2.out",
+    scrollTrigger: {
+      trigger: "#page2",
+      start: "top 80%"
+    }
+  });
+
+
+const toggle1 = document.getElementById("darkModeToggle");
+
+if (localStorage.getItem("theme") === "dark") {
+  document.body.classList.add("dark");
+}
+
+toggle1.addEventListener("click", () => {
+  document.body.classList.toggle("dark");
+
+  const isDark = document.body.classList.contains("dark");
+  localStorage.setItem("theme", isDark ? "dark" : "light");
 });
 
-
+});

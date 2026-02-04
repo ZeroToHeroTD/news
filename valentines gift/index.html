@@ -6,9 +6,18 @@
     <title>Document</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
 
 </head>
 <body>
+    <div class="theme-toggle" id="darkModeToggle">
+        <div class="toggle-circle">
+            <span class="material-symbols-outlined sun">light_mode</span>
+            <span class="material-symbols-outlined moon">dark_mode</span>
+        </div>
+    </div>
+
+    
     <section class="page" id="page1">
         <h1>Martch</h1>
         <p>A collection of thoughts, emotions, and imagination — expressed through art.</p>
@@ -21,18 +30,18 @@
     
     <div class="carousel-row row-fast">
       <div class="carousel-track">
-        <img src="Jo1.jfif" alt="error">
-        <img src="jo2.jfif" alt="error">
-        <img src="jo3.jfif" alt="error">
-        <img src="jo4.jfif" alt="error">
-        <img src="jo5.jfif" alt="error">
+        <img src="Jo1.jfif" alt="error" loading="lazy">
+        <img src="jo2.jfif" alt="error" loading="lazy">
+        <img src="jo3.jfif" alt="error" loading="lazy">
+        <img src="jo4.jfif" alt="error" loading="lazy">
+        <img src="jo5.jfif" alt="error" loading="lazy">
 
         <!-- duplicate -->
-        <img src="Jo1.jfif" alt="error">
-        <img src="jo2.jfif" alt="error">
-        <img src="jo3.jfif" alt="error">
-        <img src="jo4.jfif" alt="error">
-        <img src="jo5.jfif" alt="error">
+        <img src="Jo1.jfif" alt="error" loading="lazy">
+        <img src="jo2.jfif" alt="error" loading="lazy">
+        <img src="jo3.jfif" alt="error" loading="lazy">
+        <img src="jo4.jfif" alt="error" loading="lazy">
+        <img src="jo5.jfif" alt="error" loading="lazy">
       </div>
     </div>
 
@@ -52,12 +61,19 @@
         Made by her poging bf ^_^
     </footer>
 
-    <div class="lightbox">
-        <img class="lightbox-img" src="">
+   <div class="lightbox">
+        <button class="lightbox-prev">&#10094;</button>
+        <img class="lightbox-img" src="" alt="Artwork">
+        <button class="lightbox-next">&#10095;</button>
     </div>
 
 
+
+
     <script src="https://unpkg.com/gsap@3/dist/gsap.min.js"></script>
+    <script src="https://unpkg.com/gsap@3/dist/Draggable.min.js"></script>
+    <script src="https://unpkg.com/gsap@3/dist/ScrollTrigger.min.js"></script>
+
     <script src="script.js"></script>
 </body>
 </html>
