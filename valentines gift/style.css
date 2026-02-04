@@ -172,19 +172,17 @@ body.dark .moon {
     gap: 1.5rem;
 }
 
-.carousel-track img{
-    width: 250px;
-    max-width: 90vw; /* prevents overflow on small screens */
-    border-radius: 12px;
-    flex-shrink: 0;
-    cursor: pointer;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+.carousel-track img {
+  width: 250px;
+  aspect-ratio: 4 / 6;      /* portrait gallery vibe */
+  object-fit: cover;
+  border-radius: 12px;
+  flex-shrink: 0;
+  cursor: pointer;
+  will-change: transform;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.15);
 }
 
-.carousel-track img:hover{
-    transform: scale(1.05);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-}
 
 /* =====================
    Lightbox

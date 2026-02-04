@@ -18,36 +18,39 @@ document.addEventListener("DOMContentLoaded", () => {
     duration: 50,      
     ease: "none",
     repeat: -1
+
   });
 
-
-  Draggable.create(track, {
-    type: "x",
-    edgeResistance: 0.85,
-    inertia: true,
-    bounds: { minX: -distance, maxX: 0 }, 
-    onPress: () => carouselAnimation.pause(),  
-    onRelease: () => carouselAnimation.play()  
-  });
-
-
-  images.forEach((img, index) => {
-    img.addEventListener("click", () => {
-      currentIndex = index;
-      lightboxImg.src = img.src;
-      lightbox.classList.add("show");
-      carouselAnimation.pause(); 
+images.forEach(img => {
+  img.addEventListener("mouseenter", () => {
+    gsap.to(img, {
+      scale: 1.08,
+      y: -6,
+      boxShadow: "0 20px 40px rgba(0,0,0,0.25)",
+      duration: 0.35,
+      ease: "power3.out",
+      overwrite: "auto"
     });
   });
 
-
-  lightbox.addEventListener("click", (e) => {
-    if (e.target === lightbox) {
-      lightbox.classList.remove("show");
-      carouselAnimation.play(); 
-    }
+  img.addEventListener("mouseleave", () => {
+    gsap.to(img, {
+      scale: 1,
+      y: 0,
+      boxShadow: "0 6px 15px rgba(0,0,0,0.15)",
+      duration: 0.35,
+      ease: "power3.out",
+      overwrite: "auto"
+    });
   });
+});
 
+
+  gsap.to(img, {
+    scale: 1.08,
+    y: -6,
+    boxShadow: "0 20px 40px rgba(0,0,0,0.25)"
+  });
 
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && lightbox.classList.contains("show")) {
