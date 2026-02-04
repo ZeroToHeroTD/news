@@ -1,9 +1,11 @@
-
-*{
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Inter', sans-serif;
+/* =====================
+   Global Reset & Variables
+===================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
 }
 
 :root {
@@ -22,7 +24,9 @@ body {
   transition: background 0.5s, color 0.5s;
 }
 
-/* Toggle Container */
+/* =====================
+   Theme Toggle
+===================== */
 .theme-toggle {
   width: 110px;
   height: 52px;
@@ -40,7 +44,6 @@ body {
   z-index: 1000;
 }
 
-/* Sliding Circle */
 .toggle-circle {
   width: 40px;
   height: 40px;
@@ -51,140 +54,102 @@ body {
   justify-content: center;
   position: relative;
   transform: translateX(0);
-  transition: transform 0.5s cubic-bezier(.4,0,.2,1),
-              background 0.4s ease;
-  box-shadow:
-    4px 4px 10px rgba(0,0,0,0.2),
-    -2px -2px 6px rgba(255,255,255,0.6);
+  transition: transform 0.5s cubic-bezier(.4,0,.2,1), background 0.4s ease;
+  box-shadow: 4px 4px 10px rgba(0,0,0,0.2), -2px -2px 6px rgba(255,255,255,0.6);
 }
 
-/* Icons */
 .toggle-circle span {
   position: absolute;
   font-size: 1.2rem;
   transition: opacity 0.3s ease, transform 0.4s ease;
 }
 
-.sun {
-  opacity: 1;
-}
+.sun { opacity: 1; }
+.moon { opacity: 0; transform: rotate(-90deg); }
 
-.moon {
-  opacity: 0;
-  transform: rotate(-90deg);
-}
-
-/* 🌙 Dark Mode State */
-body.dark .theme-toggle {
-  background: #2b2b2b;
-}
-
-body.dark .toggle-circle {
-  transform: translateX(52px);
-  background: linear-gradient(145deg, #5b5bff, #3b3bd9);
-}
-
-body.dark .sun {
-  opacity: 0;
-  transform: rotate(90deg);
-}
-
-body.dark .moon {
-  opacity: 1;
-  transform: rotate(0deg);
-}
+body.dark .theme-toggle { background: #2b2b2b; }
+body.dark .toggle-circle { transform: translateX(52px); background: linear-gradient(145deg, #5b5bff, #3b3bd9); }
+body.dark .sun { opacity: 0; transform: rotate(90deg); }
+body.dark .moon { opacity: 1; transform: rotate(0deg); }
 
 /* =====================
    Page Container
 ===================== */
-
 .page {
-  width: 100%;
-  min-height: 100vh; /* allows content to grow */
+  width: 90%;
+  max-width: 1200px;
+  min-height: 100vh;
   display: flex;
-  flex-direction: column; /* stack content vertically */
+  flex-direction: column;
   align-items: center;
-  justify-content: flex-start; /* content starts from top */
+  justify-content: flex-start;
   text-align: center;
-  padding: clamp(40px, 5vw, 80px); /* responsive padding */
+  padding: clamp(40px, 5vw, 80px);
+  margin: 0 auto;
 }
-
 
 /* =====================
    Page 1
 ===================== */
-#page1{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    gap: 0.2rem;
-
+#page1 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-#page1 h1{
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(1.8rem, 5vw, 3rem);
-    margin-bottom: 1rem; 
+#page1 h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2rem, 5vw, 3rem);
+  margin-bottom: 1rem;
 }
 
-#page1 p{
-    max-width: 500px;
-    font-size: clamp(0.9rem, 2vw, 1.2rem);
-    line-height: 1.5;
-    opacity: 0.8;
+#page1 p {
+  max-width: 90%;
+  font-size: clamp(1rem, 2.5vw, 1.2rem);
+  line-height: 1.5;
+  opacity: 0.9;
 }
 
 /* =====================
    Page 2 - Carousel
 ===================== */
-#page2{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    gap: 0.2rem;
+#page2 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-#page2 h2{
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(1.3rem, 4vw, 2rem);
-    margin-bottom: 2rem;
-    text-align: center;
+#page2 h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  margin-bottom: 2rem;
+  text-align: center;
 }
 
-.carousel-container{
-    width: 100%;
-    max-width: 1200px; /* limits width for large screens */
-    overflow: hidden;
-    padding: 2rem 0;
-    margin: 0 auto;
-}
-
-.carousel-row{
-    width: 100%;
-    overflow: hidden;
+.carousel-container {
+  width: 100%;
+  overflow: hidden;
+  padding: 2rem 0;
 }
 
 .carousel-track {
   display: flex;
   gap: 2vw;
-  flex-wrap: nowrap; /* keep single row */
-  scroll-behavior: smooth;
+  flex-wrap: nowrap;
 }
-
 
 .carousel-track img {
   width: min(20vw, 250px);
-  aspect-ratio: 4 / 6;      /* portrait gallery vibe */
+  max-width: 80vw;
+  aspect-ratio: 4/6;
   object-fit: cover;
   border-radius: 12px;
   flex-shrink: 0;
   cursor: pointer;
-  will-change: transform;
   box-shadow: 0 6px 15px rgba(0,0,0,0.15);
 }
-
 
 /* =====================
    Lightbox
@@ -236,123 +201,69 @@ body.dark .moon {
 
 .lightbox-prev { left: 20px; }
 .lightbox-next { right: 20px; }
-
-.lightbox-prev:hover,
-.lightbox-next:hover {
-  color: #cfc8bc;
-}
+.lightbox-prev:hover, .lightbox-next:hover { color: #cfc8bc; }
 
 /* =====================
    Page 3
 ===================== */
-#page3{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    gap: 1.2rem;
+#page3 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
 }
 
-#page3 h2{
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(1.5rem, 4vw, 2.5rem);
-    margin-bottom: 1rem;
-    text-align: center;
+#page3 h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  margin-bottom: 1rem;
+  text-align: center;
 }
-#page3 p{
-    max-width: 800px;
-    font-size: clamp(0.9rem, 2vw, 1.2rem);
-    line-height: 1.5;
-    opacity: 0.8;
+
+#page3 p {
+  max-width: 90%;
+  font-size: clamp(1rem, 2.5vw, 1.2rem);
+  line-height: 1.5;
+  opacity: 0.9;
 }
 
 /* =====================
    Footer
 ===================== */
-footer{
-    padding: 2rem;
-    text-align: center;
-    font-size: 0.9rem;
-    opacity: 0.6;
-    color: #fff;
-    position: sticky;
-    bottom: 0;
+footer {
+  padding: 2rem;
+  text-align: center;
+  font-size: clamp(0.8rem, 1.5vw, 0.9rem);
+  opacity: 0.6;
+  color: #fff;
+  position: sticky;
+  bottom: 0;
 }
 
 /* =====================
-   Responsive Media Queries
+   Responsive Tweaks
 ===================== */
-
-/* Tablets */
 @media (max-width: 1024px) {
-    #page1 h1 {
-        font-size: 2.5rem;
-    }
-
-    #page2 h2 {
-        font-size: 1.8rem;
-    }
-
-    #page3 h2 {
-        font-size: 2rem;
-    }
-
-    .carousel-track img {
-        width: 200px;
-        max-width: 90vw;
-    }
+  #page1 h1 { font-size: 2.5rem; }
+  #page2 h2 { font-size: 2rem; }
+  #page3 h2 { font-size: 2rem; }
+  .carousel-track img { width: min(25vw, 220px); }
 }
 
-/* Mobile */
 @media (max-width: 768px) {
-    .page {
-        padding: 40px 15px;
-    }
-
-    #page1 h1 {
-        font-size: 2rem;
-    }
-
-    #page2 h2 {
-        font-size: 1.5rem;
-    }
-
-    #page3 h2 {
-        font-size: 1.8rem;
-    }
-
-    .carousel-track {
-        gap: 1rem;
-    }
-
-    .carousel-track img {
-        width: 150px;
-        max-width: 90vw;
-    }
+  .page { padding: 40px 5vw; }
+  #page1 h1 { font-size: 2.2rem; }
+  #page2 h2 { font-size: 1.8rem; }
+  #page3 h2 { font-size: 1.8rem; }
+  .carousel-track { gap: 4vw; }
+  .carousel-track img { width: min(35vw, 180px); }
 }
 
-/* Small phones */
 @media (max-width: 480px) {
-    #page1 h1 {
-        font-size: 1.6rem;
-    }
-
-    #page2 h2 {
-        font-size: 1.3rem;
-    }
-
-    #page3 h2 {
-        font-size: 1.5rem;
-    }
-
-    .carousel-track img {
-        width: 120px;
-        gap: 0.8rem;
-        max-width: 90vw;
-    }
-
-    footer {
-        font-size: 0.8rem;
-        padding: 1.5rem;
-    }
+  #page1 h1 { font-size: 1.8rem; }
+  #page2 h2 { font-size: 1.5rem; }
+  #page3 h2 { font-size: 1.5rem; }
+  .carousel-track { gap: 6vw; }
+  .carousel-track img { width: min(45vw, 140px); }
+  footer { font-size: 0.8rem; padding: 1.5rem; }
 }
