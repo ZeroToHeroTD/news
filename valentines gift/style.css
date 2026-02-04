@@ -166,14 +166,16 @@ body.dark .moon {
     overflow: hidden;
 }
 
-.carousel-track{
-    display: flex;
-    width: max-content;
-    gap: 1.5rem;
+.carousel-track {
+  display: flex;
+  gap: 2vw;
+  flex-wrap: nowrap; /* keep single row */
+  scroll-behavior: smooth;
 }
 
+
 .carousel-track img {
-  width: 250px;
+  width: min(20vw, 250px);
   aspect-ratio: 4 / 6;      /* portrait gallery vibe */
   object-fit: cover;
   border-radius: 12px;

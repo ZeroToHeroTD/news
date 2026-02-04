@@ -5,59 +5,69 @@ document.addEventListener("DOMContentLoaded", () => {
   const lightboxImg = document.querySelector(".lightbox-img");
   const prevBtn = document.querySelector(".lightbox-prev");
   const nextBtn = document.querySelector(".lightbox-next");
-  const toggle = document.querySelector("#darkModeToggle");
+  const toggle = document.querySelector(".theme-toggle"); // matches your HTML
 
   let currentIndex = 0;
 
-
+  // Calculate total distance for infinite slide
   const distance = track.scrollWidth / 2;
 
-
+  // Infinite carousel animation
   const carouselAnimation = gsap.to(track, {
     x: -distance,
-    duration: 50,      
+    duration: 50,
     ease: "none",
     repeat: -1
-
   });
 
-images.forEach(img => {
-  img.addEventListener("mouseenter", () => {
-    gsap.to(img, {
-      scale: 1.08,
-      y: -6,
-      boxShadow: "0 20px 40px rgba(0,0,0,0.25)",
-      duration: 0.35,
-      ease: "power3.out",
-      overwrite: "auto"
+  // Hover scale + shadow effect using GSAP
+  images.forEach(img => {
+    img.addEventListener("mouseenter", () => {
+      gsap.to(img, {
+        scale: 1.08,
+        y: -6,
+        boxShadow: "0 20px 40px rgba(0,0,0,0.25)",
+        duration: 0.35,
+        ease: "power3.out",
+        overwrite: "auto"
+      });
+    });
+
+    img.addEventListener("mouseleave", () => {
+      gsap.to(img, {
+        scale: 1,
+        y: 0,
+        boxShadow: "0 6px 15px rgba(0,0,0,0.15)",
+        duration: 0.35,
+        ease: "power3.out",
+        overwrite: "auto"
+      });
+    });
+
+    // Open lightbox on click
+    img.addEventListener("click", () => {
+      currentIndex = Array.from(images).indexOf(img);
+      lightboxImg.src = img.src;
+      lightbox.classList.add("show");
+      // Optional: pause carousel while lightbox is open
+      carouselAnimation.pause();
     });
   });
 
-  img.addEventListener("mouseleave", () => {
-    gsap.to(img, {
-      scale: 1,
-      y: 0,
-      boxShadow: "0 6px 15px rgba(0,0,0,0.15)",
-      duration: 0.35,
-      ease: "power3.out",
-      overwrite: "auto"
-    });
-  });
-});
-
-
-  gsap.to(img, {
-    scale: 1.08,
-    y: -6,
-    boxShadow: "0 20px 40px rgba(0,0,0,0.25)"
+  // Close lightbox when clicking outside image
+  lightbox.addEventListener("click", (e) => {
+    if (e.target === lightbox) {
+      lightbox.classList.remove("show");
+      carouselAnimation.play();
+    }
   });
 
+  // Keyboard navigation
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && lightbox.classList.contains("show")) {
       lightbox.classList.remove("show");
       carouselAnimation.play();
     }
-
 
     if (lightbox.classList.contains("show")) {
       if (e.key === "ArrowLeft") prevBtn.click();
@@ -65,19 +75,18 @@ images.forEach(img => {
     }
   });
 
-
+  // Lightbox navigation
   prevBtn.addEventListener("click", () => {
     currentIndex = (currentIndex - 1 + images.length) % images.length;
     lightboxImg.src = images[currentIndex].src;
   });
-
 
   nextBtn.addEventListener("click", () => {
     currentIndex = (currentIndex + 1) % images.length;
     lightboxImg.src = images[currentIndex].src;
   });
 
-
+  // Touch swipe for lightbox
   let startX = 0;
   lightboxImg.addEventListener("touchstart", (e) => {
     startX = e.touches[0].clientX;
@@ -90,7 +99,7 @@ images.forEach(img => {
     else if (diff < -50) prevBtn.click();
   });
 
-
+  // Footer show on scroll bottom
   window.addEventListener("scroll", () => {
     const footer = document.querySelector("footer");
     const scrollTop = window.scrollY;
@@ -104,7 +113,7 @@ images.forEach(img => {
     }
   });
 
-
+  // Scroll-triggered page animations
   gsap.registerPlugin(ScrollTrigger);
 
   document.querySelectorAll(".page").forEach((page) => {
@@ -133,18 +142,14 @@ images.forEach(img => {
     }
   });
 
+  // Dark mode toggle
+  if (localStorage.getItem("theme") === "dark") {
+    document.body.classList.add("dark");
+  }
 
-const toggle1 = document.getElementById("darkModeToggle");
-
-if (localStorage.getItem("theme") === "dark") {
-  document.body.classList.add("dark");
-}
-
-toggle1.addEventListener("click", () => {
-  document.body.classList.toggle("dark");
-
-  const isDark = document.body.classList.contains("dark");
-  localStorage.setItem("theme", isDark ? "dark" : "light");
-});
-
+  toggle.addEventListener("click", () => {
+    document.body.classList.toggle("dark");
+    const isDark = document.body.classList.contains("dark");
+    localStorage.setItem("theme", isDark ? "dark" : "light");
+  });
 });
