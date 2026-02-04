@@ -1,3 +1,6 @@
+/* =====================
+   Global Reset
+===================== */
 *{
     margin: 0;
     padding: 0;
@@ -9,27 +12,31 @@ body{
     scroll-behavior: smooth;
     background: linear-gradient(
         180deg, 
-        #8B8078 0%,    /* Light Taupe at the very top of the site */
-        #544741 50%,   /* Deep Brown transition in the middle */
-        #3B312C 100%   /* Even deeper brown at the very bottom */
+        #8B8078 0%,   
+        #544741 50%,   
+        #3B312C 100%   
     );
-    background-attachment: fixed; /* Keeps the gradient still as you scroll */
+    background-attachment: fixed; 
+    color: #f4f1ed;
 }
 
-
+/* =====================
+   Page Container
+===================== */
 .page{
-  height: 100vh;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 40px;
-  color: #f4f1ed; /* warm off-white for headings/text */
-
-
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: center;
+    padding: 60px 20px;
 }
 
+/* =====================
+   Page 1
+===================== */
 #page1{
     display: flex;
     justify-content: center;
@@ -50,6 +57,9 @@ body{
     opacity: 0.8;
 }
 
+/* =====================
+   Page 2 - Carousel
+===================== */
 #page2{
     display: flex;
     justify-content: center;
@@ -59,16 +69,18 @@ body{
 }
 
 #page2 h2{
-      font-family: 'Playfair Display', serif;
-      font-size: 2rem;
-      margin-bottom: 2rem;
-      text-align: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    text-align: center;
 }
 
 .carousel-container{
     width: 100%;
+    max-width: 1200px; /* limits width for large screens */
     overflow: hidden;
     padding: 2rem 0;
+    margin: 0 auto;
 }
 
 .carousel-row{
@@ -84,6 +96,7 @@ body{
 
 .carousel-track img{
     width: 250px;
+    max-width: 90vw; /* prevents overflow on small screens */
     border-radius: 12px;
     flex-shrink: 0;
     cursor: pointer;
@@ -95,6 +108,9 @@ body{
     box-shadow: 0 10px 30px rgba(0,0,0,0.15);
 }
 
+/* =====================
+   Lightbox
+===================== */
 .lightbox {
     position: fixed;
     inset: 0;
@@ -112,4 +128,115 @@ body{
     max-height: 90%;
     border-radius: 12px;
     transform: scale(0.8);
+}
+
+/* =====================
+   Page 3
+===================== */
+#page3{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+#page3 h2{
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+#page3 p{
+    max-width: 800px;
+    font-size: 1.1rem;
+    opacity: 0.8;
+}
+
+/* =====================
+   Footer
+===================== */
+footer{
+    padding: 2rem;
+    text-align: center;
+    font-size: 0.9rem;
+    opacity: 0.6;
+    color: #fff;
+    position: sticky;
+    bottom: 0;
+}
+
+/* =====================
+   Responsive Media Queries
+===================== */
+
+/* Tablets */
+@media (max-width: 1024px) {
+    #page1 h1 {
+        font-size: 2.5rem;
+    }
+
+    #page2 h2 {
+        font-size: 1.8rem;
+    }
+
+    #page3 h2 {
+        font-size: 2rem;
+    }
+
+    .carousel-track img {
+        width: 200px;
+    }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .page {
+        padding: 40px 15px;
+    }
+
+    #page1 h1 {
+        font-size: 2rem;
+    }
+
+    #page2 h2 {
+        font-size: 1.5rem;
+    }
+
+    #page3 h2 {
+        font-size: 1.8rem;
+    }
+
+    .carousel-track {
+        gap: 1rem;
+    }
+
+    .carousel-track img {
+        width: 150px;
+    }
+}
+
+/* Small phones */
+@media (max-width: 480px) {
+    #page1 h1 {
+        font-size: 1.6rem;
+    }
+
+    #page2 h2 {
+        font-size: 1.3rem;
+    }
+
+    #page3 h2 {
+        font-size: 1.5rem;
+    }
+
+    .carousel-track img {
+        width: 120px;
+        gap: 0.8rem;
+    }
+
+    footer {
+        font-size: 0.8rem;
+        padding: 1.5rem;
+    }
 }
