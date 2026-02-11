@@ -35,7 +35,37 @@ body {
   pointer-events: none; /* so it doesn’t block clicks */
   z-index: 0; /* behind everything */
 }
+button {
+    background-color: transparent;
+    color: #fff; /* text and icon color */
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.3s ease, transform 0.2s ease, color 0.3s ease;
+    position: fixed;
+    top: 20px;
+    left: 10px;
 
+    /* Ensure hover works even if hovering text/icon */
+    pointer-events: auto;
+}
+
+button:hover {
+    background-color: #db7a82; /* hover background */
+    transform: scale(1.05);
+    color: #fff; /* ensures text/icon stays visible on hover */
+}
+
+.material-icons {
+    font-size: 20px;
+    pointer-events: none; /* prevents icon from blocking hover */
+}
 
 /* =====================
    Theme Toggle
@@ -218,6 +248,7 @@ body.dark .moon { opacity: 1; transform: rotate(0deg); }
 .lightbox-next { right: 20px; }
 .lightbox-prev:hover, .lightbox-next:hover { color: #cfc8bc; }
 
+
 /* =====================
    Page 3
 ===================== */
@@ -286,6 +317,12 @@ footer {
     .page {
     min-height: auto; 
     padding: 3rem 1.5rem; 
+    gap: 5rem;
+
+  }
+
+  #page1 {
+    min-height: 100vh;
   }
   
   #page1 h1 { font-size: 1.8rem; }

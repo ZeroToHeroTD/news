@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
 </head>
 <body>
@@ -16,6 +17,11 @@
             <span class="material-symbols-outlined moon">dark_mode</span>
         </div>
     </div>
+
+    <button id="play-button">
+        <span class="material-icons" id="icon">play_arrow</span>
+        <span id="text">Play Music</span>
+    </button>
 
     
     <section class="page" id="page1">
@@ -58,12 +64,20 @@
         <p>
             She creates art inspired by emotion, imagination, and quiet moments.
             Each piece tells a story — soft, bold, and beautifully her own.
+
+            <div class="container-art">
+                <div class="container-img">
+                <img src="" alt="">
+                </div>
+                I stand in awe of every masterpiece she creates, though none can hold me for long, when the most beautiful work of art is the artist herself.
+            </div>
         </p>
 
-    </section>
 
+    </section>
+    
     <footer>
-        Made by her poging bf ^_^
+        Made by her poging bf ^_^ 
     </footer>
 
    <div class="lightbox">
@@ -71,6 +85,11 @@
         <img class="lightbox-img" src="" alt="Artwork">
         <button class="lightbox-next">&#10095;</button>
     </div>
+
+    <audio id="bg-music" autoplay loop>
+        <source src="La Maritza - Piano Version.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
 
 
     <canvas id="particles"></canvas>

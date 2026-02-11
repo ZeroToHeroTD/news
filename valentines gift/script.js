@@ -286,4 +286,29 @@ toggle.addEventListener("click", () => {
   );
 });
 
+  //audio function
+const music = new Audio('La Maritza - Piano Version.mp3');
+let isPlaying = false;
+let firstPlay = true; // track first play
+
+document.getElementById('play-button').addEventListener('click', () => {
+    if (!isPlaying) {
+        if (firstPlay) {
+            music.currentTime = 45; // start at 45s on first play
+            firstPlay = false;
+        }
+        music.play().catch(() => console.log('Playback blocked by browser.'));
+        document.getElementById('icon').textContent = 'pause';
+        document.getElementById('text').textContent = 'Pause Music';
+        isPlaying = true;
+    } else {
+        music.pause();
+        document.getElementById('icon').textContent = 'play_arrow';
+        document.getElementById('text').textContent = 'Play Music';
+        isPlaying = false;
+    }
+});
+
+// Optional: loop normally after music ends
+music.loop = true;
 });
