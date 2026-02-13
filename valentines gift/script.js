@@ -97,17 +97,6 @@ gsap.from("#page1 h1", { y: 50, opacity: 0, duration: 1, ease: "power2.out", sta
   });
 
   
-
-  // Lightbox navigation
-  prevBtn.addEventListener("click", () => {
-    currentIndex = (currentIndex - 1 + images.length) % images.length;
-    lightboxImg.src = images[currentIndex].src;
-  });
-
-  nextBtn.addEventListener("click", () => {
-    currentIndex = (currentIndex + 1) % images.length;
-    lightboxImg.src = images[currentIndex].src;
-  });
 // Function to update lightbox image with fade
 function updateLightbox(index) {
   gsap.to(lightboxImg, {
