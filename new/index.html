@@ -1,0 +1,2113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CPALE Auditing Theory — One-Night Reviewer</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0d1b2a;
+    --blue: #1b4f8a;
+    --accent: #e8a020;
+    --gold: #f0c040;
+    --teal: #1a7a6e;
+    --red: #c0392b;
+    --light: #f5f2ea;
+    --card: #ffffff;
+    --border: #ddd5c0;
+    --text: #1a1a2e;
+    --muted: #666;
+    --green: #1e7a50;
+    --purple: #6b3fa0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--navy);
+    color: var(--text);
+    line-height: 1.7;
+  }
+
+  /* COVER */
+  .cover {
+    background: linear-gradient(135deg, #0d1b2a 0%, #1b2f4e 50%, #0d2a1e 100%);
+    color: white;
+    padding: 60px 40px 50px;
+    text-align: center;
+    border-bottom: 4px solid var(--accent);
+    position: relative;
+    overflow: hidden;
+  }
+  .cover::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(45deg, transparent, transparent 40px, rgba(255,255,255,0.015) 40px, rgba(255,255,255,0.015) 80px);
+  }
+  .cover-badge {
+    display: inline-block;
+    background: var(--accent);
+    color: var(--navy);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 6px 20px;
+    border-radius: 2px;
+    margin-bottom: 20px;
+  }
+  .cover h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 6vw, 60px);
+    font-weight: 900;
+    letter-spacing: -1px;
+    line-height: 1.1;
+    margin-bottom: 12px;
+  }
+  .cover h1 span { color: var(--gold); }
+  .cover p {
+    font-size: 16px;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 30px;
+  }
+  .cover-meta {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+    margin-top: 24px;
+  }
+  .cover-meta div {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.85);
+  }
+  .cover-meta strong { color: var(--gold); display: block; font-size: 18px; }
+
+  /* LAYOUT */
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 20px 60px;
+  }
+
+  /* TOC */
+  .toc {
+    background: var(--light);
+    border-left: 5px solid var(--accent);
+    padding: 30px 36px;
+    margin: 30px 0;
+    border-radius: 0 8px 8px 0;
+  }
+  .toc h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    margin-bottom: 14px;
+    color: var(--navy);
+  }
+  .toc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 6px 20px;
+  }
+  .toc a {
+    color: var(--blue);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 0;
+    border-bottom: 1px dashed rgba(0,0,0,0.1);
+    transition: color 0.2s;
+  }
+  .toc a:hover { color: var(--accent); }
+  .toc-num {
+    background: var(--navy);
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 3px;
+    min-width: 28px;
+    text-align: center;
+  }
+
+  /* SECTION */
+  .section {
+    background: var(--card);
+    border-radius: 12px;
+    margin: 28px 0;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  }
+  .section-header {
+    padding: 22px 32px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .section-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 900;
+    opacity: 0.25;
+    min-width: 40px;
+    color: white;
+  }
+  .section-title {
+    flex: 1;
+  }
+  .section-title .label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0.75;
+    color: white;
+    display: block;
+    margin-bottom: 2px;
+  }
+  .section-title h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: white;
+    line-height: 1.2;
+  }
+  .toggle-btn {
+    width: 32px; height: 32px;
+    background: rgba(255,255,255,0.2);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.2s, transform 0.3s;
+  }
+  .toggle-btn.open { transform: rotate(180deg); }
+
+  .section-body {
+    padding: 28px 32px;
+    background: white;
+    display: none;
+  }
+  .section-body.open { display: block; }
+
+  /* COLOR THEMES per section */
+  .theme-blue .section-header { background: linear-gradient(135deg, #1b4f8a, #0d3060); }
+  .theme-teal .section-header { background: linear-gradient(135deg, #1a7a6e, #0d5a50); }
+  .theme-gold .section-header { background: linear-gradient(135deg, #b8860b, #8b6508); }
+  .theme-red .section-header { background: linear-gradient(135deg, #a02020, #7a1515); }
+  .theme-green .section-header { background: linear-gradient(135deg, #1e7a50, #145c38); }
+  .theme-purple .section-header { background: linear-gradient(135deg, #6b3fa0, #4a2a78); }
+  .theme-navy .section-header { background: linear-gradient(135deg, #0d1b2a, #1a3050); }
+  .theme-dark .section-header { background: linear-gradient(135deg, #2a2a2a, #111); }
+
+  /* CONTENT ELEMENTS */
+  h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px;
+    color: var(--navy);
+    margin: 24px 0 10px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid var(--border);
+  }
+  h3:first-child { margin-top: 0; }
+
+  h4 {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--blue);
+    margin: 16px 0 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  p { font-size: 15px; margin-bottom: 10px; color: var(--text); }
+
+  ul, ol { padding-left: 20px; margin-bottom: 12px; }
+  li { font-size: 15px; margin-bottom: 5px; }
+
+  /* CALLOUT BOXES */
+  .box {
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 14px 0;
+    font-size: 14px;
+  }
+  .box-blue { background: #e8f0fb; border-left: 4px solid var(--blue); }
+  .box-gold { background: #fdf5e0; border-left: 4px solid var(--gold); }
+  .box-red { background: #fde8e8; border-left: 4px solid var(--red); }
+  .box-green { background: #e8f5ee; border-left: 4px solid var(--green); }
+  .box-teal { background: #e0f5f2; border-left: 4px solid var(--teal); }
+  .box-purple { background: #f0e8fb; border-left: 4px solid var(--purple); }
+  .box strong { display: block; margin-bottom: 4px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* FORMULA BOX */
+  .formula {
+    background: var(--navy);
+    color: var(--gold);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 18px;
+    font-weight: 600;
+    padding: 18px 24px;
+    border-radius: 8px;
+    text-align: center;
+    margin: 16px 0;
+    letter-spacing: 1px;
+  }
+  .formula small {
+    display: block;
+    font-size: 12px;
+    color: rgba(255,255,255,0.5);
+    margin-top: 4px;
+    font-family: 'DM Sans', sans-serif;
+    letter-spacing: 0;
+  }
+
+  /* TABLE */
+  .table-wrap { overflow-x: auto; margin: 14px 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  th {
+    background: var(--navy);
+    color: white;
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  td { padding: 9px 14px; border-bottom: 1px solid #eee; vertical-align: top; }
+  tr:nth-child(even) td { background: #f9f7f4; }
+  tr:hover td { background: #f0ece4; }
+  td strong { color: var(--blue); }
+
+  /* QUICK CARD */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+    margin: 14px 0;
+  }
+  .card {
+    background: var(--light);
+    border-radius: 8px;
+    padding: 14px 16px;
+    border: 1px solid var(--border);
+  }
+  .card-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .card-val {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--navy);
+  }
+  .card-sub { font-size: 13px; color: var(--muted); margin-top: 3px; }
+
+  /* MNEMONIC */
+  .mnemonic {
+    background: linear-gradient(135deg, #fff8e8, #fff2d0);
+    border: 2px dashed var(--accent);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin: 14px 0;
+  }
+  .mnemonic-title {
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #a06000;
+    margin-bottom: 8px;
+  }
+  .mnemonic-word {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 6px;
+  }
+  .mnemonic-breakdown { font-size: 14px; color: var(--text); }
+  .mnemonic-breakdown span { font-weight: 700; color: var(--blue); }
+
+  /* EXAMPLE BOX */
+  .example {
+    background: #f0f4f8;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 10px 0;
+    font-size: 14px;
+    position: relative;
+  }
+  .example::before {
+    content: '📝 EXAMPLE';
+    display: block;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: var(--blue);
+    margin-bottom: 6px;
+  }
+
+  /* TRICK TIP */
+  .tip {
+    background: #fff8e8;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 10px 0;
+    font-size: 14px;
+    position: relative;
+  }
+  .tip::before {
+    content: '💡 EXAM TIP';
+    display: block;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: #a06000;
+    margin-bottom: 6px;
+  }
+
+  /* REMEMBER */
+  .remember {
+    background: #fff0f0;
+    border: 1px solid #fcc;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 10px 0;
+    font-size: 14px;
+  }
+  .remember::before {
+    content: '🔴 REMEMBER';
+    display: block;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: var(--red);
+    margin-bottom: 6px;
+  }
+
+  /* COMPUTATION */
+  .computation {
+    background: #e8f8f0;
+    border: 1px solid #a0d8b8;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 12px 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+  }
+  .computation::before {
+    content: '🔢 COMPUTATION';
+    display: block;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: var(--green);
+    margin-bottom: 8px;
+  }
+  .computation .line { margin: 3px 0; }
+  .computation .ans { border-top: 2px solid var(--green); margin-top: 6px; padding-top: 6px; font-weight: 700; color: var(--green); }
+
+  /* BADGE TAGS */
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+  .tag {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.5px;
+    padding: 3px 10px; border-radius: 20px;
+    background: var(--navy); color: white;
+  }
+  .tag-blue { background: #e8f0fb; color: var(--blue); }
+  .tag-gold { background: #fdf0d0; color: #8b6000; }
+  .tag-red { background: #fde8e8; color: var(--red); }
+  .tag-green { background: #e8f5ee; color: var(--green); }
+
+  .divider {
+    border: none; border-top: 2px dashed var(--border);
+    margin: 22px 0;
+  }
+
+  /* QUICK QUIZ */
+  .quiz-q {
+    background: var(--light);
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 10px 0;
+    font-size: 14px;
+    border: 1px solid var(--border);
+  }
+  .quiz-q strong { color: var(--navy); display: block; margin-bottom: 6px; }
+  .quiz-ans {
+    margin-top: 8px;
+    padding: 8px 12px;
+    background: #e8f5ee;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--green);
+    display: none;
+  }
+  .quiz-ans.show { display: block; }
+  .show-ans {
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--blue);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-weight: 700;
+    text-decoration: underline;
+    padding: 0;
+  }
+
+  /* PROGRESS BAR */
+  .progress-bar {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin: 8px 0 20px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--blue), var(--teal));
+    border-radius: 2px;
+    transition: width 0.3s;
+  }
+
+  /* FOOTER */
+  footer {
+    background: var(--navy);
+    color: rgba(255,255,255,0.5);
+    text-align: center;
+    padding: 24px;
+    font-size: 13px;
+    border-top: 2px solid var(--accent);
+    margin-top: 40px;
+  }
+  footer strong { color: var(--gold); }
+
+  @media (max-width: 600px) {
+    .section-body { padding: 20px 18px; }
+    .section-header { padding: 18px 18px; }
+    .cover { padding: 40px 20px 36px; }
+    table { font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <div class="cover-badge">ReSA Batch 45 · May 2023 CPALE</div>
+  <h1>Auditing Theory<br><span>One-Night Reviewer</span></h1>
+  <p>Comprehensive notes from AT-01 to AT-20 · Based on PSAs, RA 9298, AASC & Code of Ethics</p>
+  <div class="cover-meta">
+    <div><strong>20</strong> Modules</div>
+    <div><strong>13+</strong> Computation Items</div>
+    <div><strong>1 Night</strong> Study Guide</div>
+    <div><strong>PSAs</strong> Referenced</div>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- TOC -->
+<div class="toc">
+  <h2>📋 Table of Contents</h2>
+  <div class="toc-grid">
+    <a href="#s1"><span class="toc-num">01</span> Assurance Engagement Framework</a>
+    <a href="#s2"><span class="toc-num">02</span> Introduction to Auditing</a>
+    <a href="#s3"><span class="toc-num">03</span> FS Audit Overview</a>
+    <a href="#s4"><span class="toc-num">04</span> Philippine Accountancy Act (RA 9298)</a>
+    <a href="#s5"><span class="toc-num">05</span> Quality Management (ISQM1)</a>
+    <a href="#s6"><span class="toc-num">06</span> Pre-Engagement & Audit Planning</a>
+    <a href="#s7"><span class="toc-num">07</span> Audit Planning & Materiality</a>
+    <a href="#s8"><span class="toc-num">08</span> Audit Risk Formula & Components</a>
+    <a href="#s9"><span class="toc-num">09</span> Internal Control (COSO)</a>
+    <a href="#s10"><span class="toc-num">10</span> Tests of Controls (TOC)</a>
+    <a href="#s11"><span class="toc-num">11</span> Substantive Testing</a>
+    <a href="#s12"><span class="toc-num">12</span> Fraud, Error & Non-Compliance</a>
+    <a href="#s13"><span class="toc-num">13</span> 13 Computation Items</a>
+    <a href="#s14"><span class="toc-num">14</span> Code of Ethics</a>
+  </div>
+</div>
+
+
+<!-- ===== SECTION 1: ASSURANCE ENGAGEMENT ===== -->
+<div class="section theme-blue" id="s1">
+  <div class="section-header" onclick="toggle(this)">
+    <div class="section-num">01</div>
+    <div class="section-title">
+      <span class="label">AT-01 · Philippine Framework</span>
+      <h2>Assurance Engagement Framework</h2>
+    </div>
+    <button class="toggle-btn">▼</button>
+  </div>
+  <div class="section-body open">
+
+    <div class="box box-blue">
+      <strong>Definition</strong>
+      An <em>assurance engagement</em> is one where a practitioner expresses a conclusion designed to <strong>enhance the degree of confidence</strong> of intended users (other than the responsible party) about the outcome of evaluating a subject matter against criteria.
+    </div>
+
+    <h3>Three-Party Relationship</h3>
+    <div class="cards">
+      <div class="card">
+        <div class="card-title">Practitioner</div>
+        <div class="card-val">The Auditor/CPA</div>
+        <div class="card-sub">Performs the engagement and expresses the conclusion</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Responsible Party</div>
+        <div class="card-val">Management</div>
+        <div class="card-sub">Prepares the subject matter information (e.g., FS)</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Intended Users</div>
+        <div class="card-val">Shareholders, Banks, etc.</div>
+        <div class="card-sub">Use the conclusion to make decisions</div>
+      </div>
+    </div>
+
+    <h3>5 Elements of an Assurance Engagement (3-WISE)</h3>
+    <div class="mnemonic">
+      <div class="mnemonic-title">🔑 Mnemonic</div>
+      <div class="mnemonic-word">"3-WISE"</div>
+      <div class="mnemonic-breakdown">
+        <span>3</span>-party relationship · <span>W</span>ritten report · <span>I</span>dentifiable subject matter · <span>S</span>uitable criteria · <span>E</span>vidence (sufficient &amp; appropriate)
+      </div>
+    </div>
+
+    <h3>AASC Standards Summary</h3>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Standard</th><th>Covers</th><th>Assurance Level</th></tr>
+        <tr><td><strong>PSA</strong> (Philippine Standards on Auditing)</td><td>Audit of historical FS</td><td>High (Reasonable)</td></tr>
+        <tr><td><strong>PSRE</strong> (Review Engagements)</td><td>Review of historical FS</td><td>Moderate (Limited)</td></tr>
+        <tr><td><strong>PSAE</strong> (Assurance Engagements)</td><td>Other subject matters</td><td>Reasonable or Limited</td></tr>
+        <tr><td><strong>PSRS</strong> (Related Services)</td><td>Compilation, Agreed-upon procedures</td><td>No assurance</td></tr>
+        <tr><td><strong>PSQC</strong> (Quality Control)</td><td>Firm quality systems</td><td>N/A</td></tr>
+      </table>
+    </div>
+
+    <h3>Two Types of Assurance Engagements</h3>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Type</th><th>Risk Level</th><th>Evidence</th><th>Conclusion Form</th></tr>
+        <tr><td><strong>Reasonable (Audit)</strong></td><td>Reduced to acceptably LOW</td><td>Extensive (unlimited)</td><td><strong>Positive form</strong> — "In our opinion…"</td></tr>
+        <tr><td><strong>Limited (Review)</strong></td><td>Reduced, but HIGHER than reasonable</td><td>Primarily inquiry &amp; analytical</td><td><strong>Negative form</strong> — "Nothing has come to our attention…"</td></tr>
+      </table>
+    </div>
+
+    <div class="example">
+      <strong>Positive:</strong> "In our opinion, the financial statements present fairly, in all material respects…"<br><br>
+      <strong>Negative:</strong> "Based on our review, nothing has come to our attention that causes us to believe that the financial statements are not prepared, in all material respects, in accordance with PFRS."
+    </div>
+
+    <h3>Suitable Criteria — CRRUN</h3>
+    <div class="mnemonic">
+      <div class="mnemonic-title">🔑 Mnemonic</div>
+      <div class="mnemonic-word">CRRUN</div>
+      <div class="mnemonic-breakdown">
+        <span>C</span>omplete · <span>R</span>elevant · <span>R</span>eliable · <span>U</span>nderstandable · <span>N</span>eutral
+      </div>
+    </div>
+
+    <h3>Comparing Engagement Types</h3>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Service</th><th>Assurance</th><th>Report Form</th><th>Evidence</th><th>Skill</th></tr>
+        <tr><td><strong>Audit</strong></td><td>High (not absolute)</td><td>Positive</td><td>Theoretically unlimited</td><td>Auditing</td></tr>
+        <tr><td><strong>Review</strong></td><td>Moderate</td><td>Negative</td><td>Inquiry + Analytical Procedures</td><td>Auditing</td></tr>
+        <tr><td><strong>Agreed-upon Procedures</strong></td><td>None</td><td>Factual findings (restricted)</td><td>As agreed</td><td>Auditing</td></tr>
+        <tr><td><strong>Compilation</strong></td><td>None</td><td>Identifies compiled info</td><td>None required</td><td>Accounting</td></tr>
+      </table>
+    </div>
+
+    <div class="tip">
+      <strong>ABSOLUTE ASSURANCE IS NEVER ATTAINABLE.</strong> Reasons: use of judgment, selective testing, inherent limits of internal control, evidence is <em>persuasive rather than conclusive</em>. The CPALE loves asking this — always say "high but NOT absolute."
+    </div>
+
+    <div class="remember">
+      A practitioner may NOT change from an assurance to non-assurance engagement (or from reasonable to limited) <strong>without reasonable justification.</strong> If the client just wants to hide bad results, that is NOT a valid reason.
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ===== SECTION 2: INTRO TO AUDITING ===== -->
+<div class="section theme-teal" id="s2">
+  <div class="section-header" onclick="toggle(this)">
+    <div class="section-num">02</div>
+    <div class="section-title">
+      <span class="label">AT-02 · PSA Basics</span>
+      <h2>Introduction to Auditing</h2>
+    </div>
+    <button class="toggle-btn">▼</button>
+  </div>
+  <div class="section-body">
+
+    <div class="box box-teal">
+      <strong>AAA Definition of Auditing</strong>
+      "A <em>systematic process</em> of objectively obtaining and evaluating evidence regarding <em>assertions</em> about economic actions and events to ascertain the <em>degree of correspondence</em> between those assertions and established <em>criteria</em>, and communicating the results to interested users." (American Accounting Association)
+    </div>
+
+    <h3>Types of Audit</h3>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Type</th><th>Purpose</th><th>Performed by</th></tr>
+        <tr><td><strong>Independent FS Audit</strong></td><td>Opinion on fair presentation of FS</td><td>External CPA/firm</td></tr>
+        <tr><td><strong>Internal Audit</strong></td><td>Operational, management, financial review</td><td>Internal auditors</td></tr>
+        <tr><td><strong>Government Audit</strong></td><td>Compliance, FS, Performance (economy, efficiency, effectiveness)</td><td>COA</td></tr>
+      </table>
+    </div>
+
+    <h3>Objective of FS Audit</h3>
+    <p>To enable the auditor to <strong>express an opinion</strong> on whether the financial statements are prepared, <em>in all material respects</em>, in accordance with the applicable financial reporting framework.</p>
+
+    <div class="tip">
+      The auditor does NOT: guarantee accuracy, ensure viability of the entity, nor assess stewardship. The auditor provides <strong>reasonable assurance</strong> only. Management is ALWAYS responsible for preparing the FS — audit does NOT relieve management of this responsibility.
+    </div>
+
+    <h3>Key Terms</h3>
+    <div class="cards">
+      <div class="card">
+        <div class="card-title">Financial Statement Assertions</div>
+        <div class="card-sub">Representations by management, explicit or implicit, embodied in the FS. Used by auditors to consider types of potential misstatements.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Professional Skepticism</div>
+        <div class="card-sub">A questioning mind; critical assessment of evidence. Neither accept nor disbelieve — always probe.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Agency Theory</div>
+        <div class="card-sub">Managers have more info than shareholders → need for audit. Goal congruence issues arise.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Information Asymmetry</div>
+        <div class="card-sub">Users don't have the same info as management → audit bridges this gap.</div>
+      </div>
+    </div>
+
+    <h3>Internal vs. External Auditor</h3>
+    <div class="table-wrap">
+      <table>
+        <tr><th></th><th>External Auditor</th><th>Internal Auditor</th></tr>
+        <tr><td><strong>Reports to</strong></td><td>Shareholders/members (outside governance)</td><td>Board of directors & senior management (inside)</td></tr>
+        <tr><td><strong>Independence</strong></td><td>Independent from client</td><td>Employee of entity</td></tr>
+        <tr><td><strong>Primary objective</strong></td><td>Opinion on FS</td><td>Add value, improve operations</td></tr>
+        <tr><td><strong>Standards</strong></td><td>PSA / ISA</td><td>IIA Standards</td></tr>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ===== SECTION 3: FS AUDIT OVERVIEW ===== -->
+<div class="section theme-navy" id="s3">
+  <div class="section-header" onclick="toggle(this)">
+    <div class="section-num">03</div>
+    <div class="section-title">
+      <span class="label">AT-03 · PSA 200</span>
+      <h2>Financial Statement Audit Overview</h2>
+    </div>
+    <button class="toggle-btn">▼</button>
+  </div>
+  <div class="section-body">
+
+    <h3>Management Assertions (COVERAGE-D)</h3>
+    <p>These are the assertions the auditor tests. Know them by category:</p>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Category</th><th>Assertions</th><th>Question Asked</th></tr>
+        <tr>
+          <td><strong>Classes of Transactions & Events</strong><br><small>(Income Statement items)</small></td>
+          <td>Occurrence, Completeness, Accuracy, Cutoff, Classification, Presentation</td>
+          <td>Did it happen? All recorded? Correct amount? Right period? Right account?</td>
+        </tr>
+        <tr>
+          <td><strong>Account Balances</strong><br><small>(Balance Sheet items)</small></td>
+          <td>Existence, Rights & Obligations, Completeness, Accuracy/Valuation/Allocation</td>
+          <td>Does it exist? Do we own it? Is everything included? Is it properly valued?</td>
+        </tr>
+        <tr>
+          <td><strong>Presentation & Disclosure</strong></td>
+          <td>Occurrence, Completeness, Classification, Accuracy/Valuation, Understandability</td>
+          <td>Is it properly disclosed? All disclosures complete? Understandable to users?</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="mnemonic">
+      <div class="mnemonic-title">🔑 For Transaction Assertions</div>
+      <div class="mnemonic-word">OCA CC P</div>
+      <div class="mnemonic-breakdown">
+        <span>O</span>ccurrence · <span>C</span>ompleteness · <span>A</span>ccuracy · <span>C</span>utoff · <span>C</span>lassification · <span>P</span>resentation
+      </div>
+    </div>
+
+    <div class="mnemonic">
+      <div class="mnemonic-title">🔑 For Balance Sheet Assertions</div>
+      <div class="mnemonic-word">ERCA V</div>
+      <div class="mnemonic-breakdown">
+        <span>E</span>xistence · <span>R</span>ights &amp; Obligations · <span>C</span>ompleteness · <span>A</span>ccuracy/<span>V</span>aluation
+      </div>
+    </div>
+
+    <div class="tip">
+      Existence vs. Completeness: <br>
+      • <strong>Existence (overstatement):</strong> Start from the records → trace to supporting docs. Did this invoice really exist?<br>
+      • <strong>Completeness (understatement):</strong> Start from source docs → trace to records. Was every shipment recorded?
+    </div>
+
+    <h3>Audit Report Communication Path</h3>
+    <p>The auditor communicates results through the <strong>Auditor's Report</strong> (not the engagement letter or management letter). The medium for sharing audit results is always the <em>audit report.</em></p>
+
+  </div>
+</div>
+
+
+<!-- ===== SECTION 4: RA 9298 ===== -->
+<div class="section theme-gold" id="s4">
+  <div class="section-header" onclick="toggle(this)">
+    <div class="section-num">04</div>
+    <div class="section-title">
+      <span class="label">AT-04 · RA 9298 · IRR</span>
+      <h2>Philippine Accountancy Act & COR/PIC</h2>
+    </div>
+    <button class="toggle-btn">▼</button>
+  </div>
+  <div class="section-body">
+
+    <h3>RA 9298 — Philippine Accountancy Act of 2004</h3>
+    <p>Has THREE main objectives:</p>
+    <div class="box box-gold">
+      <strong>3 Objectives of RA 9298</strong>
+      1. <strong>Standardization</strong> of accounting education (CHED, Education Technical Council)<br>
+      2. <strong>Examination</strong> for registration (PRBOA, CPALE)<br>
+      3. <strong>Supervision, control &amp; regulation</strong> of accountancy practice (4 sectors: Public Practice, Commerce &amp; Industry, Government, Education)
+    </div>
+
+    <h3>PRBOA — Professional Regulatory Board of Accountancy</h3>
+    <p><strong>Qualifications of PRBOA Members:</strong></p>
+    <ul>
+      <li>Natural-born Filipino citizen &amp; resident of the Philippines</li>
+      <li>Registered CPA with at least <strong>10 years</strong> of work experience</li>
+      <li>Good moral character; NOT convicted of crime involving moral turpitude</li>
+      <li>NO pecuniary interest in any school offering accountancy or review</li>
+      <li>NOT a Director/Officer of PICPA at time of appointment</li>
+    </ul>
+
+    <h3>CPALE — CPA Licensure Examination</h3>
+    <h4>Qualifications of Applicants:</h4>
+    <ul>
+      <li>Filipino citizen</li>
+      <li>Good moral character</li>
+      <li>Holder of BS Accountancy from CHED-recognized school</li>
+      <li>No conviction of criminal offense involving moral turpitude</li>
+    </ul>
+
+    <h4>Rating / Passing the CPALE:</h4>
+    <div class="box box-gold">
+      <strong>CPALE Rating Rules</strong>
+      • General average of <strong>75%</strong> with no subject below <strong>65%</strong> = <strong>PASSED</strong><br>
+      • General average ≥ 75% but one subject is 60–64% = <strong>CONDITIONAL</strong> (must retake that subject; must get ≥ 75% to pass)<br>
+      • Any subject below <strong>60%</strong> = <strong>FAILED</strong><br>
+      • <strong>2 failed complete exams</strong> → must complete <strong>24 units refresher course</strong> before retaking
+    </div>
+
+    <div class="example">
+      Berlin got: 90, 88, 95, 74, 74, 64 → Average = (90+88+95+74+74+64)/6 = 80.8 → But Subject 6 = 64 (below 65 but ≥ 60) → <strong>CONDITIONAL</strong>. Berlin must retake Subject 6 and score ≥ 75 to pass completely.
+    </div>
+
+    <h3>Certificate of Registration (COR) & Professional Identification Card (PIC)</h3>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Document</th><th>Description</th><th>Key Points</th></tr>
+        <tr>
+          <td><strong>COR</strong> (Certificate of Registration)</td>
+          <td>Certificate under seal bearing a registration number</td>
+          <td>Issued by PRC upon recommendation of PRBOA; does NOT expire</td>
+        </tr>
+        <tr>
+          <td><strong>PIC</strong> (Professional Identification Card)</td>
+          <td>Card indicating holder is a registered CPA</td>
+          <td>Renewed every <strong>3 years</strong> upon payment of fees</td>
+        </tr>
+      </table>
+    </div>
+
+    <h3>CPD — Continuing Professional Development</h3>
+    <p>Required for renewal of PIC. Objectives: raise/maintain professional capability, attain/maintain minimum standards. Does NOT include "make the profession financially rewarding."</p>
+
+    <h3>Key Bodies Under RA 9298</h3>
+    <div class="cards">
+      <div class="card">
+        <div class="card-title">AASC</div>
+        <div class="card-val">Auditing &amp; Assurance Standards Council</div>
+        <div class="card-sub">Issues PSAs, PSREs, PSAEs, PSRSs, PSQCs</div>
+      </div>
+      <div class="card">
+        <div class="card-title">FRSC</div>
+        <div class="card-val">Financial Reporting Standards Council</div>
+        <div class="card-sub">Issues PFRSs</div>
+      </div>
+      <div class="card">
+        <div class="card-title">QRC</div>
+        <div class="card-val">Quality Review Committee</div>
+        <div class="card-sub">Reviews quality of CPA firms in public practice</div>
+      </div>
+      <div class="card">
+        <div class="card-title">PICPA</div>
+        <div class="card-val">Phil. Institute of CPAs</div>
+        <div class="card-sub">APO (Accredited Professional Organization); member of IFAC</div>
+      </div>
+    </div>
+
+    <div class="remember">
+      Changes to CPALE subjects: PRBOA may revise or exclude subjects, but NOT more often than <strong>every 2 years.</strong> The PRBOA ordinarily administers the CPALE <strong>twice a year</strong> (May and October).
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ===== SECTION 5: QUALITY MANAGEMENT ===== -->
+<div class="section theme-purple" id="s5">
+  <div class="section-header" onclick="toggle(this)">
+    <div class="section-num">05</div>
+    <div class="section-title">
+      <span class="label">AT-05 · ISQM1 / PSQM1</span>
+      <h2>Quality Management</h2>
+    </div>
+    <button class="toggle-btn">▼</button>
+  </div>
+  <div class="section-body">
+
+    <div class="box box-purple">
+      <strong>ISQM 1 Purpose</strong>
+      A firm shall design, implement and operate a <em>System of Quality Management (SOQM)</em> for audits, reviews, and other assurance/related services engagements. It takes a <strong>proactive, risk-based approach</strong> to managing quality.
+    </div>
+
+    <h3>8 Components of Quality Management</h3>
+    <div class="mnemonic">
+      <div class="mnemonic-title">🔑 Mnemonic</div>
+      <div class="mnemonic-word">RGERR + IME</div>
+      <div class="mnemonic-breakdown">
+        <span>R</span>isk Assessment Process · <span>G</span>overnance &amp; Leadership · <span>E</span>thical Requirements · <span>A</span>cceptance &amp; Continuance · <span>E</span>ngagement Performance · <span>R</span>esources · <span>I</span>nformation &amp; Communication · <span>M</span>onitoring &amp; R<span>E</span>mediation
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <tr><th>#</th><th>Component</th><th>Role</th><th>Think of it as…</th></tr>
+        <tr><td>1</td><td><strong>Risk Assessment Process</strong></td><td>Backbone — used to establish quality objectives &amp; identify risks</td><td>The firm's "danger radar"</td></tr>
+        <tr><td>2</td><td><strong>Governance &amp; Leadership</strong></td><td>Sets the culture and tone at the top</td><td>The firm's "DNA &amp; culture"</td></tr>
+        <tr><td>3</td><td><strong>Relevant Ethical Requirements</strong></td><td>Fundamental to all engagements</td><td>"The rulebook everyone must follow"</td></tr>
+        <tr><td>4</td><td><strong>Acceptance &amp; Continuance</strong></td><td>Should we take/keep this client?</td><td>"Screening the client"</td></tr>
+        <tr><td>5</td><td><strong>Engagement Performance</strong></td><td>Direction, supervision, review of work</td><td>"Doing the work right"</td></tr>
+        <tr><td>6</td><td><strong>Resources</strong></td><td>People, tech, intellectual resources</td><td>"Having the right tools &amp; people"</td></tr>
+        <tr><td>7</td><td><strong>Information &amp; Communication</strong></td><td>Getting and sharing relevant info</td><td>"Good communication flow"</td></tr>
+        <tr><td>8</td><td><strong>Monitoring &amp; Remediation</strong></td><td>Evaluate the SOQM; fix deficiencies</td><td>"Quality check &amp; improvement"</td></tr>
+      </table>
+    </div>
+
+    <h3>ISQM 2 — Engagement Quality Reviews (EQR)</h3>
+    <p>ISQM 2 deals with the appointment and eligibility of EQR reviewers, and the performance of the review. The EQR must be completed <em>on or before</em> the date of the auditor's report.</p>
+
+    <div class="tip">
+      The <strong>Engagement Partner</strong> is responsible for the overall quality of each audit engagement. The firm's SOQM (ISQM1) operates at the firm level; ISQM2 operates at the engagement level.
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ===== SECTION 6: PRE-ENGAGEMENT ===== -->
+<div class="section theme-teal" id="s6">
+  <div class="section-header" onclick="toggle(this)">
+    <div class="section-num">06</div>
+    <div class="section-title">
+      <span class="label">AT-06 · PSA 210 / 220</span>
+      <h2>Audit Engagement & Pre-Engagement</h2>
+    </div>
+    <button class="toggle-btn">▼</button>
+  </div>
+  <div class="section-body">
+
+    <h3>Accepting an Audit Engagement</h3>
+    <p>Before accepting, the auditor (engagement partner) evaluates <strong>3 things</strong>:</p>
+    <ol>
+      <li>Relevant ethical requirements will be satisfied (especially <strong>independence</strong>)</li>
+      <li>Sufficient <strong>competence, time, and resources</strong> are available</li>
+      <li><strong>Preconditions for audit</strong> exist — management acknowledges its responsibilities</li>
+    </ol>
+
+    <div class="box box-teal">
+      <strong>Preconditions for an Audit</strong>
+      Management must acknowledge: (a) responsibility for preparing FS in accordance with applicable FRF, (b) responsibility for internal control, and (c) provide the auditor with all information, access, and unrestricted access to persons.
+    </div>
+
+    <h3>Audit Engagement Letter (PSA 210)</h3>
+    <p>Records the <strong>agreed terms</strong> of the audit engagement. Must include:</p>
+    <ul>
+      <li>Objective and scope of the audit</li>
+      <li>Responsibilities of the auditor</li>
+      <li>Responsibilities of management</li>
+      <li>Identification of the applicable financial reporting framework</li>
+      <li>Expected form and content of the auditor's report</li>
+    </ul>
+
+    <div class="tip">
+      On <strong>recurring audits</strong>: the engagement letter need NOT be sent every year, but the auditor should assess if circumstances require revision. If there's a change in management, change in nature of the entity, or a reminder of the existing terms — renew or remind.
+    </div>
+
+    <h3>Change in Engagement Terms</h3>
+    <div class="box box-red">
+      <strong>When can the auditor NOT agree to change?</strong>
+      If there is <em>no reasonable justification</em> for the change. Example: the client wants to downgrade from an audit to a compilation simply because the audit found errors — that is NOT acceptable. The purpose should not be to hide unfavorable results.
+    </div>
+
+    <h3>Initial Audit — Opening Balances (PSA 510)</h3>
+    <p>The incoming auditor must obtain sufficient appropriate evidence that:</p>
+    <ul>
+      <li>Opening balances do not contain <em>material misstatements</em></li>
+      <li>Appropriate accounting policies are consistently applied</li>
+    </ul>
+    <p>Methods: review predecessor's working papers, perform specific procedures, evaluate whether current-period procedures give evidence about opening balances.</p>
+
+    <h3>PSA 220 — Documentation Requirements</h3>
+    <ul>
+      <li>Fulfillment of ethical requirements (including independence)</li>
+      <li>Acceptance and continuance conclusions</li>
+      <li>Nature and scope of consultations and conclusions</li>
+      <li>Confirmation that EQR (Engagement Quality Review) was completed before the audit report date</li>
+    </ul>
+
+  </div>
+</div>
+
+
+<!-- ===== SECTION 7: AUDIT PLANNING ===== -->
+<div class="section theme-blue" id="s7">
+  <div class="section-header" onclick="toggle(this)">
+    <div class="section-num">07</div>
+    <div class="section-title">
+      <span class="label">AT-07 · PSA 300 / 320</span>
+      <h2>Audit Planning & Materiality</h2>
+    </div>
+    <button class="toggle-btn">▼</button>
+  </div>
+  <div class="section-body">
+
+    <h3>Audit Strategy vs. Audit Plan</h3>
+    <div class="table-wrap">
+      <table>
+        <tr><th></th><th>Audit Strategy</th><th>Audit Plan</th></tr>
+        <tr><td><strong>Level</strong></td><td>General, high-level</td><td>Specific, detailed</td></tr>
+        <tr><td><strong>Content</strong></td><td>Scope, timing, direction, materiality, required communications</td><td>RAP, further audit procedures (TOC + substantive), other PSA-required procedures</td></tr>
+        <tr><td><strong>Sequence</strong></td><td>Established FIRST</td><td>Developed AFTER strategy</td></tr>
+        <tr><td><strong>Format</strong></td><td>Memorandum</td><td>Written (required by PSA)</td></tr>
+      </table>
+    </div>
+    <div class="remember">
+      The audit strategy is NOT more detailed than the audit plan — it's the other way around. Plan = detailed; Strategy = general. This is a common trap question!
+    </div>
+
+    <h3>Materiality (PSA 320)</h3>
+    <div class="box box-blue">
+      <strong>Key Principle</strong>
+      Information is <em>material</em> if its omission or misstatement could reasonably be expected to influence the economic decisions of users.
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <tr><th>Term</th><th>Definition</th><th>Relationship</th></tr>
+        <tr>
+          <td><strong>Overall Materiality</strong><br>(FS as a whole)</td>
+          <td>The threshold set for the FS as a whole</td>
+          <td>Largest amount</td>
+        </tr>
+        <tr>
+          <td><strong>Performance Materiality</strong></td>
+          <td>Amount set at LESS than overall materiality to reduce the probability that aggregate uncorrected + undetected misstatements exceed overall materiality</td>
+          <td>Less than overall materiality</td>
+        </tr>
+        <tr>
+          <td><strong>Specific Materiality</strong></td>
+          <td>Set for specific classes of transactions or disclosures (e.g., related party transactions)</td>
+          <td>May be lower than overall</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="example">
+      If Overall Materiality = ₱1,000,000 → Performance Materiality might be set at ₱700,000.<br>
+      Why? So the combined effect of individually immaterial misstatements doesn't accidentally exceed the ₱1M threshold. Think of it as a "safety buffer."
+    </div>
+
+    <h3>Materiality vs. Audit Risk — Inverse Relationship</h3>
+    <div class="formula">
+      Higher Materiality → Lower Audit Risk → Less Evidence Needed
+      <small>Lower Materiality → Higher Audit Risk → More Evidence Needed</small>
+    </div>
+
+    <h3>Purpose of Audit Planning</h3>
+    <ul>
+      <li>Ensure appropriate attention to important areas</li>
+      <li>Identify potential problems early</li>
+      <li>Assign team members appropriately</li>
+      <li>Direct and supervise team effectively</li>
+      <li>Coordinate with component auditors (group audits)</li>
+    </ul>
+
+    <h3>Required Documentation (Audit Planning)</h3>
+    <ol>
+      <li>Audit Strategy</li>
+      <li>Audit Plan</li>
+      <li>Significant changes to the audit strategy/plan and reasons for changes</li>
+      <li>Overall Materiality, Performance Materiality, any revisions</li>
+    </ol>
+
+  </div>
+</div>
+
+
+<!-- ===== SECTION 8: AUDIT RISK ===== -->
+<div class="section theme-red" id="s8">
+  <div class="section-header" onclick="toggle(this)">
+    <div class="section-num">08</div>
+    <div class="section-title">
+      <span class="label">AT-08 / AT-10 · PSA 315 / 330</span>
+      <h2>Audit Risk Formula & Components</h2>
+    </div>
+    <button class="toggle-btn">▼</button>
+  </div>
+  <div class="section-body">
+
+    <div class="formula">
+      AR = IR × CR × DR
+      <small>Audit Risk = Inherent Risk × Control Risk × Detection Risk</small>
+    </div>
+
+    <div class="formula">
+      DR = AR ÷ (IR × CR)
+      <small>Detection Risk is the DEPENDENT variable — auditor controls this</small>
+    </div>
+
+    <h3>The Three Risk Components</h3>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Component</th><th>Definition</th><th>Who controls it?</th><th>Direction of Relationship with DR</th></tr>
+        <tr>
+          <td><strong>IR — Inherent Risk</strong></td>
+          <td>Susceptibility of an assertion to material misstatement, BEFORE considering controls</td>
+          <td>Client (inherent to the business)</td>
+          <td>IR ↑ → DR ↓ (auditor does more work)</td>
+        </tr>
+        <tr>
+          <td><strong>CR — Control Risk</strong></td>
+          <td>Risk that a material misstatement will NOT be prevented or detected by internal controls</td>
+          <td>Client (strength of internal controls)</td>
+          <td>CR ↑ → DR ↓ (auditor does more work)</td>
+        </tr>
+        <tr>
+          <td><strong>DR — Detection Risk</strong></td>
+          <td>Risk that the auditor's procedures will FAIL to detect a material misstatement</td>
+          <td><strong>Auditor</strong> (by nature, timing, extent of procedures)</td>
+          <td>Independent variable is RMM; DR is set inversely</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="remember">
+      IR and CR are functions of the CLIENT and its environment — the auditor cannot change them, only assess them. DR is the only risk the auditor can MANIPULATE by changing the nature, timing, and extent of procedures.
+    </div>
+
+    <h3>Risk of Material Misstatement (RMM)</h3>
+    <div class="formula">
+      RMM = IR × CR
+      <small>Assessed at Financial Statement Level AND Assertion Level</small>
+    </div>
+
+    <h3>Risk Relationship Matrix</h3>
+    <div class="table-wrap">
+      <table>
+        <tr><th>If IR is…</th><th>And CR is…</th><th>Then ADR should be…</th><th>Meaning: Auditor should…</th></tr>
+        <tr><td>High</td><td>High</td><td><strong>Lowest</strong></td><td>Perform the MOST procedures</td></tr>
+        <tr><td>High</td><td>Medium</td><td><strong>Lower</strong></td><td>Perform many procedures</td></tr>
+        <tr><td>Medium</td><td>Medium</td><td><strong>Medium</strong></td><td>Moderate procedures</td></tr>
+        <tr><td>Low</td><td>Low</td><td><strong>Higher</strong></td><td>Perform fewer procedures</td></tr>
+      </table>
+    </div>
+
+    <div class="example">
+      <strong>CPALE-type Question:</strong> If IR = HIGH and CR = MEDIUM, what is the acceptable level of DR?<br><br>
+      <strong>Answer: LOWER</strong> (because RMM is high, DR must be set low, meaning the auditor must perform extensive substantive procedures to keep overall AR at an acceptably low level.)
+    </div>
+
+    <h3>Significant Risks</h3>
+    <div class="box box-red">
+      <strong>Significant Risk</strong> = A risk of material misstatement where inherent risk assessment is close to the UPPER END of the spectrum. For significant risks:<br>
+      • Substantive procedures ALONE cannot provide sufficient appropriate evidence<br>
+      • Auditor MUST perform tests of controls<br>
+      • Must perform specific substantive procedures designed for that significant risk
+    </div>
+
+    <h3>Higher Risk = More Procedures. Know these high-risk accounts:</h3>
+    <div class="cards">
+      <div class="card">
+        <div class="card-title">High Inherent Risk</div>
+        <div class="card-sub">Cash, Held-for-trading securities, Accounts receivable, Revenue, Related party transactions</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Lower Inherent Risk</div>
+        <div class="card-sub">Property, plant &amp; equipment (routine; less susceptible to theft), long-term liabilities</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ===== SECTION 9: INTERNAL CONTROL ===== -->
+<div class="section theme-green" id="s9">
+  <div class="section-header" onclick="toggle(this)">
+    <div class="section-num">09</div>
+    <div class="section-title">
+      <span class="label">AT-09 · PSA 315 (Revised)</span>
+      <h2>Internal Control — COSO Framework</h2>
+    </div>
+    <button class="toggle-btn">▼</button>
+  </div>
+  <div class="section-body">
+
+    <div class="box box-green">
+      <strong>Internal Control Definition</strong>
+      A process designed, implemented and maintained by <em>those charged with governance, management, and other personnel</em> to provide <strong>reasonable assurance</strong> (NOT absolute) about achieving objectives related to: financial reporting, operations, and compliance.
+    </div>
+
+    <h3>5 Components of Internal Control (CRIME)</h3>
+    <div class="mnemonic">
+      <div class="mnemonic-title">🔑 Mnemonic — CRIME</div>
+      <div class="mnemonic-word">C-R-I-M-E</div>
+      <div class="mnemonic-breakdown">
+        <span>C</span>ontrol Environment · <span>R</span>isk Assessment (entity's) · <span>I</span>nformation &amp; Communication · <span>M</span>onitoring Activities · <span>E</span>ntity's Control Activities
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <tr><th>Component</th><th>Nature</th><th>What to Know</th></tr>
+        <tr>
+          <td><strong>Control Environment</strong></td>
+          <td>Indirect controls</td>
+          <td>Tone at the top; management philosophy; ethical values; organizational structure; HR policies. FOUNDATION of IC.</td>
+        </tr>
+        <tr>
+          <td><strong>Risk Assessment</strong></td>
+          <td>Indirect controls</td>
+          <td>The entity's own process to identify and respond to risks. Different from auditor's risk assessment!</td>
+        </tr>
+        <tr>
+          <td><strong>Information &amp; Communication</strong></td>
+          <td>Indirect controls</td>
+          <td>Information system captures, processes, and reports transactions accurately. Must communicate relevant info to the right people.</td>
+        </tr>
+        <tr>
+          <td><strong>Monitoring Activities</strong></td>
+          <td>Indirect controls</td>
+          <td>Ongoing evaluation of IC quality. Includes internal audit, management reviews.</td>
+        </tr>
+        <tr>
+          <td><strong>Control Activities</strong></td>
+          <td>Direct controls</td>
+          <td>The actual policies and procedures that ensure management directives are carried out. Most directly testable.</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="tip">
+      <strong>Two types of components:</strong><br>
+      • <strong>Indirect controls</strong>: Control Environment, Risk Assessment, Information &amp; Communication, Monitoring → affect the overall control environment<br>
+      • <strong>Direct controls</strong>: Control Activities → directly prevent/detect/correct misstatements at the assertion level
+    </div>
+
+    <h3>Limitations of Internal Control</h3>
+    <div class="box box-red">
+      <strong>Why IC can NEVER give absolute assurance:</strong><br>
+      1. Human judgment in decision-making<br>
+      2. Breakdowns (errors, mistakes)<br>
+      3. <strong>Collusion</strong> — even segregation of duties can be circumvented<br>
+      4. Management override of controls<br>
+      5. Cost-benefit constraint
+    </div>
+
+    <h3>Types of Control Activities</h3>
+    <ul>
+      <li><strong>Preventive controls</strong> — stop errors/fraud before they happen (e.g., requiring authorization)</li>
+      <li><strong>Detective controls</strong> — find errors/fraud after they happen (e.g., reconciliations, audits)</li>
+      <li><strong>Corrective controls</strong> — fix identified issues (e.g., error correction procedures)</li>
+    </ul>
+    <p>Controls can also be: <strong>Manual</strong> (human performed), <strong>Automated</strong> (system performed), or <strong>IT-dependent manual</strong> (rely on IT output).</p>
+
+    <h3>Segregation of Duties (SOD)</h3>
+    <p>Incompatible functions must be separated:</p>
+    <ul>
+      <li><strong>Authorization</strong> — approving a transaction</li>
+      <li><strong>Recording</strong> — recording the transaction in books</li>
+      <li><strong>Custody</strong> — physical custody of assets</li>
+    </ul>
+    <div class="example">
+      The cashier (custody) should NOT also record cash receipts (recording). If one person controls both, they can steal cash and cover it up by falsifying the records.
+    </div>
+
+    <h3>Key Concepts in Understanding IC (Auditor's Work)</h3>
+    <ol>
+      <li><strong>Understand the design</strong> of controls (is the control designed well?)</li>
+      <li><strong>Determine if they are implemented</strong> (is the control actually in use?)</li>
+      <li><strong>Assess operating effectiveness</strong> (is the control working consistently?) → tested through Tests of Controls</li>
+    </ol>
+
+    <h3>Control Deficiencies</h3>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Type</th><th>Definition</th><th>Communication to</th></tr>
+        <tr><td><strong>Control Deficiency</strong></td><td>Control doesn't exist, or is not designed/operating properly</td><td>Management (optional communication)</td></tr>
+        <tr><td><strong>Significant Deficiency</strong></td><td>Important enough to merit attention by TCWG</td><td>Those Charged with Governance (required)</td></tr>
+        <tr><td><strong>Material Weakness</strong></td><td>Significant deficiency; reasonable possibility of material misstatement NOT being prevented/detected</td><td>TCWG (required, timely)</td></tr>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ===== SECTION 10: TESTS OF CONTROLS ===== -->
+<div class="section theme-teal" id="s10">
+  <div class="section-header" onclick="toggle(this)">
+    <div class="section-num">10</div>
+    <div class="section-title">
+      <span class="label">AT-11 · PSA 330</span>
+      <h2>Risk Assessment Procedures & Tests of Controls (TOC)</h2>
+    </div>
+    <button class="toggle-btn">▼</button>
+  </div>
+  <div class="section-body">
+
+    <h3>Three Types of Audit Procedures</h3>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Procedure Type</th><th>Purpose</th><th>When</th></tr>
+        <tr><td><strong>Risk Assessment Procedures (RAP)</strong></td><td>Understand the entity and its environment + IC to identify &amp; assess RMM</td><td>Planning phase</td></tr>
+        <tr><td><strong>Tests of Controls (TOC)</strong></td><td>Test OPERATING EFFECTIVENESS of controls</td><td>After RAP; if auditor plans to rely on controls</td></tr>
+        <tr><td><strong>Substantive Tests</strong></td><td>Detect material misstatements in account balances, transactions, and disclosures</td><td>Throughout the audit</td></tr>
+      </table>
+    </div>
+
+    <h3>Risk Assessment Procedures (RAP)</h3>
+    <p>The three RAP procedures are:</p>
+    <div class="mnemonic">
+      <div class="mnemonic-title">🔑 Remember: I-A-O</div>
+      <div class="mnemonic-word">I - A - O</div>
+      <div class="mnemonic-breakdown">
+        <span>I</span>nquiries (of management, TCWG, internal audit, in-house counsel, employees) ·
+        <span>A</span>nalytical Procedures (develop expectations about plausible relationships) ·
+        <span>O</span>bservation and Inspection (plant tours, reading documents, inspecting records)
+      </div>
+    </div>
+
+    <div class="tip">
+      Inquiry ALONE is NOT sufficient for RAP. The auditor must CORROBORATE through observation, inspection, and analytical procedures. Inquiry is the weakest form of evidence.
+    </div>
+
+    <h3>Tests of Controls (TOC)</h3>
+    <div class="box box-teal">
+      <strong>When to perform TOC:</strong><br>
+      1. When the auditor PLANS to rely on the operating effectiveness of controls in determining the nature, timing and extent of substantive tests; OR<br>
+      2. When substantive procedures ALONE cannot provide sufficient appropriate audit evidence (i.e., for significant risks)
+    </div>
+
+    <h4>TOC Procedures:</h4>
+    <div class="mnemonic">
+      <div class="mnemonic-title">🔑 Mnemonic: I-O-I-R</div>
+      <div class="mnemonic-word">I - O - I - R</div>
+      <div class="mnemonic-breakdown">
+        <span>I</span>nquiry · <span>O</span>bservation · <span>I</span>nspection of documents/records · <span>R</span>eperformance
+      </div>
+    </div>
+
+    <h3>TOC vs. Substantive Testing — Effect of Result</h3>
+    <div class="table-wrap">
+      <table>
+        <tr><th>TOC Result</th><th>Effect on Control Risk</th><th>Effect on Substantive Testing</th></tr>
+        <tr><td>Controls are <strong>EFFECTIVE</strong></td><td>Control Risk ↓ (Low)</td><td>Substantive testing can be <strong>REDUCED</strong></td></tr>
+        <tr><td>Controls are <strong>NOT EFFECTIVE</strong></td><td>Control Risk ↑ (High)</td><td>Substantive testing must be <strong>INCREASED</strong></td></tr>
+      </table>
+    </div>
+
+    <h3>Key Cycle Controls to Know</h3>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Cycle</th><th>Key Documents</th><th>Key Control Objective</th></tr>
+        <tr><td><strong>Revenue/Sales</strong></td><td>Sales order, Delivery receipt, Sales invoice, Official receipt</td><td>Occurrence: All recorded sales actually happened</td></tr>
+        <tr><td><strong>Expenditure/AP</strong></td><td>Purchase requisition, Purchase order, Receiving report, Vendor invoice</td><td>AP Dept. verifies by matching PO + Receiving Report + Vendor Invoice (3-way match)</td></tr>
+        <tr><td><strong>Cash</strong></td><td>Bank statements, Cash receipts journal, Deposit slips</td><td>Custodian ≠ recorder (segregation of duties)</td></tr>
+      </table>
+    </div>
+
+    <div class="example">
+      The accounts payable department verifies propriety of acquisitions by comparing: <strong>Purchase Order + Receiving Report + Vendor Invoice</strong> (the "3-way match"). This is a classic control over Expenditure Cycle.
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ===== SECTION 11: SUBSTANTIVE TESTING ===== -->
+<div class="section theme-purple" id="s11">
+  <div class="section-header" onclick="toggle(this)">
+    <div class="section-num">11</div>
+    <div class="section-title">
+      <span class="label">AT-12 · PSA 330 / 500</span>
+      <h2>Substantive Testing & Audit Evidence</h2>
+    </div>
+    <button class="toggle-btn">▼</button>
+  </div>
+  <div class="section-body">
+
+    <h3>What is Substantive Testing?</h3>
+    <div class="box box-purple">
+      Substantive procedures are designed to detect <strong>material misstatements at the assertion level</strong> in account balances, classes of transactions, and disclosures.
+    </div>
+
+    <h3>Two Types of Substantive Procedures</h3>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Type</th><th>Includes</th><th>Good for…</th></tr>
+        <tr>
+          <td><strong>Tests of Details</strong></td>
+          <td>• Tests of transactions<br>• Tests of balances</td>
+          <td>Specific assertion testing; tracing, vouching, confirmations, physical inspection</td>
+        </tr>
+        <tr>
+          <td><strong>Analytical Procedures</strong><br><small>(Substantive APs)</small></td>
+          <td>Trend analysis, ratio analysis, reasonableness tests</td>
+          <td>Identifying unusual relationships; supporting tests of details</td>
+        </tr>
+      </table>
+    </div>
+
+    <h3>Analytical Procedures — 3 Uses</h3>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Stage</th><th>Purpose</th><th>Required?</th></tr>
+        <tr><td><strong>Planning</strong></td><td>Directs attention to likely misstatements; helps develop RAP</td><td>✅ REQUIRED</td></tr>
+        <tr><td><strong>Substantive</strong></td><td>Supports or refutes account balances</td><td>Optional (auditor's choice)</td></tr>
+        <tr><td><strong>Overall Review</strong></td><td>Reviews reasonableness of account balances near completion</td><td>✅ REQUIRED</td></tr>
+      </table>
+    </div>
+
+    <h3>Sufficient &amp; Appropriate Evidence</h3>
+    <div class="cards">
+      <div class="card">
+        <div class="card-title">Sufficiency</div>
+        <div class="card-val">QUANTITY</div>
+        <div class="card-sub">More risk = more evidence needed. Higher quality evidence = less quantity needed.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Appropriateness</div>
+        <div class="card-val">QUALITY</div>
+        <div class="card-sub">Evidence is appropriate when it is both RELEVANT (relates to the assertion) and RELIABLE.</div>
+      </div>
+    </div>
+
+    <h3>Reliability Hierarchy of Evidence</h3>
+    <p><strong>More Reliable → Less Reliable:</strong></p>
+    <ol>
+      <li>Evidence from <strong>independent external sources</strong> (e.g., bank confirmation)</li>
+      <li>Evidence obtained <strong>directly by the auditor</strong> (e.g., physical count by auditor)</li>
+      <li>Evidence from entity's records when <strong>internal controls are effective</strong></li>
+      <li>Evidence obtained <strong>indirectly or by inference</strong></li>
+      <li>Evidence from <strong>original documents</strong> &gt; photocopies/faxes</li>
+    </ol>
+
+    <div class="tip">
+      The weakest evidence is oral testimony (inquiry). The strongest is direct physical evidence obtained by the auditor. Documentary evidence from external sources (bank confirmations) is generally more reliable than internally-generated documents.
+    </div>
+
+    <h3>Timing of Substantive Procedures</h3>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Detection Risk Level</th><th>Testing Timing</th></tr>
+        <tr><td><strong>Low DR</strong> (high RMM)</td><td>Year-end testing preferred; more extensive work</td></tr>
+        <tr><td><strong>High DR</strong> (low RMM)</td><td>May perform <strong>interim testing</strong> (before year-end)</td></tr>
+      </table>
+    </div>
+
+    <h3>Audit Documentation (Working Papers)</h3>
+    <p>Working papers are the record of:</p>
+    <ul>
+      <li>Audit procedures performed</li>
+      <li>Relevant audit evidence obtained</li>
+      <li>Conclusions reached by the auditor</li>
+    </ul>
+
+    <div class="table-wrap">
+      <table>
+        <tr><th>File Type</th><th>Contents</th><th>Retention</th></tr>
+        <tr><td><strong>Current File</strong></td><td>Current year audit plan, audit programs, working trial balance, management representation letter</td><td>5 years from date of auditor's report</td></tr>
+        <tr><td><strong>Permanent File</strong></td><td>Long-term contracts, articles of incorporation, organization charts, prior year audited FS</td><td>Indefinitely</td></tr>
+      </table>
+    </div>
+
+    <div class="remember">
+      <strong>No deletions of audit documentation</strong> are allowed after the <em>assembly period</em> (60 days after the date of the auditor's report). After assembly, the file is locked — no additions, changes, or deletions.
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ===== SECTION 12: FRAUD ===== -->
+<div class="section theme-red" id="s12">
+  <div class="section-header" onclick="toggle(this)">
+    <div class="section-num">12</div>
+    <div class="section-title">
+      <span class="label">AT-14 · PSA 240 / PSA 250</span>
+      <h2>Fraud, Error & Non-Compliance</h2>
+    </div>
+    <button class="toggle-btn">▼</button>
+  </div>
+  <div class="section-body">
+
+    <h3>Fraud vs. Error</h3>
+    <div class="table-wrap">
+      <table>
+        <tr><th></th><th>Fraud</th><th>Error</th></tr>
+        <tr><td><strong>Intent</strong></td><td>INTENTIONAL</td><td>UNINTENTIONAL</td></tr>
+        <tr><td><strong>Examples</strong></td><td>Fraudulent financial reporting, misappropriation of assets</td><td>Arithmetic mistakes, misapplication of accounting policies</td></tr>
+        <tr><td><strong>Auditor's concern</strong></td><td>When it causes <em>material misstatement</em> in FS</td><td>Any misstatement, particularly material ones</td></tr>
+      </table>
+    </div>
+
+    <h3>Two Types of Fraud</h3>
+    <div class="cards">
+      <div class="card">
+        <div class="card-title">Fraudulent Financial Reporting</div>
+        <div class="card-sub">Management manipulates the FS (overstatement of revenues, understatement of liabilities). E.g., channel stuffing, premature revenue recognition.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Misappropriation of Assets</div>
+        <div class="card-sub">Theft of assets (skimming cash, pilfering inventory, lapping). Usually by lower-level employees.</div>
+      </div>
+    </div>
+
+    <h3>Fraud Risk Triangle</h3>
+    <div class="mnemonic">
+      <div class="mnemonic-title">🔑 Fraud Triangle</div>
+      <div class="mnemonic-word">I - O - R</div>
+      <div class="mnemonic-breakdown">
+        <span>I</span>ncentive/Pressure (need or motivation to commit fraud) ·
+        <span>O</span>pportunity (weak internal controls) ·
+        <span>R</span>ationalization (justifying the act: "I'll pay it back")
+      </div>
+    </div>
+
+    <h3>Responsibilities — Who Does What?</h3>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Party</th><th>Responsibility</th></tr>
+        <tr><td><strong>Management + TCWG</strong></td><td><strong>Primary</strong> responsibility for prevention and detection of fraud</td></tr>
+        <tr><td><strong>Auditor</strong></td><td>Responsible for obtaining <em>reasonable assurance</em> that FS are free from material misstatement due to fraud OR error; maintain professional skepticism throughout</td></tr>
+      </table>
+    </div>
+
+    <div class="remember">
+      The auditor does NOT make <em>legal determinations</em> of whether fraud has occurred — that is for law enforcement/courts. The auditor only identifies and assesses the <em>risk</em> of material misstatement due to fraud.
+    </div>
+
+    <h3>Key PSA 240 Requirements</h3>
+    <ol>
+      <li>Maintain attitude of <strong>professional skepticism</strong></li>
+      <li><strong>Discussion</strong> among engagement team about susceptibility to fraud</li>
+      <li><strong>Inquire</strong> of management: process for identifying fraud risks, awareness of any actual/suspected fraud</li>
+      <li>Inquire of <strong>TCWG</strong>: how it oversees fraud risk management</li>
+      <li>Evaluate <strong>unusual/unexpected analytical procedure relationships</strong> (especially revenue accounts)</li>
+      <li>Consider whether identified fraud risks are <strong>significant risks</strong></li>
+    </ol>
+
+    <h3>Presumed Significant Fraud Risks (Always)</h3>
+    <div class="box box-red">
+      <strong>Two always-present significant risks (PSA 240):</strong><br>
+      1. <strong>Revenue recognition</strong> — always presumed a significant risk (management may be incentivized to manipulate revenue)<br>
+      2. <strong>Management override of controls</strong> — always a significant risk; no matter how good the controls, management can circumvent them
+    </div>
+
+    <h3>PSA 250 — Non-Compliance with Laws and Regulations</h3>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Category</th><th>Auditor's Approach</th></tr>
+        <tr><td>Laws directly affecting FS (e.g., tax, pension)</td><td>Obtain sufficient appropriate audit evidence of compliance</td></tr>
+        <tr><td>Other laws (environmental, employment)</td><td>Perform specified procedures; inquire of management; stay alert for indications of non-compliance</td></tr>
+      </table>
+    </div>
+
+    <div class="tip">
+      The risk of NOT detecting fraud is <strong>higher</strong> than the risk of not detecting an error, because fraud involves deception (forgery, collusion, deliberate failure to record). Procedures effective for errors may NOT be effective for fraud.
+    </div>
+
+    <h3>Responses to Identified Fraud Risk</h3>
+    <ul>
+      <li>Assign more <strong>experienced staff</strong> to high-risk areas</li>
+      <li>Increase <strong>unpredictability</strong> in audit procedures (change timing, add surprise procedures)</li>
+      <li>Address <strong>management override risk</strong>: always test journal entries, especially non-standard ones, and year-end adjustments</li>
+      <li>Include <strong>retrospective review</strong> of accounting estimates for possible bias</li>
+    </ul>
+
+  </div>
+</div>
+
+
+<!-- ===== SECTION 13: COMPUTATIONS ===== -->
+<div class="section theme-gold" id="s13">
+  <div class="section-header" onclick="toggle(this)">
+    <div class="section-num">13</div>
+    <div class="section-title">
+      <span class="label">AT — Computation Items</span>
+      <h2>The 13 Computation Items</h2>
+    </div>
+    <button class="toggle-btn">▼</button>
+  </div>
+  <div class="section-body">
+
+    <div class="box box-gold">
+      <strong>Instructor's Note</strong>
+      These 13 computation items regularly appear in the CPALE. Memorize the formulas and the logic behind them. Work through each example carefully — these can be the difference between passing and conditional.
+    </div>
+
+    <h3>1. Audit Risk Model</h3>
+    <div class="formula">AR = IR × CR × DR</div>
+    <div class="computation">
+      <div class="line">Given: AR = 5%, IR = 80%, CR = 60%</div>
+      <div class="line">DR = AR ÷ (IR × CR)</div>
+      <div class="line">DR = 0.05 ÷ (0.80 × 0.60)</div>
+      <div class="line">DR = 0.05 ÷ 0.48</div>
+      <div class="ans">DR = 10.42%</div>
+    </div>
+    <div class="tip">Higher IR + CR → Lower DR → Auditor must do MORE substantive testing</div>
+
+    <hr class="divider">
+
+    <h3>2. CPALE Rating Computation</h3>
+    <div class="box box-gold">
+      <strong>Passing rules:</strong> General Average ≥ 75%, No subject below 65% = PASSED.<br>
+      GA ≥ 75% but one subject 60–64% = CONDITIONAL.<br>
+      GA &lt; 75% OR any subject below 60% = FAILED.
+    </div>
+    <div class="computation">
+      <div class="line">Candidate A: 88, 82, 79, 76, 62, 85</div>
+      <div class="line">Average = (88+82+79+76+62+85) ÷ 6 = 472 ÷ 6 = 78.67%</div>
+      <div class="line">Average ≥ 75 ✓ BUT Subject 5 = 62 (60–64 range)</div>
+      <div class="ans">Result: CONDITIONAL — must retake Subject 5 and score ≥ 75</div>
+    </div>
+
+    <hr class="divider">
+
+    <h3>3. Detection Risk — Inverse Relationship</h3>
+    <div class="formula">ADR = AR ÷ RMM = AR ÷ (IR × CR)</div>
+    <div class="computation">
+      <div class="line">Scenario: IR = High (100%), CR = High (100%), AR = 5%</div>
+      <div class="line">ADR = 0.05 ÷ (1.0 × 1.0) = 5% (Lowest possible DR)</div>
+      <div class="ans">Auditor must perform maximum substantive testing</div>
+    </div>
+
+    <hr class="divider">
+
+    <h3>4. Materiality Benchmarks</h3>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Base</th><th>Typical % Range</th><th>Best for…</th></tr>
+        <tr><td>Total revenues</td><td>0.5% – 1%</td><td>Profit entities</td></tr>
+        <tr><td>Total assets</td><td>0.5% – 1%</td><td>Balance sheet heavy entities</td></tr>
+        <tr><td>Net income / profit before tax</td><td>5% – 10%</td><td>Investor-focused entities</td></tr>
+        <tr><td>Total expenditures</td><td>0.5% – 1%</td><td>Non-profit, government</td></tr>
+        <tr><td>Equity</td><td>1% – 5%</td><td>Financing decisions</td></tr>
+      </table>
+    </div>
+    <div class="computation">
+      <div class="line">Total Assets = ₱50,000,000; Benchmark = 1%</div>
+      <div class="line">Overall Materiality = ₱50,000,000 × 1% = ₱500,000</div>
+      <div class="line">Performance Materiality = 70% × ₱500,000</div>
+      <div class="ans">Performance Materiality = ₱350,000</div>
+    </div>
+
+    <hr class="divider">
+
+    <h3>5. Audit Sampling — Sample Size Relationships</h3>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Factor Increases (↑)</th><th>Effect on Sample Size</th></tr>
+        <tr><td>Risk of material misstatement (IR, CR)</td><td>Increases ↑</td></tr>
+        <tr><td>Tolerable misstatement / Tolerable deviation rate</td><td>Decreases ↓</td></tr>
+        <tr><td>Expected error / deviation rate</td><td>Increases ↑</td></tr>
+        <tr><td>Confidence level (1 - DR)</td><td>Increases ↑</td></tr>
+        <tr><td>Population size</td><td>Increases ↑ (slightly)</td></tr>
+        <tr><td>Acceptable level of DR (higher DR)</td><td>Decreases ↓</td></tr>
+      </table>
+    </div>
+    <div class="tip">
+      Tolerable misstatement is the maximum misstatement an auditor can accept and still conclude the balance is fairly stated. Higher tolerable misstatement = fewer samples needed.
+    </div>
+
+    <hr class="divider">
+
+    <h3>6. Tolerable Misstatement vs. Performance Materiality</h3>
+    <div class="formula">
+      Tolerable Misstatement ≤ Performance Materiality ≤ Overall Materiality
+    </div>
+    <div class="computation">
+      <div class="line">Overall Materiality = ₱500,000</div>
+      <div class="line">Performance Materiality = ₱350,000 (70% of overall)</div>
+      <div class="ans">Tolerable Misstatement per account = set at or below ₱350,000</div>
+    </div>
+
+    <hr class="divider">
+
+    <h3>7. Effect of Assessed Risk on Evidence</h3>
+    <div class="computation">
+      <div class="line">Lower DR required → More substantive evidence needed</div>
+      <div class="line">Higher DR acceptable → Less substantive evidence needed</div>
+      <div class="line">Strong controls (low CR) → Can plan for higher DR → Less substantive testing</div>
+      <div class="ans">Inverse: DR and (IR × CR) are INVERSELY related</div>
+    </div>
+
+    <hr class="divider">
+
+    <h3>8. Lower Risk = Lower Sample Size</h3>
+    <div class="computation">
+      <div class="line">Auditor assessed IR = Low; controls effective (CR = Low)</div>
+      <div class="line">RMM = Low → ADR = High → Less substantive testing</div>
+      <div class="ans">Fewer confirmations needed; can accept higher tolerable deviation</div>
+    </div>
+
+    <hr class="divider">
+
+    <h3>9. Projected Misstatement</h3>
+    <div class="formula">Projected Misstatement = (Sample Misstatement ÷ Sample Book Value) × Population Book Value</div>
+    <div class="computation">
+      <div class="line">Sample book value = ₱200,000; Sample misstatement found = ₱4,000</div>
+      <div class="line">Population book value = ₱2,000,000</div>
+      <div class="line">Projected misstatement = (₱4,000 ÷ ₱200,000) × ₱2,000,000</div>
+      <div class="ans">Projected misstatement = ₱40,000</div>
+    </div>
+
+    <hr class="divider">
+
+    <h3>10. Deviations in TOC (Tests of Controls)</h3>
+    <div class="formula">Deviation Rate = Number of Deviations ÷ Sample Size</div>
+    <div class="computation">
+      <div class="line">Sample size = 100; Deviations found = 7</div>
+      <div class="line">Deviation rate = 7 ÷ 100 = 7%</div>
+      <div class="line">Tolerable deviation rate = 5%</div>
+      <div class="line">7% > 5% → Controls CANNOT be relied upon</div>
+      <div class="ans">Increase substantive testing; do NOT reduce DR based on controls</div>
+    </div>
+
+    <hr class="divider">
+
+    <h3>11. Confidence Level & Risk of Assessing CR Too Low</h3>
+    <div class="formula">
+      Confidence Level = 1 − Risk of Assessing CR Too Low
+      <small>(Risk of over-relying on controls that are actually ineffective)</small>
+    </div>
+    <div class="computation">
+      <div class="line">Confidence level = 95%</div>
+      <div class="ans">Risk of assessing CR too low = 1 - 0.95 = 5%</div>
+    </div>
+
+    <hr class="divider">
+
+    <h3>12. Overall Audit Risk — Acceptable Level</h3>
+    <div class="computation">
+      <div class="line">Goal: Keep overall AR ≤ 5% (standard)</div>
+      <div class="line">If IR = 60%, CR = 50%:</div>
+      <div class="line">DR = 0.05 ÷ (0.60 × 0.50) = 0.05 ÷ 0.30</div>
+      <div class="ans">Acceptable DR = 16.67%</div>
+    </div>
+
+    <hr class="divider">
+
+    <h3>13. CPALE Score — Conditional Credit System</h3>
+    <div class="computation">
+      <div class="line">Conditional candidate: passed 5 subjects; failed 1 (scored 62)</div>
+      <div class="line">Conditional credits for the 5 passed subjects are RETAINED</div>
+      <div class="line">Must retake only the 1 failed subject</div>
+      <div class="line">Must score ≥ 75 on the retake within the allowed period</div>
+      <div class="ans">If achieved: PASSED the CPA Board Exams</div>
+    </div>
+
+    <div class="tip">
+      For TOC computations: if deviation rate found &gt; tolerable deviation rate → <strong>rely less/not at all on controls</strong> → increase substantive testing. For substantive testing: if projected misstatement &gt; tolerable misstatement → <strong>FS is likely materially misstated</strong> → qualify or expand procedures.
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ===== SECTION 14: CODE OF ETHICS ===== -->
+<div class="section theme-dark" id="s14">
+  <div class="section-header" onclick="toggle(this)">
+    <div class="section-num">14</div>
+    <div class="section-title">
+      <span class="label">AT-20 · IESBA Code</span>
+      <h2>Code of Ethics for Professional Accountants</h2>
+    </div>
+    <button class="toggle-btn">▼</button>
+  </div>
+  <div class="section-body">
+
+    <h3>5 Fundamental Principles (IOPCB)</h3>
+    <div class="mnemonic">
+      <div class="mnemonic-title">🔑 Mnemonic</div>
+      <div class="mnemonic-word">I - O - P - C - B</div>
+      <div class="mnemonic-breakdown">
+        <span>I</span>ntegrity · <span>O</span>bjectivity · <span>P</span>rofessional Competence &amp; Due Care · <span>C</span>onfidentiality · <span>B</span>ehavior (Professional)
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <tr><th>Principle</th><th>Meaning</th><th>Example Violation</th></tr>
+        <tr>
+          <td><strong>Integrity</strong></td>
+          <td>Be straightforward and honest in all professional/business relationships</td>
+          <td>Auditor signs off on FS knowing they are materially misstated</td>
+        </tr>
+        <tr>
+          <td><strong>Objectivity</strong></td>
+          <td>Don't let bias, conflict of interest, or undue influence affect professional judgment</td>
+          <td>Auditor invests heavily in the client's stocks</td>
+        </tr>
+        <tr>
+          <td><strong>Professional Competence &amp; Due Care</strong></td>
+          <td>Maintain knowledge and skill; act diligently and in accordance with standards</td>
+          <td>Taking an audit engagement without the technical expertise to perform it</td>
+        </tr>
+        <tr>
+          <td><strong>Confidentiality</strong></td>
+          <td>Don't disclose client information to third parties without authority or legal right</td>
+          <td>Telling a competitor about a client's new product launch</td>
+        </tr>
+        <tr>
+          <td><strong>Professional Behavior</strong></td>
+          <td>Comply with relevant laws and regulations; avoid discrediting the profession</td>
+          <td>Making false and misleading statements about a competitor's work</td>
+        </tr>
+      </table>
+    </div>
+
+    <h3>5 Threats to Independence (SAFFI)</h3>
+    <div class="mnemonic">
+      <div class="mnemonic-title">🔑 Mnemonic</div>
+      <div class="mnemonic-word">S - A - F - F - I</div>
+      <div class="mnemonic-breakdown">
+        <span>S</span>elf-Interest · <span>A</span>dvocacy · <span>F</span>amiliarity · <span>F</span>ear (Intimidation) · se<span>l</span>f-<span>I</span>nterest review = <strong>Self-Review</strong>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <tr><th>Threat</th><th>What it is</th><th>Example</th></tr>
+        <tr>
+          <td><strong>Self-Interest</strong></td>
+          <td>Financial or other interest of the firm could inappropriately influence judgment</td>
+          <td>Auditor holds shares in the audit client</td>
+        </tr>
+        <tr>
+          <td><strong>Self-Review</strong></td>
+          <td>Auditor evaluates their own prior work</td>
+          <td>Auditor prepares the FS then audits them</td>
+        </tr>
+        <tr>
+          <td><strong>Advocacy</strong></td>
+          <td>Auditor promotes a client's position/interest to the point it compromises objectivity</td>
+          <td>Auditor acts as expert witness defending the client in litigation vs. a third party</td>
+        </tr>
+        <tr>
+          <td><strong>Familiarity</strong></td>
+          <td>Close relationship with client leading to sympathy or accepting their views</td>
+          <td>Audit partner has been on the engagement for 15 years and is close friends with CFO</td>
+        </tr>
+        <tr>
+          <td><strong>Intimidation</strong></td>
+          <td>Threat (actual or perceived) that deters professional behavior</td>
+          <td>Client threatens to terminate the audit engagement unless a clean opinion is given</td>
+        </tr>
+      </table>
+    </div>
+
+    <h3>Structure of the Code</h3>
+    <div class="cards">
+      <div class="card">
+        <div class="card-title">Part 1</div>
+        <div class="card-val">All Professional Accountants</div>
+        <div class="card-sub">Fundamental principles + conceptual framework</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Part 2</div>
+        <div class="card-val">PAs in Business</div>
+        <div class="card-sub">Commerce, industry, government, education, non-profit</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Part 3</div>
+        <div class="card-val">PAs in Public Practice</div>
+        <div class="card-sub">Providing professional services (audit, tax, advisory)</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Part 4A &amp; 4B</div>
+        <div class="card-val">Independence Standards</div>
+        <div class="card-sub">4A: Audit/review; 4B: Other assurance engagements</div>
+      </div>
+    </div>
+
+    <h3>Conceptual Framework Approach</h3>
+    <p>Instead of listing rules for every scenario, the Code uses a <strong>conceptual framework</strong>:</p>
+    <ol>
+      <li><strong>Identify</strong> threats to the fundamental principles</li>
+      <li><strong>Evaluate</strong> the significance of the threat</li>
+      <li><strong>Address</strong> the threat (apply safeguards or eliminate the circumstance)</li>
+    </ol>
+
+    <div class="tip">
+      The <strong>Reasonable and Informed Third Party test</strong>: Would a reasonable person, knowing all the facts, conclude that the accountant has complied with the fundamental principles? This is the key test for evaluating whether a threat has been adequately addressed.
+    </div>
+
+    <h3>Safeguards (How to Address Threats)</h3>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Category</th><th>Examples</th></tr>
+        <tr><td><strong>Profession/Legislation/Regulation</strong></td><td>CPE requirements, licensing, PSA standards</td></tr>
+        <tr><td><strong>Firm-level</strong></td><td>Quality control procedures, partner rotation, peer review</td></tr>
+        <tr><td><strong>Engagement-level</strong></td><td>Engagement quality reviewer, involving another partner for consultation</td></tr>
+      </table>
+    </div>
+
+    <h3>Independence — Key Definitions</h3>
+    <div class="cards">
+      <div class="card">
+        <div class="card-title">Independence in Mind</div>
+        <div class="card-sub">The actual state — not allowing external factors to influence judgment. <em>Real independence.</em></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Independence in Appearance</div>
+        <div class="card-sub">How it looks to others — avoiding facts and circumstances that a reasonable third party would find objectionable.</div>
+      </div>
+    </div>
+
+    <h3>Confidentiality — When CAN You Disclose?</h3>
+    <ul>
+      <li>With <strong>client's permission</strong></li>
+      <li>When required by <strong>law or regulation</strong> (e.g., court order, anti-money laundering)</li>
+      <li>To comply with <strong>quality review</strong> or professional inquiry</li>
+      <li>To <strong>protect the professional's interests</strong> in legal proceedings</li>
+    </ul>
+
+    <div class="remember">
+      Confidentiality survives even after the client relationship ends. A CPA cannot disclose confidential client information just because the engagement is over.
+    </div>
+
+  </div>
+</div>
+
+
+<!-- QUICK QUIZ SECTION -->
+<div class="section theme-navy">
+  <div class="section-header" onclick="toggle(this)">
+    <div class="section-num">⚡</div>
+    <div class="section-title">
+      <span class="label">Self-Test</span>
+      <h2>Quick Quiz — Test Yourself!</h2>
+    </div>
+    <button class="toggle-btn">▼</button>
+  </div>
+  <div class="section-body">
+    <p style="margin-bottom:16px; color: var(--muted); font-size:14px;">Try to answer before clicking "Show Answer."</p>
+
+    <div class="quiz-q">
+      <strong>Q1: What is the correct audit risk formula?</strong>
+      <button class="show-ans" onclick="showAns(this)">Show Answer</button>
+      <div class="quiz-ans">AR = IR × CR × DR. Detection Risk = AR ÷ (IR × CR). DR is the only component the auditor can control.</div>
+    </div>
+
+    <div class="quiz-q">
+      <strong>Q2: A practitioner expresses: "Nothing has come to our attention that causes us to believe the FS are materially misstated." What type of assurance is this?</strong>
+      <button class="show-ans" onclick="showAns(this)">Show Answer</button>
+      <div class="quiz-ans">Limited Assurance — expressed in NEGATIVE form. This is the conclusion given in a REVIEW engagement (PSRE).</div>
+    </div>
+
+    <div class="quiz-q">
+      <strong>Q3: A candidate's CPALE scores are: 80, 79, 77, 76, 62, 88. Did they pass?</strong>
+      <button class="show-ans" onclick="showAns(this)">Show Answer</button>
+      <div class="quiz-ans">Average = (80+79+77+76+62+88)/6 = 462/6 = 77%. GA ≥ 75 ✓, but Subject 5 = 62 (in the 60–64 range) → CONDITIONAL. Must retake Subject 5 and score ≥ 75 to pass completely.</div>
+    </div>
+
+    <div class="quiz-q">
+      <strong>Q4: Which component of internal control is considered the "foundation" and mainly an indirect control?</strong>
+      <button class="show-ans" onclick="showAns(this)">Show Answer</button>
+      <div class="quiz-ans">Control Environment — it sets the "tone at the top" and includes management philosophy, ethical values, and organizational structure. It is an INDIRECT control.</div>
+    </div>
+
+    <div class="quiz-q">
+      <strong>Q5: Under PSA 240, which two fraud risks are ALWAYS presumed to be significant risks?</strong>
+      <button class="show-ans" onclick="showAns(this)">Show Answer</button>
+      <div class="quiz-ans">1. Revenue recognition (management may inflate revenues), and 2. Management override of controls (management can always circumvent even the best internal controls).</div>
+    </div>
+
+    <div class="quiz-q">
+      <strong>Q6: If IR = 80% and CR = 75%, and the auditor wants to keep AR at 5%, what should DR be?</strong>
+      <button class="show-ans" onclick="showAns(this)">Show Answer</button>
+      <div class="quiz-ans">DR = AR ÷ (IR × CR) = 0.05 ÷ (0.80 × 0.75) = 0.05 ÷ 0.60 = 8.33%. The auditor must design procedures so detection risk does not exceed 8.33%.</div>
+    </div>
+
+    <div class="quiz-q">
+      <strong>Q7: What are the 5 fundamental principles of the Code of Ethics?</strong>
+      <button class="show-ans" onclick="showAns(this)">Show Answer</button>
+      <div class="quiz-ans">IOPCB: Integrity, Objectivity, Professional Competence & Due Care, Confidentiality, Professional Behavior.</div>
+    </div>
+
+    <div class="quiz-q">
+      <strong>Q8: What is the difference between Audit Strategy and Audit Plan?</strong>
+      <button class="show-ans" onclick="showAns(this)">Show Answer</button>
+      <div class="quiz-ans">Audit Strategy = General, high-level approach (scope, timing, direction). Audit Plan = Specific, detailed set of procedures (RAP, TOC, substantive tests). Strategy is established FIRST. The plan is MORE detailed than the strategy — a common trap question!</div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- CHEAT SHEET -->
+<div class="section theme-green">
+  <div class="section-header" onclick="toggle(this)">
+    <div class="section-num">📌</div>
+    <div class="section-title">
+      <span class="label">Last-Minute Review</span>
+      <h2>Master Cheat Sheet — Key Numbers & Facts</h2>
+    </div>
+    <button class="toggle-btn">▼</button>
+  </div>
+  <div class="section-body">
+
+    <h3>Critical Numbers to Memorize</h3>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Item</th><th>Key Number / Rule</th></tr>
+        <tr><td>CPALE passing grade</td><td>GA ≥ 75%, no subject &lt; 65%</td></tr>
+        <tr><td>Conditional range</td><td>GA ≥ 75%, one subject 60–64%</td></tr>
+        <tr><td>Fail condition</td><td>Any subject &lt; 60% OR GA &lt; 75%</td></tr>
+        <tr><td>PRBOA work experience requirement</td><td>10 years</td></tr>
+        <tr><td>Refresher course after 2 failed complete exams</td><td>24 units</td></tr>
+        <tr><td>PIC renewal period</td><td>Every 3 years</td></tr>
+        <tr><td>COR expiry</td><td>Does NOT expire</td></tr>
+        <tr><td>CPALE frequency</td><td>Twice a year (May &amp; October)</td></tr>
+        <tr><td>Subjects change limit</td><td>Not more than every 2 years</td></tr>
+        <tr><td>Audit documentation assembly period</td><td>60 days after auditor's report date</td></tr>
+        <tr><td>Audit documentation retention (current file)</td><td>5 years</td></tr>
+        <tr><td>ISQM 1 quality components</td><td>8 components</td></tr>
+        <tr><td>Fundamental ethics principles</td><td>5 (IOPCB)</td></tr>
+        <tr><td>Threats to independence</td><td>5 (SAFFI)</td></tr>
+        <tr><td>AR formula</td><td>AR = IR × CR × DR</td></tr>
+        <tr><td>Relationship: DR vs. (IR × CR)</td><td>INVERSE (they move in opposite directions)</td></tr>
+      </table>
+    </div>
+
+    <h3>Engagement Types — At a Glance</h3>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Engagement</th><th>Standard</th><th>Assurance</th><th>Conclusion</th></tr>
+        <tr><td>Audit</td><td>PSA</td><td>High (reasonable)</td><td>Positive</td></tr>
+        <tr><td>Review</td><td>PSRE</td><td>Moderate (limited)</td><td>Negative</td></tr>
+        <tr><td>Agreed-upon Procedures</td><td>PSRS</td><td>None</td><td>Factual findings (restricted)</td></tr>
+        <tr><td>Compilation</td><td>PSRS</td><td>None</td><td>Identifies compiled info</td></tr>
+      </table>
+    </div>
+
+    <h3>Top 10 Exam Traps</h3>
+    <ol>
+      <li><strong>"Audit guarantees accuracy"</strong> → FALSE. Audit provides HIGH but NOT ABSOLUTE assurance.</li>
+      <li><strong>"Auditor is responsible for fraud prevention"</strong> → FALSE. Management &amp; TCWG are primarily responsible. Auditor detects, not prevents.</li>
+      <li><strong>"Audit strategy is more detailed than audit plan"</strong> → FALSE. Plan is more detailed.</li>
+      <li><strong>"DR is a function of the client"</strong> → FALSE. DR is controlled by the AUDITOR.</li>
+      <li><strong>"High IR means high DR"</strong> → FALSE. High IR → LOW DR (more work needed).</li>
+      <li><strong>"IC provides absolute assurance"</strong> → FALSE. IC provides REASONABLE assurance only.</li>
+      <li><strong>"Collusion cannot happen if duties are segregated"</strong> → FALSE. Collusion CAN bypass SOD.</li>
+      <li><strong>"Auditor makes legal determinations of fraud"</strong> → FALSE. Courts do. Auditor only assesses risk.</li>
+      <li><strong>"COR expires every 3 years"</strong> → FALSE. COR does NOT expire. PIC expires every 3 years.</li>
+      <li><strong>"Inquiry alone is sufficient evidence"</strong> → FALSE. Must corroborate inquiry with observation/inspection.</li>
+    </ol>
+
+  </div>
+</div>
+
+</div><!-- /container -->
+
+<footer>
+  <strong>CPALE Auditing Theory One-Night Reviewer</strong> · Based on ReSA Batch 45 Materials (AT-01 to AT-20)<br>
+  Sources: PSAs, RA 9298 &amp; IRR, AASC Pronouncements, IESBA Code of Ethics, ISQM 1 &amp; 2<br>
+  <em>Study hard. You've got this. 🎓</em>
+</footer>
+
+<script>
+  function toggle(header) {
+    const body = header.nextElementSibling;
+    const btn = header.querySelector('.toggle-btn');
+    const isOpen = body.classList.contains('open');
+    body.classList.toggle('open', !isOpen);
+    btn.classList.toggle('open', !isOpen);
+  }
+
+  function showAns(btn) {
+    const ans = btn.nextElementSibling;
+    ans.classList.toggle('show');
+    btn.textContent = ans.classList.contains('show') ? 'Hide Answer' : 'Show Answer';
+  }
+
+  // Open first section by default
+  document.querySelectorAll('.section-body').forEach((body, i) => {
+    if (i > 0) body.style.display = 'none';
+  });
+
+  // Fix toggle function for display none
+  document.querySelectorAll('.section-header').forEach(header => {
+    header.onclick = function() {
+      const body = this.nextElementSibling;
+      const btn = this.querySelector('.toggle-btn');
+      const isOpen = body.style.display !== 'none';
+      body.style.display = isOpen ? 'none' : 'block';
+      btn.style.transform = isOpen ? '' : 'rotate(180deg)';
+    };
+  });
+</script>
+</body>
+</html>
