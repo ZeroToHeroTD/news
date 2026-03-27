@@ -34,6 +34,10 @@
    --social-card-bg: #f8fafc;
    --social-card-border: #e2e8f0;
    --social-text: #1e293b;
+
+   --accent-green: #22c55e;
+  --accent-amber: #f59e0b;
+  --accent-red: #ef4444;
 }
 
 .dark-mode {
@@ -192,8 +196,13 @@ ul.nav-links li.active a .nav-icon { opacity: 1; }
 .att-value.red { color: var(--accent-red); }
 .att-value.amber { color: var(--accent-amber); }
 .attendance-bar-track { width: 100%; height: 8px; background: var(--input-bg); border-radius: 20px; overflow: hidden; border: 1px solid var(--border-color); }
-.attendance-bar-fill { height: 100%; border-radius: 20px; transition: width 0.8s ease, background 0.3s ease; }
-
+.attendance-bar-fill {
+    height: 100%;
+    border-radius: 20px;
+    min-width: 4px; /* Prevents a 0% bar from being totally invisible */
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s ease;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
 /* ==========================================================================
    7. PAYMENTS (UPGRADED)
    ========================================================================== */
