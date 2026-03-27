@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Portal - Sign Up</title>
+  <link rel="stylesheet" href="../css/global.css">
+  <link rel="stylesheet" href="../css/auth.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <main class="container">
+    
+    <section class="hero-section signup-hero">
+      <div class="hero-content">
+        <h1>Join the Portal.</h1>
+        <p>Create your account to access course materials, collaborate with peers, and manage your academic journey.</p>
+      </div>
+    </section>
+
+    <section class="form-section">
+      <div class="form-wrapper">
+      <div class="head-text">
+          <h2>Create Account</h2>
+          <p>Sign up to get started as a student</p>
+        </div>
+
+        <div id="alertBox" class="alert-box hidden"></div>
+
+        <form id="signupForm" class="welcome-form">
+          <div class="input-group">
+            <label for="fullName">Full Name</label>
+            <input type="text" id="fullName" placeholder="Super Jawo" required>
+          </div>
+
+          <div class="input-group">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" placeholder="student@university.edu" required>
+          </div>
+
+          <div class="input-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="Create a strong password" required minlength="6">
+          </div>
+
+          <button type="submit" id="signupBtn" class="auth-btn">Create Account</button>
+          
+          <p class="signup-text">Already have an account? <a href="index.html">Log in here</a></p>
+        </form>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../scripts/signup-script.js"></script> 
+  
+</body>
+</html>

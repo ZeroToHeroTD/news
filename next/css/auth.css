@@ -1,0 +1,208 @@
+/* ==========================================================================
+   AUTHENTICATION PAGES - REFINED REDESIGN
+   ========================================================================== */
+
+body.auth-page {
+  background-color: #f0f2f5; /* Subtle neutral grey */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+}
+
+.container {
+ display: flex;
+  width: 95%;
+  max-width: 1100px;
+  min-height: 650px;
+  background: #ffffff;
+  border-radius: 28px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  /* Ensure the container itself is centered on the screen */
+  margin: auto;
+}
+
+/* --- Left Side: Hero Section (The Visual) --- */
+.hero-section {
+  flex: 1.1; /* Slightly larger than the form for visual impact */
+  background: linear-gradient(135deg, #4f46e5, #3b82f6);
+  color: white;
+  padding: 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+}
+
+/* Texture overlay for depth */
+.hero-section::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: url("https://www.transparenttextures.com/patterns/cubes.png");
+  opacity: 0.15;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+}
+
+.hero-content h1 {
+  font-size: 3.2rem;
+  font-weight: 800;
+  margin-bottom: 24px;
+  line-height: 1.1;
+  letter-spacing: -1px;
+}
+
+.hero-content p {
+  font-size: 1.15rem;
+  line-height: 1.6;
+  opacity: 0.9;
+  max-width: 90%;
+}
+
+/* --- Right Side: Form Section (The Interaction) --- */
+.form-section {
+  flex: 1; 
+  background-color: #ffffff;
+  /* Using Grid is often more stable for single-box centering */
+  display: grid;
+  place-items: center; 
+  padding: 40px;
+  position: relative;
+}
+
+/* The box containing your actual form */
+.form-wrapper {
+  width: 100%;
+  max-width: 380px; 
+  /* Removing all default margins to let the Grid handle it */
+  margin: 0; 
+  display: flex;
+  flex-direction: column;
+  animation: slideUpFade 0.5s ease-out forwards;
+}
+
+/* Ensure the text inside also feels balanced */
+.head-text {
+  margin-bottom: 30px;
+  text-align: left; /* Kept left for that 'clean' modern look */
+}
+
+.head-text h2 {
+  font-size: 1.85rem;
+  color: #111827;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.head-text p {
+  color: #6b7280;
+  font-size: 0.95rem;
+}
+
+/* Inputs & Form Logic */
+.welcome-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.input-group label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #374151;
+  padding-left: 2px;
+}
+
+.input-group input {
+  padding: 14px 16px;
+  border: 2px solid #f3f4f6; /* Lighter border */
+  border-radius: 14px;
+  font-size: 1rem;
+  outline: none;
+  background-color: #f9fafb;
+  transition: all 0.2s ease;
+}
+
+.input-group input:focus {
+  border-color: #4f46e5;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.08);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: -8px;
+}
+
+.forgot-link {
+  font-size: 0.85rem;
+  color: #4f46e5;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.auth-btn {
+  width: 100%;
+  background-color: #4f46e5;
+  color: white;
+  padding: 16px;
+  border-radius: 14px;
+  font-weight: 600;
+  font-size: 1rem;
+  margin-top: 10px;
+  border: none;
+  box-shadow: 0 4px 10px rgba(79, 70, 229, 0.25);
+}
+
+.auth-btn:hover {
+  background-color: #4338ca;
+  transform: translateY(-1px);
+}
+
+.signup-text {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #6b7280;
+  margin-top: 24px;
+}
+
+.signup-text a {
+  color: #4f46e5;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+/* Hero Variant Colors */
+.signup-hero { background: linear-gradient(135deg, #0ea5e9, #4f46e5); }
+.forgot-hero { background: linear-gradient(135deg, #10b981, #059669); }
+
+/* Mobile Responsiveness */
+@media (max-width: 850px) {
+  .container {
+    flex-direction: column;
+    min-height: auto;
+    width: 92%;
+    border-radius: 20px;
+  }
+  .hero-section {
+    padding: 40px 30px;
+    flex: none;
+  }
+  .hero-content h1 { font-size: 2.2rem; }
+  .form-section {
+    padding: 40px 30px;
+  }
+}
