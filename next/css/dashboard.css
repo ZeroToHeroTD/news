@@ -1383,6 +1383,7 @@ ul.nav-links li.active {
 .role-student { background: rgba(59, 130, 246, 0.15); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.2); }
 
 /* --- THE STATUS FIX (Dot & Pulse) --- */
+
 .status-container {
     display: flex;
     align-items: center;
