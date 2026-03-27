@@ -1,0 +1,9 @@
+{
+  "redirects": [
+    {
+      "source": "/",
+      "destination": "/next/html/index.html",
+      "permanent": false
+    }
+  ]
+}
