@@ -5,7 +5,8 @@ import {
     initProfile, loadResources, loadTodaysSchedule, loadWeeklySchedule, 
     loadMessages, updateUnreadCount, loadPaymentData, loadDeadlines, 
     loadAttendance, loadCoursesData, loadGradesData, loadNotices, 
-    loadSmartDashboardData, loadPerformanceChart, myChart 
+    loadSmartDashboardData, loadPerformanceChart, loadSocialDirectory, 
+    initializePresence, myChart 
 } from './data.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -21,7 +22,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const user = session.user;
 
     // ==========================================
-    // 2. UNIVERSAL LIVE SEARCH LOGIC (UPGRADED)
+    // 2. UNIVERSAL LIVE SEARCH LOGIC
     // ==========================================
     const topSearchInput = document.querySelector('.search-bar input');
     if (topSearchInput) {
@@ -53,45 +54,81 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // SETTINGS: Save profile changes
+    // ==========================================
+    // 3. SETTINGS & PROFILE UPDATES
+    // ==========================================
     const settingsForm = document.querySelector('.settings-form');
     if (settingsForm) {
         settingsForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const name = document.getElementById('settingName')?.value?.trim();
             const bio = document.getElementById('settingBio')?.value?.trim();
+            const course = document.getElementById('settingCourse')?.value?.trim();
+            const section = document.getElementById('settingSection')?.value?.trim();
+            
             const saveBtn = settingsForm.querySelector('[type="submit"]');
             if (saveBtn) { saveBtn.textContent = 'Saving...'; saveBtn.disabled = true; }
 
-            const { error } = await supabaseClient.from('profiles').update({ full_name: name, bio }).eq('id', user.id);
+            const { error } = await supabaseClient.from('profiles').upsert({ 
+                id: user.id, 
+                full_name: name, 
+                bio: bio,
+                course: course,
+                section: section
+            }, { onConflict: 'id' });
+
             if (!error) {
                 const topbarName = document.getElementById('topbarName');
                 if (topbarName) topbarName.textContent = name;
                 const welcomeMsg = document.getElementById('welcomeMessage');
                 if (welcomeMsg) welcomeMsg.textContent = `Welcome back, ${name.split(' ')[0]}!`;
+                
+                const roleDisplay = document.querySelector('.sidebar-user-role');
+                if (roleDisplay) {
+                    roleDisplay.textContent = course ? `${course} ${section ? '• ' + section : ''}` : 'Student';
+                }
+            } else {
+                console.error("Save Error:", error.message);
             }
-            if (saveBtn) { saveBtn.textContent = error ? 'Error - Retry' : 'Saved! ✓'; saveBtn.disabled = false; setTimeout(() => { saveBtn.textContent = 'Save Profile Changes'; }, 2500); }
+            
+            if (saveBtn) { 
+                saveBtn.textContent = error ? 'Error - Retry' : 'Saved! ✓'; 
+                saveBtn.disabled = false; 
+                setTimeout(() => { saveBtn.textContent = 'Save Profile Changes'; }, 2500); 
+            }
         });
     }
 
-    // TARGET GWA SAVE
     const saveGwaBtn = document.getElementById('saveGwaBtn');
     if (saveGwaBtn) {
         saveGwaBtn.addEventListener('click', async () => {
             const val = parseFloat(document.getElementById('targetGwaInput')?.value);
             if (isNaN(val) || val < 1.0 || val > 5.0) { alert('Please enter a valid GWA between 1.00 and 5.00'); return; }
+            
             saveGwaBtn.textContent = 'Saving...';
-            const { error } = await supabaseClient.from('profiles').update({ target_gwa: val }).eq('id', user.id);
+            
+            const { error } = await supabaseClient.from('profiles').upsert({ 
+                id: user.id, 
+                target_gwa: val 
+            }, { onConflict: 'id' });
+            
             if (!error) {
                 const targetGwaDisplay = document.getElementById('targetGwaDisplay');
                 if (targetGwaDisplay) targetGwaDisplay.textContent = val.toFixed(2);
+                
+                const targetGwaSettingDisplay = document.getElementById('targetGwaSettingDisplay');
+                if (targetGwaSettingDisplay) targetGwaSettingDisplay.textContent = val.toFixed(2);
+                
                 showToast('Target GWA saved!', 'success');
+            } else {
+                console.error("GWA Save Error:", error.message);
+                showToast('Failed to save GWA', 'error');
             }
+            
             saveGwaBtn.textContent = 'Save';
         });
     }
 
-    // PHOTO UPLOAD LOGIC (FIXED)
     const uploadBtn = document.getElementById('uploadBtn');
     const avatarInput = document.getElementById('avatarInput');
     if (uploadBtn && avatarInput) {
@@ -125,7 +162,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // GLOBAL MODALS AND HANDLERS 
+    // ==========================================
+    // 4. VIEW MODALS (Inbox & Deadlines)
+    // ==========================================
+    window.showToast = showToast;
+
     window.openMessageModal = async function(msgId, subject, content, senderName, timeAgo, isUnread) {
         const overlay = document.getElementById('messageModalOverlay');
         if (!overlay) return;
@@ -138,7 +179,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (isUnread) {
             await supabaseClient.from('portal_messages').update({ is_read: true }).eq('id', msgId);
-
             const msgEl = document.querySelector(`[data-msg-id="${msgId}"]`);
             if (msgEl) {
                 msgEl.classList.remove('unread');
@@ -171,36 +211,143 @@ document.addEventListener('DOMContentLoaded', async () => {
         overlay.classList.add('open');
     };
 
-    window.openComposeToInstructor = function(instructorName, courseName) {
-        const overlay = document.getElementById('composeModalOverlay');
-        if (overlay) overlay.classList.add('open');
-        const toField = document.getElementById('composeToDisplay');
-        if (toField) toField.textContent = `${instructorName} — ${courseName}`;
-        const subjectField = document.getElementById('composeSubject');
-        if (subjectField) subjectField.value = `Re: ${courseName}`;
-        const recipientField = document.getElementById('composeRecipientId');
-        if (recipientField) recipientField.value = instructorName;
-        const contentField = document.getElementById('composeContent');
-        if (contentField) { contentField.value = ''; setTimeout(() => contentField.focus(), 100); }
-    };
-
+    // Close logic for view modals
     document.getElementById('msgModalClose')?.addEventListener('click', () => {
         document.getElementById('messageModalOverlay')?.classList.remove('open');
     });
     document.getElementById('messageModalOverlay')?.addEventListener('click', (e) => {
-        if (e.target === document.getElementById('messageModalOverlay'))
-            document.getElementById('messageModalOverlay').classList.remove('open');
+        if (e.target === document.getElementById('messageModalOverlay')) e.target.classList.remove('open');
     });
 
     document.getElementById('dlModalClose')?.addEventListener('click', () => {
         document.getElementById('deadlineModalOverlay')?.classList.remove('open');
     });
     document.getElementById('deadlineModalOverlay')?.addEventListener('click', (e) => {
-        if (e.target === document.getElementById('deadlineModalOverlay'))
-            document.getElementById('deadlineModalOverlay').classList.remove('open');
+        if (e.target === document.getElementById('deadlineModalOverlay')) e.target.classList.remove('open');
     });
 
-    // DARK MODE & THEME TOGGLE
+    // ==========================================
+    // 5. MASTER COMPOSE MESSAGE LOGIC
+    // ==========================================
+
+// Add this to the VERY TOP of your script (outside any functions)
+let secretReceiverId = null; 
+
+window.openComposeToInstructor = function(name, idOrCourse) {
+    // 1. Regex to check if the string is a Supabase UUID
+    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(idOrCourse);
+    const overlay = document.getElementById('composeModalOverlay');
+    const displayTo = document.getElementById('composeToDisplay');
+    const subjectField = document.getElementById('composeSubject');
+    
+    if (overlay) overlay.classList.add('open'); 
+    
+    if (isUUID) {
+        // Direct Message Mode
+        secretReceiverId = idOrCourse;
+        if (subjectField) subjectField.value = ''; 
+        if (displayTo) displayTo.textContent = `To: ${name}`;
+    } else {
+        // Course Reply Mode
+        secretReceiverId = null; 
+        if (subjectField) subjectField.value = `Question: ${idOrCourse}`;
+        if (displayTo) displayTo.textContent = `To: ${name} (${idOrCourse})`;
+    }
+
+    // Populate visible read-only field (if you have one)
+    const recipientField = document.getElementById('composeRecipientId');
+    if (recipientField) recipientField.value = name;
+    
+    // Auto-focus the content
+    const contentField = document.getElementById('composeContent');
+    if (contentField) { 
+        contentField.value = ''; 
+        setTimeout(() => contentField.focus(), 250); 
+    }
+};
+    // Open from "New Message" Button in Inbox
+    const composeNewBtn = document.getElementById('composeNewBtn');
+    if (composeNewBtn) {
+        composeNewBtn.addEventListener('click', () => {
+            secretReceiverId = null; 
+            const overlay = document.getElementById('composeModalOverlay');
+            if (overlay) overlay.classList.add('open');
+            
+            if (document.getElementById('composeToDisplay')) document.getElementById('composeToDisplay').textContent = 'New Message';
+            if (document.getElementById('composeRecipientId')) document.getElementById('composeRecipientId').value = '';
+            if (document.getElementById('composeSubject')) document.getElementById('composeSubject').value = '';
+            if (document.getElementById('composeContent')) document.getElementById('composeContent').value = '';
+        });
+    }
+
+    // Close Compose Modal
+    function closeComposeModal() {
+        document.getElementById('composeModalOverlay')?.classList.remove('open');
+    }
+    document.getElementById('composeCloseBtn')?.addEventListener('click', closeComposeModal);
+    document.getElementById('composeCancelBtn')?.addEventListener('click', closeComposeModal);
+    document.getElementById('composeModalOverlay')?.addEventListener('click', (e) => {
+        if (e.target === document.getElementById('composeModalOverlay')) closeComposeModal();
+    });
+
+ // The ONE AND ONLY Send Button Listener
+    const composeSendBtn = document.getElementById('composeSendBtn');
+    if (composeSendBtn) {
+        composeSendBtn.addEventListener('click', async () => {
+            let finalReceiverId = secretReceiverId;
+            const manualRecipientId = document.getElementById('composeRecipientId')?.value?.trim();
+            
+            if (!finalReceiverId && manualRecipientId) {
+                const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(manualRecipientId);
+                if (isUUID) {
+                    finalReceiverId = manualRecipientId;
+                } else {
+                    alert("Please use the Social tab to message users securely.");
+                    return;
+                }
+            }
+
+            if (!finalReceiverId) { alert("Please select a valid recipient."); return; }
+
+            const subject = document.getElementById('composeSubject')?.value?.trim() || 'No Subject';
+            const content = document.getElementById('composeContent')?.value?.trim() || '';
+            
+            if (!content) { alert("Please type a message first!"); return; }
+
+            const originalText = composeSendBtn.innerHTML;
+            composeSendBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:1rem;">hourglass_empty</span> Sending...';
+            composeSendBtn.disabled = true;
+
+            // FIX 1: Securely fetch your actual profile name before sending
+            const { data: senderProfile } = await supabaseClient.from('profiles').select('full_name').eq('id', user.id).single();
+            const senderName = senderProfile?.full_name || user.email;
+
+            // FIX 2: Use recipient_id and sender_name correctly!
+            const { error } = await supabaseClient.from('portal_messages').insert({
+                sender_id: user.id,
+                recipient_id: finalReceiverId, // Changed back from receiver_id
+                sender_name: senderName,       // Attached your actual name!
+                subject: subject,
+                content: content
+            });
+
+            if (error) {
+                console.error("Message Error:", error.message);
+                alert("Message failed to send: " + error.message);
+            } else {
+                showToast('Message sent successfully!', 'success');
+                closeComposeModal();
+                if (document.getElementById('composeSubject')) document.getElementById('composeSubject').value = '';
+                if (document.getElementById('composeContent')) document.getElementById('composeContent').value = '';
+            }
+
+            composeSendBtn.innerHTML = originalText;
+            composeSendBtn.disabled = false;
+        });
+    }
+    // ==========================================
+    // 6. UI TOGGLES (THEME & TABS)
+    // ==========================================
     const themeBtn = document.getElementById('themeToggle');
     if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
 
@@ -223,72 +370,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // COMPOSE MODAL LOGIC
-    const composeOverlay = document.getElementById('composeModalOverlay');
-    const composeCloseBtn = document.getElementById('composeCloseBtn');
-    const composeCancelBtn = document.getElementById('composeCancelBtn');
-    const composeSendBtn = document.getElementById('composeSendBtn');
-    const composeNewBtn = document.getElementById('composeNewBtn');
+    document.addEventListener('click', (e) => {
+        const target = e.target.closest('[data-target]');
+        if (target) {
+            e.preventDefault();
+            switchView(target.getAttribute('data-target'));
+        }
+    });
 
-    function openCompose() {
-        const overlay = document.getElementById('composeModalOverlay');
-        if (overlay) overlay.classList.add('open');
-        const toField = document.getElementById('composeToDisplay');
-        if (toField) toField.textContent = 'New Message';
-        const recipientField = document.getElementById('composeRecipientId');
-        if (recipientField) recipientField.value = '';
-        const subjectField = document.getElementById('composeSubject');
-        if (subjectField) subjectField.value = '';
-        const contentField = document.getElementById('composeContent');
-        if (contentField) contentField.value = '';
-    }
-
-    function closeCompose() {
-        const overlay = document.getElementById('composeModalOverlay');
-        if (overlay) overlay.classList.remove('open');
-    }
-
-    if (composeCloseBtn) composeCloseBtn.addEventListener('click', closeCompose);
-    if (composeCancelBtn) composeCancelBtn.addEventListener('click', closeCompose);
-    if (composeNewBtn) composeNewBtn.addEventListener('click', openCompose);
-    if (composeOverlay) composeOverlay.addEventListener('click', (e) => { if (e.target === composeOverlay) closeCompose(); });
-
-    if (composeSendBtn) {
-        composeSendBtn.addEventListener('click', async () => {
-            const recipientId = document.getElementById('composeRecipientId')?.value?.trim();
-            const subject = document.getElementById('composeSubject')?.value?.trim();
-            const content = document.getElementById('composeContent')?.value?.trim();
-            if (!subject || !content) { alert('Please fill in subject and message.'); return; }
-
-            composeSendBtn.textContent = 'Sending...';
-            composeSendBtn.disabled = true;
-
-            const { data: senderProfile } = await supabaseClient.from('profiles').select('full_name').eq('id', user.id).single();
-            const senderName = senderProfile?.full_name || user.email;
-
-            const { error } = await supabaseClient.from('portal_messages').insert({
-                recipient_id: recipientId || null,
-                sender_id: user.id,
-                sender_name: senderName,
-                subject, content, is_read: false
-            });
-
-            if (error) {
-                alert('Message failed to send. Please try again.');
-                console.error("Send Error:", error.message);
-            } else {
-                closeCompose();
-                showToast('Message sent!', 'success');
-                await loadMessages(user.id);
-            }
-
-            composeSendBtn.innerHTML = '<span class="material-symbols-outlined">send</span> Send';
-            composeSendBtn.disabled = false;
-        });
-    }
+    document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+        await supabaseClient.auth.signOut();
+        window.location.href = 'index.html';
+    });
 
     // ==========================================
-    // 7. INITIALIZATION & LOGOUT
+    // 7. INITIALIZATION (FIRE IT UP!)
     // ==========================================
     async function startAllModules() {
         await initProfile(user);
@@ -309,21 +405,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             loadNotices(),
             loadDeadlines(userId),
             loadAttendance(userId),
+            loadSocialDirectory(userId),
         ]);
+
+        initializePresence(userId);
     }
-
-    document.addEventListener('click', (e) => {
-        const target = e.target.closest('[data-target]');
-        if (target) {
-            e.preventDefault();
-            switchView(target.getAttribute('data-target'));
-        }
-    });
-
-    document.getElementById('logoutBtn')?.addEventListener('click', async () => {
-        await supabaseClient.auth.signOut();
-        window.location.href = 'index.html';
-    });
 
     startAllModules();
 });

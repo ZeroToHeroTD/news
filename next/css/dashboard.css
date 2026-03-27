@@ -5,6 +5,7 @@
 /* ==========================================================================
    1. CORE THEME & RESET
    ========================================================================== */
+
 :root {
   --primary: #0062ff;
   --primary-hover: #0051d4;
@@ -17,14 +18,17 @@
   --text-muted: #64748b;
   --border-color: #e2e8f0;
   --input-bg: #f1f5f9;
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-  --shadow-md: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.05);
-  --shadow-lg: 0 10px 15px rgba(0,0,0,0.1), 0 4px 6px rgba(0,0,0,0.06);
-  --transition: 0.3s ease;
-  --accent-red: #ef4444;
-  --accent-amber: #f59e0b;
-  --accent-green: #10b981;
-  --accent-purple: #a855f7;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.07);
+  --shadow-lg: 0 10px 30px rgba(0,0,0,0.1);
+  --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Status Colors */
+  --status-online: #22c55e;
+  --status-online-glow: rgba(34, 197, 94, 0.4);
+  --status-offline: #94a3b8;
+  --instructor-accent: #a855f7;
+  --student-accent: #3b82f6;
 }
 
 .dark-mode {
@@ -36,9 +40,6 @@
   --text-muted: #94a3b8;
   --border-color: #1e293b;
   --input-bg: #1e293b;
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
-  --shadow-lg: 0 10px 30px rgba(0,0,0,0.5);
 }
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
@@ -53,7 +54,6 @@ body.app-body {
   align-items: center;
   padding: 20px;
   min-height: 100vh;
-  transition: background-color var(--transition), color var(--transition);
 }
 
 .app-container {
@@ -65,8 +65,7 @@ body.app-body {
   border-radius: 30px;
   box-shadow: var(--shadow-lg);
   overflow: hidden;
-  border: 1px solid rgba(255,255,255,0.1);
-  transition: background-color var(--transition);
+  border: 1px solid rgba(255,255,255,0.05);
 }
 
 /* Toast animation */
@@ -77,31 +76,24 @@ body.app-body {
    2. SIDEBAR & NAVIGATION
    ========================================================================== */
 .app-sidebar {
-  width: 270px;
+  width: 260px;
   background-color: var(--sidebar-bg);
-  color: white;
   padding: 40px 24px;
   display: flex;
   flex-direction: column;
-  z-index: 10;
-  box-shadow: 10px 0 30px rgba(0,0,0,0.05);
-  flex-shrink: 0;
   transition: var(--transition);
-  overflow-y: auto;
 }
 
-.sidebar-brand { display: flex; align-items: center; gap: 14px; margin-bottom: 40px; }
-.logo-icon { background: linear-gradient(135deg, var(--primary), #3b82f6); padding: 10px; border-radius: 12px; font-size: 1.4rem; box-shadow: 0 4px 12px rgba(0, 98, 255, 0.3); }
+.sidebar-brand { display: flex; align-items: center; gap: 14px; margin-bottom: 40px; color: white; }
+.logo-icon { background: linear-gradient(135deg, var(--primary), #3b82f6); padding: 10px; border-radius: 12px; }
 
-ul.nav-links { list-style: none !important; display: flex; flex-direction: column; gap: 4px; flex: 1; padding: 0; margin: 0; }
-ul.nav-links li { list-style-type: none !important; cursor: pointer; border-radius: 14px; transition: all 0.2s ease; }
-ul.nav-links li a { text-decoration: none; color: #94a3b8; padding: 11px 16px; display: flex; align-items: center; gap: 12px; font-weight: 500; pointer-events: none; font-size: 0.9rem; }
-ul.nav-links li a .nav-icon { font-size: 1.05rem; opacity: 0.8; }
-
-ul.nav-links li:hover:not(.active) { background-color: rgba(255,255,255,0.07); }
-ul.nav-links li:hover:not(.active) a { color: #cbd5e1; }
-ul.nav-links li.active { background: linear-gradient(135deg, var(--primary) 0%, #3b82f6 100%); box-shadow: 0 8px 20px rgba(0, 98, 255, 0.35); }
-ul.nav-links li.active a { color: white; font-weight: 700; }
+ul.nav-links { list-style: none; display: flex; flex-direction: column; gap: 4px; flex: 1; }
+ul.nav-links li a { 
+    text-decoration: none; color: #94a3b8; padding: 12px 16px; 
+    display: flex; align-items: center; gap: 12px; border-radius: 14px;
+    transition: var(--transition);
+}
+ul.nav-links li.active a { background: var(--primary); color: white; font-weight: 700; }ul.nav-links li.active a { color: white; font-weight: 700; }
 ul.nav-links li.active a .nav-icon { opacity: 1; }
 
 .logout-btn { width: 100%; background: rgba(239,68,68,0.1); color: #fca5a5; border: 1px solid rgba(239,68,68,0.2); padding: 14px; border-radius: 14px; font-weight: 700; cursor: pointer; transition: 0.3s ease; margin-top: auto; display: flex; align-items: center; justify-content: center; gap: 8px; }
@@ -1301,4 +1293,227 @@ ul.nav-links li.active {
     padding: 6px 13px;
     font-size: 0.72rem;
   }
+}
+#socialDirectoryContainer .social-section-block {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+    padding: 30px;
+    margin-bottom: 35px;
+}
+
+#socialDirectoryContainer .social-section-block h3 {
+    font-size: 1.25rem !important;
+    font-weight: 800 !important;
+    color: #fff !important;
+    padding-bottom: 18px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Member count badge */
+#socialDirectoryContainer .social-section-block h3::after {
+    content: attr(data-count);
+    font-size: 11px;
+    background: var(--primary);
+    color: white;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-weight: 700;
+}
+
+#socialDirectoryContainer h4 {
+    font-size: 12px !important;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--text-muted);
+    margin: 25px 0 15px 4px !important;
+}
+
+/* --- Card Grid --- */
+#socialDirectoryContainer > div > div[style*="grid"] {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
+    gap: 16px !important;
+}
+
+/* --- Aesthetic Social Card --- */
+.social-card-minimal {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 22px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.social-card-minimal:hover {
+    transform: translateY(-6px);
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+/* --- Typography Upgrade --- */
+.social-card-minimal .member-name {
+    font-size: 1.15rem !important;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 4px;
+}
+
+.social-role-badge {
+    font-size: 10px;
+    font-weight: 800;
+    padding: 4px 12px;
+    border-radius: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    width: fit-content;
+}
+
+.role-instructor { background: rgba(168, 85, 247, 0.15); color: #d8b4fe; border: 1px solid rgba(168, 85, 247, 0.2); }
+.role-student { background: rgba(59, 130, 246, 0.15); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.2); }
+
+/* --- THE STATUS FIX (Dot & Pulse) --- */
+.status-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 2px;
+}
+
+.status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    position: relative;
+    flex-shrink: 0;
+}
+
+/* Fixed: The pulse only targets the 10px dot */
+.status-dot.online {
+    background-color: var(--status-online);
+    box-shadow: 0 0 10px var(--status-online-glow);
+}
+
+.status-dot.online::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-color: var(--status-online);
+    border-radius: 50%;
+    z-index: -1;
+    animation: statusPulseEffect 2s infinite;
+}
+
+@keyframes statusPulseEffect {
+    0% { transform: scale(1); opacity: 0.8; }
+    100% { transform: scale(3.5); opacity: 0; }
+}
+
+.status-dot.offline {
+    background-color: var(--status-offline);
+    opacity: 0.6;
+}
+
+.online-status-text {
+    font-size: 13px !important;
+    font-weight: 600;
+}
+
+.online-status-text.active { color: var(--status-online); text-shadow: 0 0 10px var(--status-online-glow); }
+.online-status-text.offline { color: var(--text-muted); }
+
+/* --- Interaction Styling --- */
+/* --- Dynamic Button Overhaul --- */
+.msg-btn-minimal {
+    margin-top: auto;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px; /* Slightly tighter radius */
+    padding: 10px 14px;  /* Reduced height */
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Hover: The "Lift" */
+.msg-btn-minimal:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.25);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+    color: #fff;
+}
+
+/* Active: The "Squash" */
+.msg-btn-minimal:active {
+    transform: translateY(-1px) scale(0.96);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+/* Primary Color for Message Button */
+.msg-btn-primary {
+    background: var(--primary-soft);
+    border-color: rgba(0, 98, 255, 0.2);
+    color: #93c5fd;
+}
+
+.msg-btn-primary:hover {
+    background: var(--primary);
+    border-color: var(--primary);
+    box-shadow: 0 8px 20px rgba(0, 98, 255, 0.3);
+}
+
+/* Success State (Dynamic Class) */
+.msg-btn-minimal.copied {
+    background: #059669 !important;
+    border-color: #10b981 !important;
+    color: white !important;
+}
+
+.social-card-minimal:hover .msg-btn-minimal {
+    background: var(--primary);
+    border-color: var(--primary);
+    box-shadow: 0 8px 20px rgba(0, 98, 255, 0.3);
+}
+
+.social-card-minimal:has(.role-instructor):hover { border-color: var(--instructor-accent); }
+.social-card-minimal:has(.role-instructor):hover .msg-btn-minimal { background: var(--instructor-accent); border-color: var(--instructor-accent); }
+
+/* --- Squircle Avatar Visuals --- */
+.social-avatar-wrapper {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 4px;
+}
+
+.social-avatar-wrapper img {
+    width: 100%;
+    height: 100%;
+    border-radius: 18px; /* Modern Squircle */
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    object-fit: cover;
+    transition: var(--transition);
+}
+
+.social-card-minimal:hover .social-avatar-wrapper img {
+    border-color: var(--primary);
+    transform: scale(1.05);
 }

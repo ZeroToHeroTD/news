@@ -28,12 +28,19 @@ export async function initProfile(user) {
     if (document.getElementById('settingName')) document.getElementById('settingName').value = fullName;
     if (document.getElementById('settingEmail')) document.getElementById('settingEmail').value = email;
     if (document.getElementById('settingBio')) document.getElementById('settingBio').value = bio;
+    if (document.getElementById('settingUserId')) document.getElementById('settingUserId').value = user.id;
 
+    // Load GWA displays across both tabs
     const targetGwaInput = document.getElementById('targetGwaInput');
     const targetGwaDisplay = document.getElementById('targetGwaDisplay');
-    if (targetGwaInput && profile?.target_gwa) targetGwaInput.value = profile.target_gwa;
-    if (targetGwaDisplay && profile?.target_gwa) targetGwaDisplay.textContent = parseFloat(profile.target_gwa).toFixed(2);
+    const targetGwaSettingDisplay = document.getElementById('targetGwaSettingDisplay'); // Grab the new element
 
+    if (profile?.target_gwa) {
+        const formattedGwa = parseFloat(profile.target_gwa).toFixed(2);
+        if (targetGwaInput) targetGwaInput.value = formattedGwa;
+        if (targetGwaDisplay) targetGwaDisplay.textContent = formattedGwa;
+        if (targetGwaSettingDisplay) targetGwaSettingDisplay.textContent = formattedGwa; // Update the settings text
+    }
     updateAllAvatars(avatarUrl);
     checkUserPermissions(profile?.role);
 }
@@ -236,6 +243,7 @@ export async function loadPaymentData(userId) {
 export async function loadDeadlines(userId) {
     const container = document.getElementById('deadlinesContainer');
     const nextDeadlineText = document.getElementById('nextDeadlineText');
+    const missingContainer = document.getElementById('missingOutputsContainer'); // Grab the dashboard box
 
     const { data: deadlines, error } = await supabaseClient
         .from('deadlines').select('*')
@@ -245,14 +253,41 @@ export async function loadDeadlines(userId) {
         console.warn("Deadlines table not found or error:", error.message);
         if (nextDeadlineText) nextDeadlineText.textContent = 'No deadlines';
         if (container) container.innerHTML = `<p style="color:var(--text-muted);text-align:center;padding:20px;">No deadlines table found. Create one in Supabase.</p>`;
+        if (missingContainer) missingContainer.innerHTML = `<p style="color:var(--text-muted);font-size:0.85rem;">Database error.</p>`;
         return;
     }
 
-    const upcoming = deadlines?.filter(d => d.status !== 'submitted')[0];
+    // 1. Update Hero Card
+    const pendingDeadlines = deadlines?.filter(d => d.status !== 'submitted') || [];
     if (nextDeadlineText) {
-        nextDeadlineText.textContent = upcoming ? upcoming.title : 'No deadlines';
+        nextDeadlineText.textContent = pendingDeadlines.length > 0 ? pendingDeadlines[0].title : 'No deadlines';
     }
 
+    // 2. Update the Dashboard "Missing / Pending Outputs" Widget
+    if (missingContainer) {
+        if (pendingDeadlines.length > 0) {
+            // Show only the next 3 pending outputs
+            missingContainer.innerHTML = pendingDeadlines.slice(0, 3).map(d => {
+                const dueDate = new Date(d.due_date);
+                const isLate = dueDate < new Date();
+                const dotColor = isLate ? 'var(--accent-red)' : 'var(--accent-amber)';
+                const dateString = dueDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+                return `
+                <div class="missing-output-item" style="display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border-color);">
+                    <div style="width: 8px; height: 8px; border-radius: 50%; background: ${dotColor}; flex-shrink: 0;"></div>
+                    <div style="flex: 1; min-width: 0;">
+                        <div style="font-size: 0.85rem; color: var(--text-main); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${d.title}</div>
+                        <div style="font-size: 0.72rem; color: var(--text-muted);">${d.subject || 'Task'} • Due ${dateString}</div>
+                    </div>
+                </div>`;
+            }).join('');
+        } else {
+            missingContainer.innerHTML = `<p style="color:var(--text-muted);font-size:0.85rem;padding:10px 0;">You're all caught up! 🎉</p>`;
+        }
+    }
+
+    // 3. Update the Main Deadlines Page
     if (!container) return;
 
     if (deadlines && deadlines.length > 0) {
@@ -289,31 +324,42 @@ export async function loadDeadlines(userId) {
 }
 
 export async function loadAttendance(userId) {
-    const container = document.getElementById('attendanceContainer');
-    if (!container) return;
-
-    const { data: records, error } = await supabaseClient
-        .from('attendance').select('*').eq('student_id', userId);
-
-    if (error) { console.warn("Attendance table missing:", error.message); return; }
-
-    const total = records?.length || 0;
-    const present = records?.filter(r => r.status === 'present').length || 0;
-    const absences = records?.filter(r => r.status === 'absent').length || 0;
-    const late = records?.filter(r => r.status === 'late').length || 0;
-    const percentage = total > 0 ? Math.round((present / total) * 100) : 100;
-
+    // Target the specific elements we actually want to update
     const attPct = document.getElementById('attendancePct');
     const attAbsences = document.getElementById('attendanceAbsences');
     const attLate = document.getElementById('attendanceLate');
     const attBar = document.getElementById('attendanceBar');
 
+    // If we aren't on the dashboard/can't find the percentage display, stop here
+    if (!attPct) return; 
+
+    // Fetch the data from Supabase
+    const { data: records, error } = await supabaseClient
+        .from('attendance')
+        .select('*')
+        .eq('student_id', userId);
+
+    if (error) { 
+        console.warn("Attendance fetch error:", error.message); 
+        return; 
+    }
+
+    // Calculate the stats
+    const total = records?.length || 0;
+    const absences = records?.filter(r => r.status === 'absent').length || 0;
+    const late = records?.filter(r => r.status === 'late').length || 0;
+    
+    // Attendance percentage (Total minus absences, divided by total)
+    const percentage = total > 0 ? Math.round(((total - absences) / total) * 100) : 100;
+
+    // Update the UI
     if (attPct) attPct.textContent = `${percentage}%`;
     if (attAbsences) attAbsences.textContent = absences;
     if (attLate) attLate.textContent = late;
     if (attBar) {
         attBar.style.width = `${percentage}%`;
-        attBar.style.background = percentage >= 80 ? '#10b981' : percentage >= 60 ? '#f59e0b' : '#ef4444';
+        // Green if 80%+, Orange if 60%+, Red if below 60%
+        attBar.style.background = percentage >= 80 ? 'var(--accent-green)' : percentage >= 60 ? 'var(--accent-amber)' : 'var(--accent-red)';
     }
 }
 
@@ -538,5 +584,204 @@ export async function loadPerformanceChart(userId, filterType = 'grades') {
                 }
             }
         });
+
+        
     }
+
+    
 }
+
+
+// ==========================================
+// 1. LOADS THE DIRECTORY HTML
+// ==========================================
+export async function loadSocialDirectory(currentUserId) {
+    const container = document.getElementById('socialDirectoryContainer');
+    if (!container) return;
+
+    const { data: profiles, error } = await supabaseClient.from('profiles').select('*');
+    if (error) { 
+        container.innerHTML = `<p style="color:var(--accent-red);">Error: ${error.message}</p>`; 
+        return; 
+    }
+
+    const sections = {};
+    profiles.forEach(p => {
+        const sec = (p.section || 'Unassigned').toUpperCase().trim();
+        if (!sections[sec]) sections[sec] = { instructors: [], students: [], total: 0 };
+        if (p.role === 'teacher' || p.role === 'admin') sections[sec].instructors.push(p);
+        else sections[sec].students.push(p);
+        sections[sec].total++;
+    });
+
+    let html = '';
+    let animDelay = 0;
+
+    for (const [secName, group] of Object.entries(sections).sort()) {
+        // We add data-count here so your CSS h3::after { content: attr(data-count) } works!
+        html += `
+        <div class="social-section-block">
+            <h3 data-count="${group.total}">
+                <span class="material-symbols-outlined">school</span> ${secName}
+            </h3>`;
+        
+        if (group.instructors.length > 0) {
+            html += `<h4>Instructors</h4>
+                     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;">`;
+            html += group.instructors.map(p => { animDelay += 0.05; return createSocialCard(p, currentUserId, animDelay); }).join('');
+            html += `</div>`;
+        }
+
+        if (group.students.length > 0) {
+            html += `<h4>Classmates</h4>
+                     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;">`;
+            html += group.students.map(p => { animDelay += 0.05; return createSocialCard(p, currentUserId, animDelay); }).join('');
+            html += `</div>`;
+        }
+        html += `</div>`;
+    }
+
+    container.innerHTML = html || '<p style="color:var(--text-muted);">No users found.</p>';
+}
+
+function createSocialCard(profile, currentUserId, delay) {
+    const isMe = profile.id === currentUserId;
+    const isInstructor = profile.role === 'teacher' || profile.role === 'admin';
+    const avatar = profile.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.full_name || 'User')}&background=0062ff&color=fff`;
+    
+    const roleClass = isInstructor ? 'role-instructor' : 'role-student';
+    const roleLabel = isInstructor ? 'Instructor' : 'Student';
+
+    return `
+    <div class="social-card-minimal" style="animation: slideInRight 0.5s ease forwards; animation-delay: ${delay}s;">
+        <div style="display: flex; gap: 16px; align-items: center;">
+            <div class="social-avatar-wrapper">
+                <img src="${avatar}" alt="${profile.full_name}" />
+            </div>
+            <div style="flex: 1; min-width: 0;">
+                <span class="social-role-badge ${roleClass}">${roleLabel}</span>
+                <div class="member-name">
+                    ${profile.full_name || 'User'} 
+                    ${isMe ? '<span style="color:var(--primary); font-size:10px; margin-left:4px;">(YOU)</span>' : ''}
+                </div>
+                <div class="status-container">
+                    <div id="status-dot-${profile.id}" class="status-dot ${isMe ? 'online' : 'offline'}" data-uid="${profile.id}"></div>
+                    <span id="status-text-${profile.id}" class="online-status-text ${isMe ? 'active' : 'offline'}" data-uid="${profile.id}">
+                        ${isMe ? 'Active Now' : 'Offline'}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 8px; margin-top: 12px;">
+            <button class="msg-btn-minimal" onclick="copyUserId('${profile.id}', this)" style="flex: 0.8;">
+                <span class="material-symbols-outlined" style="font-size:16px;">content_copy</span> Copy ID
+            </button>
+            ${!isMe ? `
+            <button class="msg-btn-minimal msg-btn-primary" style="flex: 1.2;" onclick="openComposeToInstructor('${escapeAttr(profile.full_name)}', '${profile.id}')">
+                <span class="material-symbols-outlined" style="font-size:18px;">chat_bubble</span> Message
+            </button>
+            ` : ''}
+        </div>
+    </div>`;
+}
+// ==========================================
+// 3. THE REAL-TIME WEBSOCKET (Adds Pulse effect)
+// ==========================================
+export function initializePresence(currentUserId) {
+    const socialRoom = supabaseClient.channel('campus_directory_room');
+
+    socialRoom
+      .on('presence', { event: 'sync' }, () => {
+          const newState = socialRoom.presenceState();
+          
+          // Reset everyone to offline (EXCEPT YOU)
+          document.querySelectorAll('.online-status-dot').forEach(dot => {
+              if (dot.dataset.uid !== currentUserId) {
+                  dot.style.background = 'var(--text-muted)';
+                  dot.classList.remove('online-dot-pulse'); // Remove heartbeat
+              }
+          });
+          document.querySelectorAll('.online-status-text').forEach(text => {
+              if (text.dataset.uid !== currentUserId) {
+                  text.textContent = 'Offline';
+                  text.style.color = 'var(--text-muted)';
+              }
+          });
+
+          // Apply "Active Now" to verified connected users
+          for (const key in newState) {
+              const activeUsers = newState[key];
+              activeUsers.forEach(user => {
+                  const activeUid = user.user_id;
+                  
+                  const dot = document.getElementById(`status-dot-${activeUid}`);
+                  const text = document.getElementById(`status-text-${activeUid}`);
+                  const topbarDot = document.getElementById('myCurrentStatusDot');
+                  
+                  if (dot && text) {
+                      dot.style.background = 'var(--accent-green)';
+                      dot.classList.add('online-dot-pulse'); // Start heartbeat!
+                      text.textContent = 'Active Now';
+                      text.style.color = 'var(--accent-green)';
+                  }
+                  
+                  if (activeUid === currentUserId && topbarDot) {
+                      topbarDot.style.background = 'var(--accent-green)';
+                  }
+              });
+          }
+      })
+      .subscribe(async (status) => {
+          if (status === 'SUBSCRIBED') {
+              await socialRoom.track({
+                  user_id: currentUserId,
+                  status: 'online',
+                  online_at: new Date().toISOString(),
+              });
+          }
+      });
+}
+
+// --- Expose functions to the HTML window ---
+
+window.copyUserId = async function(id, btnElement) {
+    try {
+        await navigator.clipboard.writeText(id);
+        if (btnElement) {
+            const originalContent = btnElement.innerHTML;
+            btnElement.classList.add('copied'); // This triggers the green background
+            btnElement.innerHTML = `<span class="material-symbols-outlined" style="font-size:16px;">check_circle</span> Copied!`;
+            setTimeout(() => {
+                btnElement.classList.remove('copied');
+                btnElement.innerHTML = originalContent;
+            }, 2000);
+        }
+        if (window.showToast) window.showToast('ID Copied!', 'info');
+    } catch (err) { console.error("Copy failed", err); }
+};
+
+window.openComposeToInstructor = function(name, idOrCourse) {
+    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(idOrCourse);
+    const overlay = document.getElementById('composeModalOverlay');
+    if (overlay) overlay.classList.add('open'); 
+    
+    if (isUUID) {
+        secretReceiverId = idOrCourse;
+        document.getElementById('composeSubject').value = ''; 
+        document.getElementById('composeToDisplay').textContent = `Message to ${name}`;
+    } else {
+        secretReceiverId = null; 
+        document.getElementById('composeSubject').value = `Question: ${idOrCourse}`;
+        document.getElementById('composeToDisplay').textContent = `${name} — ${idOrCourse}`;
+    }
+
+    const recipientField = document.getElementById('composeRecipientId');
+    if (recipientField) recipientField.value = name;
+    
+    const contentField = document.getElementById('composeContent');
+    if (contentField) { 
+        contentField.value = ''; 
+        setTimeout(() => contentField.focus(), 200); 
+    }
+};
