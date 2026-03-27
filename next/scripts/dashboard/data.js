@@ -618,7 +618,6 @@ export async function loadSocialDirectory(currentUserId) {
     let animDelay = 0;
 
     for (const [secName, group] of Object.entries(sections).sort()) {
-        // We add data-count here so your CSS h3::after { content: attr(data-count) } works!
         html += `
         <div class="social-section-block">
             <h3 data-count="${group.total}">
@@ -627,14 +626,14 @@ export async function loadSocialDirectory(currentUserId) {
         
         if (group.instructors.length > 0) {
             html += `<h4>Instructors</h4>
-                     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;">`;
+                     <div class="social-grid-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-bottom: 24px;">`;
             html += group.instructors.map(p => { animDelay += 0.05; return createSocialCard(p, currentUserId, animDelay); }).join('');
             html += `</div>`;
         }
 
         if (group.students.length > 0) {
             html += `<h4>Classmates</h4>
-                     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;">`;
+                     <div class="social-grid-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;">`;
             html += group.students.map(p => { animDelay += 0.05; return createSocialCard(p, currentUserId, animDelay); }).join('');
             html += `</div>`;
         }
@@ -642,8 +641,34 @@ export async function loadSocialDirectory(currentUserId) {
     }
 
     container.innerHTML = html || '<p style="color:var(--text-muted);">No users found.</p>';
-}
 
+    // --- INTEGRATED SEARCH LOGIC ---
+    const socialSearch = document.getElementById('socialSearchInput');
+    if (socialSearch) {
+        socialSearch.addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase().trim();
+            const cards = document.querySelectorAll('.social-card-minimal');
+            
+            cards.forEach(card => {
+                const name = card.querySelector('.member-name')?.textContent.toLowerCase() || "";
+                const id = card.getAttribute('data-uid')?.toLowerCase() || ""; // Assuming you add data-uid to the card
+                
+                // If match found, show card, otherwise hide
+                if (name.includes(term) || id.includes(term)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            // Clean up: Hide Section Headers (like "Block A") if all their cards are hidden
+            document.querySelectorAll('.social-section-block').forEach(block => {
+                const visibleCards = block.querySelectorAll('.social-card-minimal:not([style*="display: none"])');
+                block.style.display = visibleCards.length > 0 ? 'block' : 'none';
+            });
+        });
+    }
+}
 function createSocialCard(profile, currentUserId, delay) {
     const isMe = profile.id === currentUserId;
     const isInstructor = profile.role === 'teacher' || profile.role === 'admin';
@@ -652,17 +677,18 @@ function createSocialCard(profile, currentUserId, delay) {
     const roleClass = isInstructor ? 'role-instructor' : 'role-student';
     const roleLabel = isInstructor ? 'Instructor' : 'Student';
 
+// ... inside your createSocialCard function ...
     return `
-    <div class="social-card-minimal" style="animation: slideInRight 0.5s ease forwards; animation-delay: ${delay}s;">
-        <div style="display: flex; gap: 16px; align-items: center;">
+    <div class="social-card-minimal" data-uid="${profile.id}" style="animation: slideInRight 0.5s ease forwards; animation-delay: ${delay}s;">
+        <div style="display: flex; gap: 16px; align-items: flex-start;">
             <div class="social-avatar-wrapper">
                 <img src="${avatar}" alt="${profile.full_name}" />
             </div>
-            <div style="flex: 1; min-width: 0;">
+            <div class="member-info-column">
                 <span class="social-role-badge ${roleClass}">${roleLabel}</span>
                 <div class="member-name">
                     ${profile.full_name || 'User'} 
-                    ${isMe ? '<span style="color:var(--primary); font-size:10px; margin-left:4px;">(YOU)</span>' : ''}
+                    ${isMe ? '<span style="color:var(--primary); font-size:10px; margin-left:4px; opacity:0.8;">(YOU)</span>' : ''}
                 </div>
                 <div class="status-container">
                     <div id="status-dot-${profile.id}" class="status-dot ${isMe ? 'online' : 'offline'}" data-uid="${profile.id}"></div>
@@ -673,17 +699,20 @@ function createSocialCard(profile, currentUserId, delay) {
             </div>
         </div>
 
-        <div style="display: flex; gap: 8px; margin-top: 12px;">
-            <button class="msg-btn-minimal" onclick="copyUserId('${profile.id}', this)" style="flex: 0.8;">
+        <div style="display: flex; gap: 8px; margin-top: auto; padding-top: 16px;">
+            <button class="msg-btn-minimal" onclick="copyUserId('${profile.id}', this)" style="flex: 1;">
                 <span class="material-symbols-outlined" style="font-size:16px;">content_copy</span> Copy ID
             </button>
             ${!isMe ? `
             <button class="msg-btn-minimal msg-btn-primary" style="flex: 1.2;" onclick="openComposeToInstructor('${escapeAttr(profile.full_name)}', '${profile.id}')">
                 <span class="material-symbols-outlined" style="font-size:18px;">chat_bubble</span> Message
             </button>
-            ` : ''}
+            ` : `
+            <div style="flex: 1.2; visibility: hidden;"></div>
+            `}
         </div>
-    </div>`;
+    </div>
+    `;
 }
 // ==========================================
 // 3. THE REAL-TIME WEBSOCKET (Adds Pulse effect)
@@ -691,47 +720,43 @@ function createSocialCard(profile, currentUserId, delay) {
 export function initializePresence(currentUserId) {
     const socialRoom = supabaseClient.channel('campus_directory_room');
 
-    socialRoom
-      .on('presence', { event: 'sync' }, () => {
-          const newState = socialRoom.presenceState();
-          
-          // Reset everyone to offline (EXCEPT YOU)
-          document.querySelectorAll('.online-status-dot').forEach(dot => {
-              if (dot.dataset.uid !== currentUserId) {
-                  dot.style.background = 'var(--text-muted)';
-                  dot.classList.remove('online-dot-pulse'); // Remove heartbeat
-              }
-          });
-          document.querySelectorAll('.online-status-text').forEach(text => {
-              if (text.dataset.uid !== currentUserId) {
-                  text.textContent = 'Offline';
-                  text.style.color = 'var(--text-muted)';
-              }
-          });
+   socialRoom
+  .on('presence', { event: 'sync' }, () => {
+      const newState = socialRoom.presenceState();
+      const topbarDot = document.getElementById('myCurrentStatusDot');
 
-          // Apply "Active Now" to verified connected users
-          for (const key in newState) {
-              const activeUsers = newState[key];
-              activeUsers.forEach(user => {
-                  const activeUid = user.user_id;
-                  
-                  const dot = document.getElementById(`status-dot-${activeUid}`);
-                  const text = document.getElementById(`status-text-${activeUid}`);
-                  const topbarDot = document.getElementById('myCurrentStatusDot');
-                  
-                  if (dot && text) {
-                      dot.style.background = 'var(--accent-green)';
-                      dot.classList.add('online-dot-pulse'); // Start heartbeat!
-                      text.textContent = 'Active Now';
-                      text.style.color = 'var(--accent-green)';
-                  }
-                  
-                  if (activeUid === currentUserId && topbarDot) {
-                      topbarDot.style.background = 'var(--accent-green)';
-                  }
-              });
-          }
-      })
+      // 1. Reset all dots to Offline first
+      document.querySelectorAll('.status-dot').forEach(dot => {
+          dot.classList.remove('online');
+          dot.classList.add('offline');
+      });
+      document.querySelectorAll('.online-status-text').forEach(text => {
+          text.textContent = 'Offline';
+          text.classList.remove('active');
+      });
+
+      // 2. Apply "Active Now"
+      for (const key in newState) {
+          newState[key].forEach(user => {
+              const dot = document.getElementById(`status-dot-${user.user_id}`);
+              const text = document.getElementById(`status-text-${user.user_id}`);
+              
+              if (dot) {
+                  dot.classList.remove('offline');
+                  dot.classList.add('online'); // This triggers the Pulse/Green color
+              }
+              if (text) {
+                  text.textContent = 'Active Now';
+                  text.classList.add('active');
+              }
+              
+              // Handle your Topbar Dot
+              if (user.user_id === currentUserId && topbarDot) {
+                  topbarDot.classList.add('online');
+              }
+          });
+      }
+  })
       .subscribe(async (status) => {
           if (status === 'SUBSCRIBED') {
               await socialRoom.track({

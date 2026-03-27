@@ -29,6 +29,11 @@
   --status-offline: #94a3b8;
   --instructor-accent: #a855f7;
   --student-accent: #3b82f6;
+
+   --social-block-bg: #ffffff;
+   --social-card-bg: #f8fafc;
+   --social-card-border: #e2e8f0;
+   --social-text: #1e293b;
 }
 
 .dark-mode {
@@ -40,6 +45,11 @@
   --text-muted: #94a3b8;
   --border-color: #1e293b;
   --input-bg: #1e293b;
+
+    --social-block-bg: rgba(255, 255, 255, 0.03);
+    --social-card-bg: rgba(255, 255, 255, 0.04);
+    --social-card-border: rgba(255, 255, 255, 0.1);
+    --social-text: #ffffff;
 }
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
@@ -110,8 +120,22 @@ ul.nav-links li.active a .nav-icon { opacity: 1; }
 .search-bar input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px var(--primary-soft); max-width: 410px; }
 
 .user-profile { background: var(--card-bg); color: var(--text-main); padding: 6px 16px 6px 6px; border-radius: 50px; display: flex; align-items: center; gap: 12px; font-weight: 600; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); transition: var(--transition); }
-.avatar { width: 40px; height: 40px; border-radius: 50%; overflow: hidden; border: 2px solid var(--primary); background: var(--input-bg); }
-.avatar img { width: 100%; height: 100%; object-fit: cover; }
+.avatar {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 50% !important;
+    overflow: hidden !important;
+    border: 2px solid var(--primary);
+    background: var(--input-bg);
+    display: block;
+}
+
+.avatar img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important; /* Prevents stretching/ovals */
+    display: block;
+}
 
 /* ==========================================================================
    4. DASHBOARD HERO, FOCUS CARDS, SMART ACTIONS
@@ -1267,6 +1291,27 @@ ul.nav-links li.active {
     min-width: 110px;
     line-height: 1.3;
   }
+
+  /* 1. Wrap tables in a scroll container */
+    #view-payments div[style*="overflow-x: auto"] {
+        margin: 0 -10px; /* Bleed to edges */
+        padding: 0 10px;
+    }
+
+    /* 2. Prevent the "ION" breaking from "DESCRIPT" */
+    .grades-table th {
+        white-space: nowrap; /* Don't let words break */
+        font-size: 0.7rem;
+        padding: 10px 8px !important;
+    }
+
+    /* 3. Give the Description column enough room to be readable */
+    .grades-table td:first-child, 
+    .grades-table th:first-child {
+        min-width: 140px;
+    }
+   }
+
   .welcome-mini h1 {
     font-size: 1.1rem;
   }
@@ -1293,22 +1338,46 @@ ul.nav-links li.active {
     padding: 6px 13px;
     font-size: 0.72rem;
   }
+
+  /* ==========================================================================
+   1. SOCIAL DIRECTORY THEME VARIABLES
+   ========================================================================== */
+:root {
+    --social-block-bg: #ffffff;
+    --social-card-bg: #f8fafc;
+    --social-card-border: #e2e8f0;
+    --social-text: #1e293b;
+    --status-online: #22c55e;
+    --status-offline: #94a3b8;
+    --status-online-glow: rgba(34, 197, 94, 0.4);
 }
+
+.dark-mode {
+    --social-block-bg: rgba(255, 255, 255, 0.03);
+    --social-card-bg: rgba(255, 255, 255, 0.04);
+    --social-card-border: rgba(255, 255, 255, 0.1);
+    --social-text: #ffffff;
+}
+
+/* ==========================================================================
+   2. SECTION BLOCKS & HEADERS
+   ========================================================================== */
 #socialDirectoryContainer .social-section-block {
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--social-block-bg);
     backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--social-card-border);
     border-radius: 24px;
     padding: 30px;
-    margin-bottom: 35px;
+    margin-bottom: 50px; /* Spacing between Block A and Block B */
+    transition: var(--transition);
 }
 
 #socialDirectoryContainer .social-section-block h3 {
+    color: var(--social-text) !important;
     font-size: 1.25rem !important;
     font-weight: 800 !important;
-    color: #fff !important;
     padding-bottom: 18px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid var(--social-card-border);
     display: flex;
     align-items: center;
     gap: 12px;
@@ -1333,22 +1402,25 @@ ul.nav-links li.active {
     margin: 25px 0 15px 4px !important;
 }
 
-/* --- Card Grid --- */
-#socialDirectoryContainer > div > div[style*="grid"] {
+/* ==========================================================================
+   3. GRID & CARD LAYOUT (DESKTOP)
+   ========================================================================== */
+#socialDirectoryContainer div[style*="grid"] {
     display: grid !important;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
     gap: 16px !important;
+    align-items: stretch; /* Makes all cards in a row the same height */
 }
 
-/* --- Aesthetic Social Card --- */
 .social-card-minimal {
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--social-card-bg);
+    border: 1px solid var(--social-card-border);
     border-radius: 22px;
     padding: 24px;
     display: flex;
     flex-direction: column;
     gap: 18px;
+    height: 100%;
     transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
     position: relative;
     overflow: hidden;
@@ -1356,17 +1428,60 @@ ul.nav-links li.active {
 
 .social-card-minimal:hover {
     transform: translateY(-6px);
-    background: rgba(255, 255, 255, 0.07);
-    border-color: rgba(255, 255, 255, 0.2);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    border-color: var(--primary);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
 }
 
-/* --- Typography Upgrade --- */
+.social-card-minimal .social-role-badge {
+    display: inline-block;
+    margin-bottom: 6px; /* Pushes the name down away from the badge */
+}
+
+/* Instructor specific hover */
+.social-card-minimal:has(.role-instructor):hover {
+    border-color: var(--instructor-accent);
+}
+
 .social-card-minimal .member-name {
-    font-size: 1.15rem !important;
+    font-size: 1.1rem !important; /* Slightly smaller to fit better */
+    line-height: 1.3;
     font-weight: 700;
-    color: #ffffff;
+    margin-bottom: 6px; /* Pushes the status down away from the name */
+    color: var(--social-text) !important;
+    word-break: break-word; /* Allows long names to wrap naturally */
+}
+
+.social-card-minimal .member-info-column {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex: 1;
+    min-width: 0;
+}
+
+/* Light mode specific hover tweak */
+body:not(.dark-mode) .social-card-minimal:hover {
+    background: #ffffff;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+}
+
+/* ==========================================================================
+   4. AVATARS & BADGES
+   ========================================================================== */
+.social-avatar-wrapper {
+    width: 64px;
+    height: 64px;
     margin-bottom: 4px;
+    flex-shrink: 0;
+}
+
+.social-avatar-wrapper img {
+    width: 100%;
+    height: 100%;
+    border-radius: 18px; /* Squircle */
+    border: 2px solid var(--social-card-border);
+    object-fit: cover;
+    transition: var(--transition);
 }
 
 .social-role-badge {
@@ -1382,14 +1497,10 @@ ul.nav-links li.active {
 .role-instructor { background: rgba(168, 85, 247, 0.15); color: #d8b4fe; border: 1px solid rgba(168, 85, 247, 0.2); }
 .role-student { background: rgba(59, 130, 246, 0.15); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.2); }
 
-/* --- THE STATUS FIX (Dot & Pulse) --- */
-
-.status-container {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-top: 2px;
-}
+/* ==========================================================================
+   5. STATUS DOTS & ANIMATIONS
+   ========================================================================== */
+.status-container { display: flex; align-items: center; gap: 10px; margin-top: 2px; }
 
 .status-dot {
     width: 10px;
@@ -1399,7 +1510,6 @@ ul.nav-links li.active {
     flex-shrink: 0;
 }
 
-/* Fixed: The pulse only targets the 10px dot */
 .status-dot.online {
     background-color: var(--status-online);
     box-shadow: 0 0 10px var(--status-online-glow);
@@ -1415,106 +1525,102 @@ ul.nav-links li.active {
     animation: statusPulseEffect 2s infinite;
 }
 
+.status-dot.offline { background-color: var(--status-offline); opacity: 0.6; }
+
 @keyframes statusPulseEffect {
     0% { transform: scale(1); opacity: 0.8; }
-    100% { transform: scale(3.5); opacity: 0; }
+    100% { transform: scale(3); opacity: 0; }
 }
 
-.status-dot.offline {
-    background-color: var(--status-offline);
-    opacity: 0.6;
-}
-
-.online-status-text {
-    font-size: 13px !important;
-    font-weight: 600;
-}
-
+.online-status-text { font-size: 13px !important; font-weight: 600; }
 .online-status-text.active { color: var(--status-online); text-shadow: 0 0 10px var(--status-online-glow); }
 .online-status-text.offline { color: var(--text-muted); }
 
-/* --- Interaction Styling --- */
-/* --- Dynamic Button Overhaul --- */
+/* ==========================================================================
+   6. INTERACTION BUTTONS
+   ========================================================================== */
 .msg-btn-minimal {
     margin-top: auto;
     background: rgba(255, 255, 255, 0.06);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 12px; /* Slightly tighter radius */
-    padding: 10px 14px;  /* Reduced height */
+    border-radius: 12px;
+    padding: 10px 14px;
     font-size: 13px;
     font-weight: 600;
-    color: rgba(255, 255, 255, 0.9);
+    color: var(--social-text);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.25s ease;
     position: relative;
     overflow: hidden;
 }
 
-/* Hover: The "Lift" */
 .msg-btn-minimal:hover {
-    background: rgba(255, 255, 255, 0.12);
-    border-color: rgba(255, 255, 255, 0.25);
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
     transform: translateY(-3px);
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
-    color: #fff;
 }
 
-/* Active: The "Squash" */
-.msg-btn-minimal:active {
-    transform: translateY(-1px) scale(0.96);
-    background: rgba(255, 255, 255, 0.15);
+.msg-btn-primary { background: var(--primary-soft); color: var(--primary); }
+.msg-btn-minimal.copied { background: #059669 !important; border-color: #10b981 !important; color: white !important; }
+
+/* ==========================================================================
+   7. TOPBAR AVATAR & DOT (NUCLEAR FIX)
+   ========================================================================== */
+.topbar-avatar-wrapper {
+    position: relative !important;
+    width: 40px !important;
+    height: 40px !important;
+    display: block !important;
+    flex-shrink: 0;
+    align-self: center;
 }
 
-/* Primary Color for Message Button */
-.msg-btn-primary {
-    background: var(--primary-soft);
-    border-color: rgba(0, 98, 255, 0.2);
-    color: #93c5fd;
+.topbar-status-dot {
+    position: absolute !important; 
+    bottom: 2px !important;
+    right: 2px !important;
+    width: 12px !important;
+    height: 12px !important;
+    border: 2px solid var(--card-bg) !important;
+    border-radius: 50% !important;
+    z-index: 99 !important;
+    background-color: var(--status-offline);
+    opacity: 0;
+    transition: opacity 0.3s, background-color 0.3s;
 }
 
-.msg-btn-primary:hover {
-    background: var(--primary);
-    border-color: var(--primary);
-    box-shadow: 0 8px 20px rgba(0, 98, 255, 0.3);
+.topbar-status-dot.online { opacity: 1; background-color: var(--status-online) !important; }
+
+.topbar-status-dot.online::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 100%; height: 100%;
+    transform: translate(-50%, -50%);
+    background-color: var(--status-online);
+    border-radius: 50%;
+    z-index: -1;
+    animation: statusPulseEffect 2s infinite;
 }
 
-/* Success State (Dynamic Class) */
-.msg-btn-minimal.copied {
-    background: #059669 !important;
-    border-color: #10b981 !important;
-    color: white !important;
-}
-
-.social-card-minimal:hover .msg-btn-minimal {
-    background: var(--primary);
-    border-color: var(--primary);
-    box-shadow: 0 8px 20px rgba(0, 98, 255, 0.3);
-}
-
-.social-card-minimal:has(.role-instructor):hover { border-color: var(--instructor-accent); }
-.social-card-minimal:has(.role-instructor):hover .msg-btn-minimal { background: var(--instructor-accent); border-color: var(--instructor-accent); }
-
-/* --- Squircle Avatar Visuals --- */
-.social-avatar-wrapper {
-    width: 64px;
-    height: 64px;
-    margin-bottom: 4px;
-}
-
-.social-avatar-wrapper img {
-    width: 100%;
-    height: 100%;
-    border-radius: 18px; /* Modern Squircle */
-    border: 2px solid rgba(255, 255, 255, 0.1);
-    object-fit: cover;
-    transition: var(--transition);
-}
-
-.social-card-minimal:hover .social-avatar-wrapper img {
-    border-color: var(--primary);
-    transform: scale(1.05);
+/* ==========================================================================
+   8. MOBILE RESPONSIVE OVERRIDES (< 600px)
+   ========================================================================== */
+@media (max-width: 600px) {
+    #socialDirectoryContainer div[style*="grid"] {
+        grid-template-columns: 1fr !important; /* Stack 1 per row */
+        gap: 12px !important;
+    }
+    
+    .social-card-minimal { padding: 16px !important; }
+    
+    #socialDirectoryContainer .social-section-block {
+        padding: 20px 15px;
+        margin-bottom: 30px;
+    }
 }
