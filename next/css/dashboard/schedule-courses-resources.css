@@ -1,0 +1,527 @@
+/* ==========================================================================
+   schedule-courses-resources.css — Premium SaaS Refactor
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. SCHEDULE VIEW
+   -------------------------------------------------------------------------- */
+.schedule-day-block {
+  margin-bottom: 35px;
+}
+
+.schedule-day-label {
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--primary);
+  padding: 8px 18px;
+  background: var(--primary-soft);
+  border-radius: 30px;
+  display: inline-block;
+  margin-bottom: 20px;
+  border: 1px solid rgba(0, 98, 255, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 98, 255, 0.08);
+}
+
+.schedule-items-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
+  gap: 18px;
+}
+
+.schedule-item-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+  min-width: 0;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Glass overlay for hover */
+.schedule-item-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(circle at top right, rgba(255,255,255,0.2), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+/* Left accent bar */
+.schedule-item-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 5px;
+  background: var(--primary);
+  transition: width 0.3s ease;
+}
+
+.schedule-item-card.is-urgent::before {
+  background: var(--accent-red);
+}
+
+.schedule-item-card.is-urgent {
+  background: linear-gradient(to right, rgba(239,68,68,0.03), transparent 60%);
+}
+
+.schedule-item-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--primary-soft);
+  box-shadow: var(--shadow-md);
+}
+
+.schedule-item-card:hover::after { opacity: 1; }
+.schedule-item-card:hover::before { width: 8px; }
+
+/* Time Badge */
+.schedule-time-badge {
+  background: var(--input-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 14px 12px;
+  text-align: center;
+  flex-shrink: 0;
+  min-width: 80px;
+  transition: var(--transition);
+}
+
+.schedule-item-card:hover .schedule-time-badge {
+  background: var(--card-bg);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  border-color: var(--primary-soft);
+}
+
+.time-start {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--primary);
+  display: block;
+  line-height: 1.1;
+}
+
+.time-sep {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  display: block;
+  margin: 4px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 800;
+}
+
+.time-end {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  display: block;
+}
+
+/* Schedule Info */
+.schedule-item-info { min-width: 0; flex: 1; }
+
+.schedule-item-info h4 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 6px;
+  overflow-wrap: break-word;
+}
+
+.schedule-item-info p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 0 0 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.room-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 6px 14px;
+  background: var(--primary-soft);
+  color: var(--primary);
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* --------------------------------------------------------------------------
+   2. COURSES VIEW
+   -------------------------------------------------------------------------- */
+.courses-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
+  gap: 24px;
+  margin-top: 20px;
+}
+
+.course-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 24px;
+  padding: 0;
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+  min-width: 0;
+  width: 100%;
+  box-shadow: var(--shadow-sm);
+}
+
+.course-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at top right, rgba(255,255,255,0.2), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.course-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary-soft);
+}
+
+.course-card:hover::after { opacity: 1; }
+
+.course-card-top-bar {
+  height: 6px;
+  width: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--instructor-accent));
+}
+
+.course-card-body {
+  padding: 24px;
+}
+
+.course-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.course-card-icon {
+  width: 54px;
+  height: 54px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  background: var(--primary-soft);
+  color: var(--primary);
+  transition: var(--transition);
+}
+
+.course-card:hover .course-card-icon {
+  transform: scale(1.05) rotate(-5deg);
+}
+
+.course-card-code {
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 6px 14px;
+  border-radius: 20px;
+  background: var(--input-bg);
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
+  letter-spacing: 0.05em;
+}
+
+.course-card h3 {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin-bottom: 6px;
+  line-height: 1.3;
+}
+
+.course-card .instructor-name {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.course-progress-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.course-progress-bar {
+  width: 100%;
+  height: 8px;
+  background: var(--input-bg);
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+
+.course-progress-fill {
+  height: 100%;
+  border-radius: 10px;
+  background: linear-gradient(90deg, var(--primary), #60a5fa);
+  transition: width 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.course-card-footer {
+  padding: 18px 24px;
+  border-top: 1px solid var(--border-color);
+  background: var(--input-bg);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.course-units-label {
+  font-size: 0.85rem;
+  color: var(--text-main);
+  font-weight: 800;
+}
+
+.msg-instructor-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--card-bg);
+  color: var(--primary);
+  border: 1.5px solid var(--border-color);
+  border-radius: 12px;
+  padding: 10px 18px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: var(--shadow-sm);
+}
+
+.msg-instructor-btn:hover {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0,98,255,0.25);
+}
+
+.msg-instructor-btn .material-symbols-outlined {
+  font-size: 1.1rem;
+}
+
+/* --------------------------------------------------------------------------
+   3. RESOURCES VIEW
+   -------------------------------------------------------------------------- */
+.resources-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.resources-filter-bar {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.filter-pill {
+  padding: 10px 20px;
+  border-radius: 30px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1.5px solid var(--border-color);
+  background: var(--card-bg);
+  color: var(--text-muted);
+  transition: var(--transition);
+}
+
+.filter-pill.active,
+.filter-pill:hover {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+  box-shadow: 0 6px 16px rgba(0,98,255,0.2);
+  transform: translateY(-2px);
+}
+
+.resources-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr));
+  gap: 24px;
+}
+
+.resource-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 22px;
+  padding: 0;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+.resource-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at top right, rgba(255,255,255,0.2), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.resource-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--primary-soft);
+  box-shadow: var(--shadow-md);
+}
+
+.resource-card:hover::after { opacity: 1; }
+
+/* Preview area gradients tied to SaaS accent tokens */
+.resource-card-preview {
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3.5rem;
+  border-bottom: 1px solid var(--border-color);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.resource-card:hover .resource-card-preview {
+  transform: scale(1.08);
+}
+
+/* Match Base Accent Tokens */
+.resource-card-preview.pdf  { background: linear-gradient(135deg, rgba(239,68,68,0.1),  rgba(239,68,68,0.02)); color: var(--accent-red); }
+.resource-card-preview.docx { background: linear-gradient(135deg, rgba(0,98,255,0.1), rgba(0,98,255,0.02)); color: var(--primary); }
+.resource-card-preview.pptx { background: linear-gradient(135deg, rgba(245,158,11,0.1), rgba(245,158,11,0.02)); color: var(--accent-amber); }
+.resource-card-preview.other { background: linear-gradient(135deg, rgba(100,116,139,0.1), rgba(100,116,139,0.02)); color: var(--text-muted); }
+
+.resource-card-body {
+  padding: 20px 24px;
+  flex: 1;
+}
+
+.resource-card-body h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 10px;
+  line-height: 1.4;
+  overflow-wrap: break-word;
+}
+
+/* Type Badges */
+.resource-type-badge {
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 6px 12px;
+  border-radius: 8px;
+  display: inline-block;
+}
+
+.resource-type-badge.pdf  { background: rgba(239,68,68,0.1);  color: var(--accent-red); border: 1px solid rgba(239,68,68,0.2); }
+.resource-type-badge.docx { background: rgba(0,98,255,0.1); color: var(--primary); border: 1px solid rgba(0,98,255,0.2); }
+.resource-type-badge.pptx { background: rgba(245,158,11,0.1); color: var(--accent-amber); border: 1px solid rgba(245,158,11,0.2); }
+.resource-type-badge.other { background: var(--input-bg); color: var(--text-muted); border: 1px solid var(--border-color); }
+
+.resource-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  border-top: 1px dashed var(--border-color);
+}
+
+.resource-date {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.resource-open-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--primary);
+  border: none;
+  background: none;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.resource-open-btn .material-symbols-outlined {
+  font-size: 1.1rem;
+  transition: transform 0.2s ease;
+}
+
+.resource-card:hover .resource-open-btn .material-symbols-outlined {
+  transform: translateX(6px);
+}
+
+.msg-btn-minimal {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: var(--input-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    color: var(--primary);
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.msg-btn-minimal:hover {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+.msg-btn-minimal span {
+    font-size: 1.1rem;
+}

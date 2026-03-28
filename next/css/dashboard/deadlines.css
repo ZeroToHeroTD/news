@@ -1,0 +1,307 @@
+/* ==========================================================================
+   deadlines.css — UPGRADED (Dynamic States + High Contrast Matte)
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. DEADLINE ITEM (Interactive Card)
+   -------------------------------------------------------------------------- */
+.deadline-item {
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+  padding: 22px; /* Slightly more breathing room */
+  border-radius: 20px;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-left: 5px solid var(--border-color);
+  cursor: pointer;
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); /* Smoother premium timing */
+  overflow: hidden;
+  flex-wrap: wrap;
+  margin-bottom: 15px; 
+}
+
+/* Subtle light overlay for glass effect */
+.deadline-item::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at top right, rgba(255,255,255,0.12), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+/* Hover = LIFT + DEPTH */
+.deadline-item:hover {
+  transform: translateY(-4px) translateX(4px); /* Combined lift and slide */
+  box-shadow: 0 12px 24px rgba(0,0,0,0.2);
+  border-left-color: var(--primary);
+  border-color: rgba(0, 98, 255, 0.3);
+}
+
+.deadline-item:hover::before {
+  opacity: 1;
+}
+
+/* --------------------------------------------------------------------------
+   2. STATE VARIANTS (Upgraded for "Appeal" Logic)
+   -------------------------------------------------------------------------- */
+.deadline-item.deadline-urgent {
+  border-left-color: var(--accent-amber);
+  background: linear-gradient(to right, rgba(245, 158, 11, 0.06), var(--card-bg) 40%);
+}
+
+.deadline-item.deadline-late {
+  border-left-color: var(--accent-red);
+  background: linear-gradient(to right, rgba(239, 68, 68, 0.06), var(--card-bg) 40%);
+}
+
+/* NEW: Appeal State for past-due items */
+.deadline-item.deadline-appeal {
+  border-left-color: #6366f1; /* Indigo matte */
+  background: linear-gradient(to right, rgba(99, 102, 241, 0.06), var(--card-bg) 40%);
+}
+
+/* --------------------------------------------------------------------------
+   3. ICON (Depth + Glow)
+   -------------------------------------------------------------------------- */
+.deadline-icon {
+  font-size: 1.5rem;
+  width: 50px;
+  height: 50px;
+  min-width: 50px; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  background: var(--input-bg);
+  color: var(--text-muted);
+  position: relative;
+  transition: var(--transition);
+  border: 1px solid var(--border-color);
+}
+
+.deadline-item:hover .deadline-icon {
+  transform: scale(1.1);
+  background: var(--card-bg);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.deadline-item.deadline-urgent .deadline-icon {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24; /* Brightened for dark mode */
+}
+
+.deadline-item.deadline-late .deadline-icon {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171; /* Brightened for dark mode */
+}
+
+/* Pulse ring */
+.deadline-item.deadline-late .deadline-icon::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 18px;
+  border: 2px solid var(--accent-red);
+  will-change: transform, opacity;
+  animation: dlPulse 2s infinite cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes dlPulse {
+  0% { transform: scale(0.9); opacity: 0.8; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+
+/* --------------------------------------------------------------------------
+   4. TEXT CONTENT (Hierarchy)
+   -------------------------------------------------------------------------- */
+.deadline-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.deadline-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+
+.deadline-info h4 {
+  font-size: 1.1rem; /* Slightly larger */
+  font-weight: 800;
+  color: #ffffff; /* High contrast white */
+}
+
+.deadline-type-badge {
+  font-size: 0.65rem;
+  font-weight: 900;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(0, 98, 255, 0.1);
+  color: var(--primary);
+  border: 1px solid rgba(0, 98, 255, 0.2);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.deadline-info p {
+  font-size: 0.88rem;
+  color: #cbd5e1; /* Brighter muted slate */
+  margin-bottom: 12px;
+  line-height: 1.6;
+}
+
+/* --------------------------------------------------------------------------
+   5. FOOTER META (Upgraded Action Row)
+   -------------------------------------------------------------------------- */
+.deadline-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  width: 100%;
+  padding-top: 15px;
+  border-top: 1px solid var(--border-color);
+}
+
+.deadline-due {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #94a3b8;
+}
+
+.deadline-due.late { color: #f87171; }
+.deadline-due.soon { color: #fbbf24; }
+
+/* Dynamic Action Button */
+.dl-action-trigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--input-bg);
+  border: 1px solid var(--border-color);
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--text-main);
+  transition: all 0.2s ease;
+}
+
+.deadline-item:hover .dl-action-trigger {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+/* --------------------------------------------------------------------------
+   6. STATUS BADGES (Cleaner pills)
+   -------------------------------------------------------------------------- */
+.deadline-status-badge {
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 6px 14px;
+  border-radius: 8px; /* Slightly boxy matte */
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+}
+
+.status-pending {
+  background: rgba(245,158,11,0.1);
+  color: #fbbf24;
+  border-color: rgba(245,158,11,0.2);
+}
+
+.status-submitted {
+  background: rgba(34,197,94,0.1);
+  color: #4ade80;
+  border-color: rgba(34,197,94,0.2);
+}
+
+.status-late {
+  background: rgba(239,68,68,0.1);
+  color: #f87171;
+  border-color: rgba(239,68,68,0.2);
+}
+
+/* --------------------------------------------------------------------------
+   7. MODAL COMPONENTS (Inset Premium Surface)
+   -------------------------------------------------------------------------- */
+.dl-modal-grid {
+  display: flex;
+  flex-direction: column;
+  margin-top: 20px;
+  max-height: 60vh;
+  overflow-y: auto;
+  background: var(--input-bg); 
+  border-radius: 18px;
+  padding: 10px 24px;
+  border: 1px solid var(--border-color);
+}
+
+.dl-modal-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 0;
+  border-bottom: 1px dashed var(--border-color);
+  gap: 20px;
+}
+
+.dl-modal-row:last-child { border-bottom: none; }
+
+.dl-modal-label {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #94a3b8;
+  text-transform: uppercase;
+}
+
+.dl-modal-value {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #ffffff;
+  text-align: right;
+  max-width: 65%;
+}
+
+.dl-modal-row.col-layout {
+  flex-direction: column;
+  align-items: flex-start;
+  background: rgba(255,255,255,0.02);
+  margin: 10px -10px;
+  padding: 18px;
+  border-radius: 14px;
+  border: 1px solid var(--border-color);
+}
+
+.dl-modal-row.col-layout .dl-modal-value {
+  text-align: left;
+  margin-top: 10px;
+  font-weight: 500;
+  line-height: 1.6;
+}
+
+/* --------------------------------------------------------------------------
+   8. RESPONSIVE ADJUSTMENTS
+   -------------------------------------------------------------------------- */
+@media (max-width: 600px) {
+  .deadline-item { flex-direction: column; gap: 12px; }
+  .deadline-icon { width: 40px; height: 40px; font-size: 1.2rem; }
+  .dl-modal-row { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .dl-modal-value { text-align: left; max-width: 100%; }
+}

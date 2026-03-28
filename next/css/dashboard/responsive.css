@@ -1,0 +1,306 @@
+/* ==========================================================================
+   responsive.css — Multi-Breakpoint Adaptive Engine (Premium SaaS)
+   Import this LAST so overrides apply correctly.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. MEDIUM SCREENS — Small Laptops / Landscape Tablets (< 1100px)
+   -------------------------------------------------------------------------- */
+@media (max-width: 1100px) {
+  .app-sidebar {
+    width: 240px;
+  }
+  
+  .dashboard-grid {
+    grid-template-columns: 1fr; /* Stack the Bento Grid */
+  }
+  
+  .grid-right {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+  }
+  
+  .smart-action-grid {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  }
+  
+  .app-main {
+    padding: 24px 30px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   2. TABLET — Portrait Tablets / Large Phones (< 900px)
+   -------------------------------------------------------------------------- */
+@media (max-width: 900px) {
+  /* Show Menu Trigger */
+  .hamburger-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: var(--input-bg);
+    color: var(--text-main);
+    transition: var(--transition);
+  }
+
+  .hamburger-btn:hover {
+    background: var(--border-color);
+  }
+
+  /* Remove outer app wrapper styling for mobile */
+  .app-container {
+    height: 100dvh;
+    border-radius: 0;
+    border: none;
+  }
+
+  /* Sidebar becomes an off-canvas drawer */
+  .app-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100dvh;
+    z-index: 100; /* Above topbar */
+    transform: translateX(-100%);
+    transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    width: 280px;
+    max-width: 85vw;
+    border-radius: 0 24px 24px 0;
+    box-shadow: 10px 0 40px rgba(0,0,0,0.3);
+  }
+
+  .app-sidebar.open {
+    transform: translateX(0);
+  }
+
+  /* Overlay Fade */
+  .sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 90; /* Below sidebar, above topbar */
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+  }
+  
+  .sidebar-overlay.active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .app-main {
+    padding: 20px 24px;
+  }
+
+  .topbar {
+    gap: 15px;
+    margin-bottom: 24px;
+    padding: 12px 18px;
+  }
+
+  .search-bar input {
+    max-width: 100%; /* Search bar takes available space */
+  }
+
+  .dashboard-hero {
+    flex-direction: column;
+    gap: 20px;
+    align-items: flex-start;
+  }
+
+  .today-focus-container {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Side-by-side on tablets */
+  }
+
+  .focus-card {
+    min-width: 0;
+  }
+
+  .grid-right {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Restore Sidebar Nav Items Layout on Mobile */
+  .nav-links {
+    flex-direction: column; 
+    overflow-x: hidden; 
+  }
+}
+
+/* --------------------------------------------------------------------------
+   3. MOBILE — Phones (< 600px)
+   -------------------------------------------------------------------------- */
+@media (max-width: 600px) {
+  body.app-body {
+    padding: 0;
+  }
+
+  .app-main {
+    padding: 16px;
+    padding-bottom: calc(20px + env(safe-area-inset-bottom)); /* iOS safe area */
+  }
+
+  .topbar {
+    gap: 10px;
+    margin-bottom: 20px;
+    border-radius: 16px;
+  }
+
+  /* Hide name to save space, rely on avatar */
+  #topbarName {
+    display: none; 
+  }
+
+  .user-profile {
+    padding: 4px;
+    border-radius: 50%; /* Collapse to a perfect circle */
+  }
+
+  .search-bar {
+    display: none; /* Hide on smallest screens to keep header clean */
+  }
+
+  .welcome-mini h1 {
+    font-size: 1.4rem;
+  }
+
+  .today-focus-container {
+    grid-template-columns: 1fr; /* Stack focus cards */
+  }
+
+  .focus-card {
+    padding: 16px;
+    min-height: 70px;
+  }
+
+  /* Action Grid - 2x2 Layout */
+  .smart-action-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .action-card {
+    padding: 16px 12px;
+    gap: 10px;
+    flex-direction: column; /* Stack icon and text */
+    text-align: center;
+    align-items: center;
+  }
+
+  /* Split Stats evenly */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .attendance-summary {
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    text-align: center;
+  }
+
+  .section-card {
+    padding: 20px 16px;
+    border-radius: 20px;
+  }
+
+  /* Mobile Modals */
+  .compose-modal-overlay {
+    padding: 16px;
+    align-items: flex-end; /* Drop to bottom on mobile */
+  }
+
+  .compose-modal-box {
+    padding: 24px 20px;
+    border-radius: 24px 24px 16px 16px;
+    max-height: 85vh;
+    margin-bottom: env(safe-area-inset-bottom);
+    transform: translateY(100%);
+  }
+
+  .compose-modal-overlay.active .compose-modal-box {
+    transform: translateY(0);
+  }
+
+  .compose-modal-actions {
+    flex-direction: column-reverse; /* Put 'Send' on top for thumbs */
+    gap: 12px;
+    margin-top: 24px;
+  }
+
+  /* --------------------------------------------------
+     Tables: Mobile Optimization (Safe Horizontal Scroll)
+     -------------------------------------------------- */
+  .grades-table {
+    font-size: 0.85rem;
+    min-width: 450px; /* Allows safe scrolling inside .table-scroll-wrapper */
+  }
+
+  .grades-table th,
+  .grades-table td {
+    padding: 12px 10px;
+  }
+
+  .grades-table td:first-child,
+  .grades-table th:first-child {
+    min-width: 140px;
+    white-space: normal;
+    line-height: 1.4;
+  }
+
+  /* --------------------------------------------------
+     Card Refinements (Deadlines/Messages)
+     -------------------------------------------------- */
+  .deadline-item,
+  .message-card {
+    padding: 16px;
+    flex-direction: column; /* Stack icons on top of info */
+    gap: 14px;
+  }
+
+  .deadline-icon,
+  .msg-icon-wrapper {
+    width: 44px;
+    height: 44px;
+    font-size: 1.2rem;
+  }
+
+  .deadline-top, 
+  .msg-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .deadline-bottom, 
+  .msg-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding-top: 12px;
+  }
+
+  /* --------------------------------------------------
+     Touch Target Sizing (Accessibility)
+     -------------------------------------------------- */
+  .view-btn,
+  .compose-new-btn,
+  .btn-send,
+  .btn-cancel {
+    min-height: 50px; /* Generous iOS/Android touch target */
+    width: 100%;
+    justify-content: center;
+  }
+}

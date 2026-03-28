@@ -1,0 +1,358 @@
+/* ========================================================================== 
+   attendance-payments.css — REFACTORED (Premium UI Upgrade)
+   ========================================================================== */
+
+/* -------------------------------------------------------------------------- 
+   1. ATTENDANCE WIDGET (Premium Depth & Balance)
+   -------------------------------------------------------------------------- */
+.attendance-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.attendance-pct-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  position: relative;
+}
+
+.attendance-big-num {
+  font-size: clamp(2.2rem, 4vw, 3rem);
+  font-weight: 900;
+  color: var(--text-main);
+  line-height: 1;
+  letter-spacing: -1px;
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Subtle text depth */
+}
+
+.attendance-stats {
+  display: flex;
+  gap: 32px; /* Increased breathing room */
+  flex-wrap: wrap;
+}
+
+.att-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.att-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+}
+
+.att-value {
+  font-size: 1.5rem;
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.att-value.red   { color: var(--accent-red); }
+.att-value.amber { color: var(--accent-amber); }
+
+/* Progress Bar (Glass + Glow) */
+.attendance-bar-track {
+  width: 100%;
+  height: 14px; /* Slightly thicker for better visibility */
+  background: var(--input-bg);
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  position: relative;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.04); /* Inner depth */
+}
+
+.attendance-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  min-width: 8px;
+  transition: width 1.2s cubic-bezier(0.22, 1, 0.36, 1); /* Smoother, more organic easing */
+  position: relative;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.2); /* Base glow */
+}
+
+/* Gradient States */
+.bg-attendance-good {
+  background: linear-gradient(90deg, #22c55e, #10b981);
+}
+.bg-attendance-warning {
+  background: linear-gradient(90deg, #f59e0b, #fbbf24);
+}
+.bg-attendance-danger {
+  background: linear-gradient(90deg, #ef4444, #f87171);
+}
+
+/* -------------------------------------------------------------------------- 
+   2. PAYMENTS — Cards (Interactive Depth & Hierarchy)
+   -------------------------------------------------------------------------- */
+.payment-summary-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 28px;
+}
+
+.pay-summary-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px); /* Glassmorphism base */
+}
+
+/* Subtle inner glow / Shine effect */
+.pay-summary-card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: -100%; width: 50%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+  transform: skewX(-20deg);
+  transition: 0.5s;
+}
+
+.pay-summary-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.pay-summary-card:hover::before {
+  left: 150%; /* Triggers the shine on hover */
+}
+
+/* Default (Blue/Primary Accent) */
+.pay-summary-card:not(.green):not(.red) {
+  border-top: 4px solid var(--primary);
+}
+.pay-summary-card:not(.green):not(.red):hover {
+  border-color: var(--primary);
+}
+
+/* GREEN (Paid) */
+.pay-summary-card.green {
+  background: linear-gradient(145deg, rgba(34, 197, 94, 0.02), rgba(34, 197, 94, 0.08));
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  border-top: 4px solid var(--accent-green, #10b981);
+}
+.pay-summary-card.green:hover {
+  box-shadow: 0 12px 24px rgba(34, 197, 94, 0.12);
+  border-color: rgba(34, 197, 94, 0.4);
+}
+
+/* RED (Remaining/Overdue) */
+.pay-summary-card.red {
+  background: linear-gradient(145deg, rgba(239, 68, 68, 0.02), rgba(239, 68, 68, 0.08));
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-top: 4px solid var(--accent-red, #ef4444);
+}
+.pay-summary-card.red:hover {
+  box-shadow: 0 12px 24px rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+.pay-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  z-index: 1; /* Sit above the shine effect */
+}
+
+.pay-amount {
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  color: var(--text-main);
+  overflow-wrap: break-word;
+  word-break: break-word;
+  z-index: 1;
+}
+
+.pay-summary-card.green .pay-amount { color: var(--accent-green, #10b981); }
+.pay-summary-card.red   .pay-amount { color: var(--accent-red, #ef4444); }
+
+/* -------------------------------------------------------------------------- 
+   3. STATUS BADGES (Crisp & Modern)
+   -------------------------------------------------------------------------- */
+.payment-status, .dl-status-value {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 14px;
+  border-radius: 999px; /* Perfect pill */
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(4px);
+}
+
+.status-paid {
+  background: rgba(16, 185, 129, 0.1);
+  color: #047857;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+.status-pending {
+  background: rgba(245, 158, 11, 0.1);
+  color: #b45309;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+.status-overdue {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* Dark Mode Adjustments */
+.dark-mode .status-paid { color: #34d399; background: rgba(52, 211, 153, 0.15); }
+.dark-mode .status-pending { color: #fbbf24; background: rgba(251, 191, 36, 0.15); }
+.dark-mode .status-overdue { color: #f87171; background: rgba(248, 113, 113, 0.15); }
+
+/* -------------------------------------------------------------------------- 
+   4. TABLES (Highly Readable + Custom Scrollbar)
+   -------------------------------------------------------------------------- */
+.table-scroll-wrapper {
+  width: 100%;
+  max-height: 400px; /* Enables inner scrolling if table gets too long */
+  overflow-x: auto;
+  overflow-y: auto;
+  border-radius: 16px;
+  border: 1px solid var(--border-color);
+  background: var(--card-bg);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+}
+
+/* Custom sleek scrollbar just for the table wrapper */
+.table-scroll-wrapper::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.table-scroll-wrapper::-webkit-scrollbar-track {
+  background: transparent;
+}
+.table-scroll-wrapper::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 10px;
+}
+.table-scroll-wrapper::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+.grades-table {
+  width: 100%;
+  border-collapse: separate; /* Changed from collapse for better rounded corners/borders */
+  border-spacing: 0;
+  min-width: 600px; /* Slightly wider for breathing room */
+}
+
+.grades-table th {
+  padding: 16px 24px;
+  text-align: left;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-bottom: 2px solid var(--border-color); /* Thicker bottom border for header */
+  background: var(--input-bg);
+  position: sticky; /* Sticky header when scrolling */
+  top: 0;
+  z-index: 10;
+  backdrop-filter: blur(8px); /* Glassy sticky header */
+}
+
+.grades-table td {
+  padding: 18px 24px;
+  color: var(--text-main);
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.95rem;
+  font-weight: 500;
+  vertical-align: middle;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  max-width: 260px;
+}
+
+.grades-table tbody tr {
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+/* Smoother hover with slight scale */
+.grades-table tbody tr:hover,
+#paymentsTableBody tr:hover {
+  background: var(--input-bg);
+  transform: scale(1.002);
+  cursor: default;
+}
+
+/* Zebra striping - improved for light/dark modes */
+.grades-table tbody tr:nth-child(even) {
+  background: rgba(0, 0, 0, 0.015);
+}
+.dark-mode .grades-table tbody tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.015);
+}
+
+.grades-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 12px;
+    border-radius: 8px; /* Slightly boxy matte look */
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    width: 100px; /* Fixed width for alignment */
+}
+
+/* Passed - Clean Green */
+.status-passed {
+    background: rgba(34, 197, 94, 0.15);
+    color: #22c55e;
+    border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+/* Failed - Clean Red */
+.status-failed {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+/* Incomplete - Matte Amber */
+.status-inc {
+    background: rgba(245, 158, 11, 0.15);
+    color: #f59e0b;
+    border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+/* Pending/Others - Slate */
+.status-pending {
+    background: var(--input-bg);
+    color: var(--text-muted);
+    border: 1px solid var(--border-color);
+}
+

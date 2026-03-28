@@ -1589,33 +1589,39 @@ body:not(.dark-mode) .social-card-minimal:hover {
     align-self: center;
 }
 
+/* THE DOT ITSELF */
 .topbar-status-dot {
-    position: absolute !important; 
+    position: absolute !important;
     bottom: 2px !important;
     right: 2px !important;
     width: 12px !important;
     height: 12px !important;
     border: 2px solid var(--card-bg) !important;
     border-radius: 50% !important;
+    background-color: var(--status-online) !important;
     z-index: 99 !important;
-    background-color: var(--status-offline);
-    opacity: 0;
-    transition: opacity 0.3s, background-color 0.3s;
+    pointer-events: none;
 }
 
-.topbar-status-dot.online { opacity: 1; background-color: var(--status-online) !important; }
-
+/* THE PULSE: Centered using 'inset' */
 .topbar-status-dot.online::after {
     content: '';
     position: absolute;
-    top: 50%; left: 50%;
-    width: 100%; height: 100%;
-    transform: translate(-50%, -50%);
+    /* This 'inset: 0' pins the pulse exactly to the 4 borders of the dot */
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
     background-color: var(--status-online);
     border-radius: 50%;
     z-index: -1;
-    animation: statusPulseEffect 2s infinite;
+    /* By default, transform-origin is center, so scale will work correctly now */
+    animation: statusPulseEffect 2s infinite ease-out;
 }
+
+
+.topbar-status-dot.online { opacity: 1; background-color: var(--status-online) !important; }
 
 /* ==========================================================================
    8. MOBILE RESPONSIVE OVERRIDES (< 600px)

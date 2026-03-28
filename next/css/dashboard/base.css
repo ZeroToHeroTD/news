@@ -1,0 +1,285 @@
+/* ==========================================================================
+   base.css — REFACTORED (Premium SaaS Upgrade)
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. TOKENS (Extended, NOT replaced)
+   -------------------------------------------------------------------------- */
+:root {
+  --primary: #0062ff;
+  --primary-hover: #0051d4;
+  --primary-soft: rgba(0, 98, 255, 0.1);
+
+  --sidebar-bg: #1e293b;
+  --bg-body: #e8edf5;
+  --bg-app: #f8fafc;
+  --card-bg: #ffffff;
+
+  --text-main: #1e293b;
+  --text-muted: #64748b;
+  --border-color: #e2e8f0;
+  --input-bg: #f1f5f9;
+
+  /* === IMPROVED SHADOW SYSTEM === */
+  --shadow-sm: 0 2px 6px rgba(0,0,0,0.05);
+  --shadow-md: 0 10px 25px rgba(0,0,0,0.08);
+  --shadow-lg: 0 25px 60px rgba(0,0,0,0.12);
+  --shadow-float: 0 30px 80px rgba(0,0,0,0.18);
+
+  /* Motion */
+  --transition: 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+
+  /* Status */
+  --status-online: #22c55e;
+  --status-online-glow: rgba(34, 197, 94, 0.4);
+  --status-offline: #94a3b8;
+
+  --instructor-accent: #a855f7;
+  --student-accent: #3b82f6;
+
+  --accent-green: #22c55e;
+  --accent-amber: #f59e0b;
+  --accent-red: #ef4444;
+
+  /* NEW: Premium surfaces */
+  --glass-bg: rgba(255,255,255,0.6);
+  --glass-border: rgba(255,255,255,0.4);
+  --blur: blur(14px);
+}
+
+/* --------------------------------------------------------------------------
+   2. DARK MODE (Better depth)
+   -------------------------------------------------------------------------- */
+.dark-mode {
+  --sidebar-bg: #0a0f1e;
+  --bg-body: #020617;
+  --bg-app: #0f172a; /* Adjusted for better contrast than pure black */
+  --card-bg: #1e293b;
+
+  --text-main: #f1f5f9;
+  --text-muted: #94a3b8;
+  --border-color: #334155;
+  --input-bg: #0f172a;
+
+  --shadow-sm: 0 2px 6px rgba(0,0,0,0.3);
+  --shadow-md: 0 10px 25px rgba(0,0,0,0.4);
+  --shadow-lg: 0 25px 60px rgba(0,0,0,0.5);
+
+  --glass-bg: rgba(30,41,59,0.7);
+  --glass-border: rgba(255,255,255,0.08);
+}
+
+/* --------------------------------------------------------------------------
+   3. RESET (Cleaner + safer)
+   -------------------------------------------------------------------------- */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
+}
+
+html, body {
+  overflow-x: hidden;
+  width: 100%;
+}
+
+/* --------------------------------------------------------------------------
+   4. SCROLLBAR (Softer feel)
+   -------------------------------------------------------------------------- */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb {
+  background: rgba(100,116,139,0.4);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(100,116,139,0.7);
+}
+
+/* --------------------------------------------------------------------------
+   5. APP SHELL (BIG VISUAL UPGRADE)
+   -------------------------------------------------------------------------- */
+body.app-body {
+  background: linear-gradient(180deg, var(--bg-body), rgba(0,0,0,0.02));
+  color: var(--text-main);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  min-height: 100vh;
+}
+
+/* main container now feels like a "floating app" */
+.app-container {
+  display: flex;
+  width: 100%;
+  max-width: 1440px;
+  height: 94vh;
+  background: var(--bg-app);
+  border-radius: 30px;
+  box-shadow: var(--shadow-float);
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+  position: relative;
+}
+
+/* subtle highlight layer */
+.app-container::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at top right, rgba(255,255,255,0.3), transparent 60%);
+  pointer-events: none;
+}
+
+/* --------------------------------------------------------------------------
+   6. INPUTS & FORMS (More premium focus feel)
+   -------------------------------------------------------------------------- */
+input, textarea, select {
+  width: 100%;
+  padding: 12px 18px; /* Slightly tighter padding */
+  background: var(--input-bg);
+  color: var(--text-main);
+  border: 1.5px solid var(--border-color);
+  border-radius: 12px;
+  font-size: 0.95rem;
+  outline: none;
+  transition: var(--transition);
+}
+
+input:focus, textarea:focus, select:focus {
+  border-color: var(--primary);
+  background: var(--card-bg);
+  box-shadow: 
+    0 0 0 4px var(--primary-soft),
+    0 4px 12px rgba(0, 98, 255, 0.15);
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+/* --------------------------------------------------------------------------
+   7. BUTTONS (Now feel clickable and match HTML)
+   -------------------------------------------------------------------------- */
+.view-btn, .btn-send {
+  padding: 12px 28px;
+  background: linear-gradient(135deg, var(--primary), #3b82f6);
+  color: white;
+  border-radius: 12px;
+  border: none;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.25s ease;
+  box-shadow: 0 6px 16px rgba(0, 98, 255, 0.25);
+}
+
+.view-btn:hover, .btn-send:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 10px 30px rgba(0, 98, 255, 0.35);
+}
+
+.view-btn:active, .btn-send:active {
+  transform: scale(0.98);
+}
+
+/* Secondary / Cancel Button */
+.btn-cancel {
+  padding: 12px 28px;
+  background: transparent;
+  color: var(--text-main);
+  border: 1.5px solid var(--border-color);
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: var(--transition);
+}
+
+.btn-cancel:hover {
+  background: var(--input-bg);
+  border-color: var(--text-muted);
+}
+
+/* --------------------------------------------------------------------------
+   8. VIEW ANIMATIONS (Matches .view-content in HTML)
+   -------------------------------------------------------------------------- */
+.view-content {
+  display: none;
+  flex: 1;
+  overflow-y: auto;
+  padding: 30px;
+  opacity: 0;
+}
+
+.view-content.active {
+  display: block;
+  animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Matte Message Button */
+.msg-btn-minimal {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: var(--input-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    color: var(--primary);
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: none !important; /* Force no glow */
+}
+
+.msg-btn-minimal:hover {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+}
+
+.msg-btn-minimal.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    border-style: dashed;
+}
+
+/* --------------------------------------------------------------------------
+   9. KEYFRAMES
+   -------------------------------------------------------------------------- */
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}

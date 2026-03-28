@@ -141,17 +141,74 @@ body.auth-page {
   box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.08);
 }
 
+/* --- FIXED: Added missing layout and matte checkbox styles --- */
+
 .form-actions {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: -8px;
+    display: flex; /* Added back to put them on one line */
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    user-select: none;
+}
+
+/* 1. The Wrapper */
+.remember-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.85rem;
+    color: #6b7280; /* Matches your text-muted color */
+    cursor: pointer;
+}
+
+/* 2. Hide the default browser checkbox */
+.remember-label input {
+    display: none;
+}
+
+/* 3. The Matte Box itself (This was missing!) */
+.custom-checkbox {
+    width: 20px;
+    height: 20px;
+    background-color: #f9fafb; /* Matches your input background */
+    border: 2px solid #f3f4f6;
+    border-radius: 6px;
+    position: relative;
+    transition: all 0.2s ease;
+    display: inline-block;
+}
+
+/* Update your existing hover logic to use your theme blue */
+.remember-label:hover .custom-checkbox {
+    border-color: #4f46e5;
+    background: #ffffff;
+}
+
+/* Update your existing checked logic to use your theme blue */
+.remember-label input:checked + .custom-checkbox {
+    background-color: #4f46e5;
+    border-color: #4f46e5;
+}
+
+/* Your existing checkmark code (Keep this) */
+.remember-label input:checked + .custom-checkbox::after {
+    content: "";
+    position: absolute;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    left: 6px; /* Adjusted slightly for centering */
+    top: 2px;
+    transform: rotate(45deg);
+    display: block;
 }
 
 .forgot-link {
-  font-size: 0.85rem;
-  color: #4f46e5;
-  text-decoration: none;
-  font-weight: 600;
+    font-size: 0.85rem;
+    color: #4f46e5;
+    text-decoration: none;
+    font-weight: 600;
 }
 
 .auth-btn {

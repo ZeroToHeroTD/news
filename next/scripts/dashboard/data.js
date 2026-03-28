@@ -1,6 +1,6 @@
-import { supabaseClient } from './config.js';
-import { escapeAttr, getTimeAgo, getPHNumericalGrade, updateGwaComparison } from './utils.js';
-import { updateAllAvatars, checkUserPermissions } from './ui.js';
+import { supabaseClient } from '../new/config.js';
+import { escapeAttr, getTimeAgo, getPHNumericalGrade, updateGwaComparison } from '../new/utils.js';
+import { updateAllAvatars, checkUserPermissions } from '../new/ui.js';
 
 export async function initProfile(user) {
     const { data: profile, error } = await supabaseClient
@@ -43,6 +43,13 @@ export async function initProfile(user) {
     }
     updateAllAvatars(avatarUrl);
     checkUserPermissions(profile?.role);
+
+    // Add these lines to initProfile
+const settingCourse = document.getElementById('settingCourse');
+const settingSection = document.getElementById('settingSection');
+
+if (settingCourse) settingCourse.value = profile?.course_name || 'Unassigned';
+if (settingSection) settingSection.value = profile?.section || 'Unassigned';
 }
 
 export async function loadResources() {

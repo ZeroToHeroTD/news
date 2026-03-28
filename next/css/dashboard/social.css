@@ -1,0 +1,331 @@
+/* ==========================================================================
+   social.css — Social Directory, Presence, Status Dots, Social Cards
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. SECTION BLOCKS & HEADERS
+   -------------------------------------------------------------------------- */
+#socialDirectoryContainer .social-section-block {
+  background: var(--card-bg); /* Upgraded to unified token */
+  backdrop-filter: var(--blur); /* Upgraded to unified token */
+  -webkit-backdrop-filter: var(--blur);
+  border: 1px solid var(--border-color);
+  border-radius: 24px;
+  padding: 32px;
+  margin-bottom: 40px;
+  transition: var(--transition);
+  box-shadow: var(--shadow-sm);
+  
+  /* Strict Overflow Protection */
+  min-width: 0;
+  width: 100%;
+  overflow: hidden;
+}
+
+#socialDirectoryContainer .social-section-block h3 {
+  color: var(--text-main) !important;
+  font-size: 1.3rem !important;
+  font-weight: 800 !important;
+  padding-bottom: 20px;
+  border-bottom: 1px dashed var(--border-color); /* Premium dashed look */
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Member count badge via data attribute */
+#socialDirectoryContainer .social-section-block h3::after {
+  content: attr(data-count);
+  font-size: 0.75rem;
+  background: var(--primary-soft); /* Upgraded for better contrast */
+  color: var(--primary);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-weight: 800;
+  border: 1px solid rgba(0, 98, 255, 0.15);
+  box-shadow: 0 4px 10px rgba(0, 98, 255, 0.1); /* Softer shadow */
+}
+
+#socialDirectoryContainer h4 {
+  font-size: 0.8rem !important;
+  text-transform: uppercase;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin: 30px 0 16px 4px !important;
+}
+
+/* --------------------------------------------------------------------------
+   2. GRID LAYOUT
+   -------------------------------------------------------------------------- */
+#socialDirectoryContainer div[style*="grid"] {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
+  gap: 24px !important; /* Slightly more breathing room */
+  align-items: stretch;
+}
+
+/* --------------------------------------------------------------------------
+   3. SOCIAL CARDS (Overflow Safe)
+   -------------------------------------------------------------------------- */
+.social-card-minimal {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 24px;
+  padding: 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  height: 100%;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); /* Smoother interaction */
+  position: relative;
+  
+  /* Strict Overflow Protection */
+  overflow: hidden;
+  min-width: 0;
+  width: 100%;
+}
+
+/* NEW: Added the premium glass hover effect without removing your existing logic */
+.social-card-minimal::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(circle at top right, rgba(255,255,255,0.2), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.social-card-minimal:hover {
+  transform: translateY(-6px);
+  border-color: var(--primary-soft);
+  box-shadow: var(--shadow-md);
+}
+
+.social-card-minimal:hover::after {
+  opacity: 1;
+}
+
+/* Instructor-specific hover */
+.social-card-minimal:has(.role-instructor):hover { 
+  border-color: var(--instructor-accent); 
+}
+
+/* Light mode specific */
+body:not(.dark-mode) .social-card-minimal:hover { 
+  background: #ffffff; 
+  box-shadow: var(--shadow-lg); /* Upgraded shadow variable */
+}
+
+.social-card-minimal .social-role-badge { 
+  display: inline-block; 
+  margin-bottom: 8px; 
+}
+
+.social-card-minimal .member-name {
+  font-size: 1.15rem !important;
+  line-height: 1.3;
+  font-weight: 800;
+  margin-bottom: 8px;
+  color: var(--text-main) !important;
+  
+  /* Text Wrapping Safety */
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.social-card-minimal .member-info-column { 
+  display: flex; 
+  flex-direction: column; 
+  justify-content: center; 
+  flex: 1; 
+  min-width: 0; 
+}
+
+/* --------------------------------------------------------------------------
+   4. AVATARS & ROLE BADGES
+   -------------------------------------------------------------------------- */
+.social-avatar-wrapper { 
+  width: 68px; 
+  height: 68px; 
+  margin-bottom: 4px; 
+  flex-shrink: 0; 
+}
+
+.social-avatar-wrapper img {
+  width: 100%; 
+  height: 100%; 
+  border-radius: 20px; /* Modern Squircle */
+  border: 2px solid var(--input-bg); /* Upgraded border contrast */
+  object-fit: cover; 
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
+}
+
+.social-card-minimal:hover .social-avatar-wrapper img {
+  border-color: var(--primary-soft);
+}
+
+.social-role-badge {
+  font-size: 0.65rem; 
+  font-weight: 800; 
+  padding: 6px 12px; 
+  border-radius: 8px;
+  text-transform: uppercase; 
+  letter-spacing: 0.08em; 
+  width: fit-content;
+}
+
+.role-instructor { background: rgba(168,85,247,0.1); color: var(--instructor-accent); border: 1px solid rgba(168,85,247,0.2); }
+.role-student { background: rgba(59,130,246,0.1); color: var(--student-accent); border: 1px solid rgba(59,130,246,0.2); }
+
+.dark-mode .role-instructor { color: #e9d5ff; }
+.dark-mode .role-student { color: #bfdbfe; }
+
+/* --------------------------------------------------------------------------
+   5. CARD STATUS DOTS & PULSE ANIMATION
+   -------------------------------------------------------------------------- */
+.status-container { 
+  display: flex; 
+  align-items: center; 
+  gap: 10px; 
+  margin-top: 4px; /* Slightly adjusted for balance */
+}
+
+.status-dot { 
+  width: 10px; 
+  height: 10px; 
+  border-radius: 50%; 
+  position: relative; 
+  flex-shrink: 0; 
+}
+
+.status-dot.online { 
+  background-color: var(--status-online); 
+  box-shadow: 0 0 10px var(--status-online-glow); 
+}
+
+.status-dot.offline { 
+  background-color: var(--status-offline); 
+  opacity: 0.6; 
+}
+
+/* Standard Card Pulse */
+.status-dot.online::after {
+  content: ''; 
+  position: absolute; 
+  inset: -2px; /* Pulls slightly outside the dot for better visual */
+  margin: auto;
+  border: 2px solid var(--status-online); 
+  border-radius: 50%;
+  z-index: 1; 
+  will-change: transform, opacity;
+  animation: statusPulseEffect 2.5s infinite cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes statusPulseEffect {
+  0%   { transform: scale(0.8);  opacity: 0.8; }
+  100% { transform: scale(3.5); opacity: 0; }
+}
+
+.online-status-text { 
+  font-size: 0.85rem !important; 
+  font-weight: 700; 
+}
+
+.online-status-text.active  { color: var(--status-online); text-shadow: 0 0 10px var(--status-online-glow); }
+.online-status-text.offline { color: var(--text-muted); }
+
+/* --------------------------------------------------------------------------
+   6. TOPBAR PRESENCE DOT (PERMANENTLY CENTERED FIX)
+   -------------------------------------------------------------------------- */
+.topbar-avatar-wrapper {
+  position: relative !important; 
+  width: 40px !important; 
+  height: 40px !important;
+  display: block !important; 
+  flex-shrink: 0; 
+  align-self: center;
+}
+
+.topbar-status-dot {
+  position: absolute !important; 
+  bottom: 0px !important; 
+  right: 0px !important;
+  width: 13px !important; 
+  height: 13px !important;
+  border: 2.5px solid var(--card-bg) !important; 
+  border-radius: 50% !important;
+  background-color: var(--status-offline) !important; 
+  z-index: 99 !important; 
+  pointer-events: none;
+}
+
+.topbar-status-dot.online { 
+  opacity: 1; 
+  background-color: var(--status-online) !important; 
+}
+
+/* Fixed Centered Pulse using Inset/Margin */
+.topbar-status-dot.online::after {
+  content: ''; 
+  position: absolute;
+  inset: -2px; 
+  margin: auto; /* This pins it perfectly to the center */
+  border: 2px solid var(--status-online); 
+  border-radius: 50%;
+  z-index: -1; 
+  animation: statusPulseEffect 2.5s infinite cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* --------------------------------------------------------------------------
+   7. INTERACTION BUTTONS
+   -------------------------------------------------------------------------- */
+.msg-btn-minimal {
+  margin-top: auto; 
+  background: var(--input-bg); /* Upgraded from hardcoded rgba */
+  border: 1px solid var(--border-color);
+  border-radius: 14px; 
+  padding: 12px 16px; 
+  font-size: 0.85rem; 
+  font-weight: 700;
+  color: var(--text-main); 
+  cursor: pointer; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center;
+  gap: 8px; 
+  transition: all 0.25s ease; 
+  position: relative; 
+  overflow: hidden;
+}
+
+.msg-btn-minimal:hover { 
+  background: var(--primary); 
+  border-color: var(--primary); 
+  color: white; 
+  transform: translateY(-3px); 
+  box-shadow: 0 6px 16px rgba(0, 98, 255, 0.25); 
+}
+
+.msg-btn-primary { 
+  background: var(--primary-soft); 
+  color: var(--primary); 
+  border-color: rgba(0, 98, 255, 0.2);
+}
+
+/* Standardized the success state using your established accent-green */
+.msg-btn-minimal.copied { 
+  background: rgba(34, 197, 94, 0.1) !important; 
+  border-color: var(--accent-green) !important; 
+  color: var(--accent-green) !important; 
+}
+
+.msg-btn-minimal.copied:hover {
+  background: var(--accent-green) !important;
+  color: white !important;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(34, 197, 94, 0.25);
+}

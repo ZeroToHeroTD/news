@@ -1,0 +1,432 @@
+/* ==========================================================================
+   layout.css — Topbar, Main Area, Dashboard Hero, Section Cards, Stats
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. MAIN CONTENT AREA
+   -------------------------------------------------------------------------- */
+.app-main {
+  flex: 1;
+  padding: 30px 40px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: transparent; /* Lets the app-container background shine through */
+  position: relative;
+  transition: background-color var(--transition);
+  min-width: 0;
+  width: 100%;
+  scroll-behavior: smooth;
+}
+
+/* --------------------------------------------------------------------------
+   2. TOPBAR & PROFILE (Glassmorphism + Sticky)
+   -------------------------------------------------------------------------- */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+  gap: 20px;
+  flex-wrap: wrap;
+  width: 100%;
+  padding: 14px 24px;
+  border-radius: 20px;
+  
+  /* Premium Glass Effect */
+  background: var(--glass-bg);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-sm);
+  
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+
+.search-bar {
+  flex: 1;
+  max-width: 400px;
+}
+
+.search-bar input {
+  padding: 14px 22px;
+  background: var(--card-bg);
+  color: var(--text-main);
+  border: 1.5px solid var(--border-color);
+  border-radius: 16px;
+  width: 100%;
+  outline: none;
+  transition: var(--transition);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.search-bar input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px var(--primary-soft);
+  background: var(--card-bg);
+}
+
+.user-profile {
+  background: var(--card-bg);
+  padding: 6px 18px 6px 6px;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+  border: 1px solid var(--border-color);
+  transition: var(--transition);
+  cursor: pointer;
+}
+
+.user-profile:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary-soft);
+}
+
+.topbar-avatar-wrapper {
+  position: relative;
+  display: flex;
+}
+
+.avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--bg-app);
+  background: var(--input-bg);
+}
+
+/* --------------------------------------------------------------------------
+   3. DASHBOARD HERO + FOCUS CARDS
+   -------------------------------------------------------------------------- */
+.dashboard-hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 35px;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding: 24px 30px;
+  border-radius: 24px;
+  background: linear-gradient(135deg, var(--card-bg), var(--input-bg));
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+}
+
+.welcome-mini { min-width: 0; }
+.welcome-mini h1 {
+  font-size: clamp(1.4rem, 3vw, 1.8rem);
+  font-weight: 800;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.today-focus-container {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  min-width: 0;
+  flex: 1;
+  justify-content: flex-end;
+}
+
+.focus-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  padding: 16px 20px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 220px;
+  flex: 1 1 220px;
+  max-width: 300px;
+  min-height: 76px;
+  transition: var(--transition);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.focus-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Gradient Tints for Focus Cards */
+.focus-card.urgent { 
+  border-left: 4px solid var(--accent-red); 
+  background: linear-gradient(to right, rgba(239,68,68,0.04), transparent 60%);
+}
+.focus-card.warning { 
+  border-left: 4px solid var(--accent-amber); 
+  background: linear-gradient(to right, rgba(245,158,11,0.04), transparent 60%);
+}
+
+.focus-info { min-width: 0; }
+
+.focus-info small {
+  color: var(--text-muted);
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.focus-info h4 {
+  color: var(--text-main);
+  font-size: 0.95rem;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.focus-info p {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* --------------------------------------------------------------------------
+   4. SMART ACTION GRID
+   -------------------------------------------------------------------------- */
+.smart-action-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 18px;
+  margin-bottom: 35px;
+  width: 100%;
+}
+
+.action-card {
+  background: var(--card-bg);
+  padding: 20px;
+  border-radius: 22px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+  border: 1px solid var(--border-color);
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.action-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary-soft);
+}
+
+.action-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.action-card:hover .action-icon { transform: scale(1.15) rotate(5deg); }
+
+.action-icon.blue   { background: rgba(0,98,255,0.1);  color: var(--primary); }
+.action-icon.purple { background: rgba(168,85,247,0.1); color: var(--accent-purple); }
+.action-icon.orange { background: rgba(245,158,11,0.1); color: var(--accent-amber); }
+.action-icon.green  { background: rgba(34,197,94,0.1);  color: var(--accent-green); }
+
+.action-content { min-width: 0; overflow: hidden; }
+.action-content h4 { font-size: 1rem; font-weight: 700; color: var(--text-main); margin-bottom: 2px;}
+.action-content p { font-size: 0.8rem; font-weight: 500; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+
+/* --------------------------------------------------------------------------
+   5. DASHBOARD GRID & SECTION CARDS
+   -------------------------------------------------------------------------- */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: 24px;
+  width: 100%;
+}
+
+.grid-left, .grid-right { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
+
+.section-card {
+  background: var(--card-bg);
+  border-radius: 24px;
+  padding: 28px;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+}
+
+.section-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.section-card h2, .section-card h3 { 
+  font-size: 1.15rem; 
+  font-weight: 800; 
+  color: var(--text-main);
+  margin-bottom: 10px;
+}
+
+/* --------------------------------------------------------------------------
+   6. STATS ROW & CHARTS
+   -------------------------------------------------------------------------- */
+.stats-row { 
+  display: flex; 
+  gap: 16px; 
+  margin-top: 25px; 
+  flex-wrap: wrap; 
+}
+
+.data-card.mini {
+  flex: 1 1 120px;
+  padding: 20px;
+  text-align: center;
+  background: var(--input-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  transition: var(--transition);
+}
+
+.data-card.mini:hover { 
+  border-color: var(--primary-soft); 
+  transform: translateY(-2px); 
+  box-shadow: var(--shadow-sm); 
+}
+
+.data-card.mini h3 { 
+  font-size: 0.75rem; 
+  font-weight: 800; 
+  letter-spacing: 0.08em; 
+  color: var(--text-muted); 
+  text-transform: uppercase; 
+}
+
+.data-card.mini h2 { 
+  font-size: 1.8rem; 
+  font-weight: 800; 
+  margin-top: 8px; 
+  color: var(--primary); 
+}
+
+.chart-select {
+  padding: 8px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  background: var(--input-bg);
+  color: var(--text-main);
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  outline: none;
+  transition: var(--transition);
+}
+
+.chart-select:focus, .chart-select:hover { 
+  border-color: var(--primary); 
+  box-shadow: 0 0 0 3px var(--primary-soft); 
+}
+
+/* --------------------------------------------------------------------------
+   7. NOTICES & MISSING OUTPUTS (Interactive List)
+   -------------------------------------------------------------------------- */
+.notice-item, .missing-output-item {
+  padding: 16px;
+  border-bottom: 1px dashed var(--border-color);
+  transition: var(--transition);
+  border-radius: 16px;
+  cursor: pointer;
+  margin-bottom: 4px;
+}
+
+.notice-item:hover, .missing-output-item:hover {
+  background: var(--input-bg);
+  transform: translateX(6px);
+}
+
+.notice-item:last-child, .missing-output-item:last-child { 
+  border-bottom: none; 
+}
+
+.notice-item h4 { 
+  font-size: 0.95rem; 
+  font-weight: 700; 
+  color: var(--text-main); 
+  margin-bottom: 6px; 
+}
+
+.notice-item p { 
+  font-size: 0.85rem; 
+  color: var(--text-muted); 
+  line-height: 1.5; 
+}
+
+.topbar-right-group {
+    margin-left: auto; /* Pushes the whole group to the right */
+}
+
+.theme-toggle-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: var(--input-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.theme-toggle-btn:hover {
+    background: var(--border-color);
+    transform: translateY(-2px);
+}
+
+/* Icon Color Logic */
+body:not(.dark-mode) #themeIcon {
+    color: #f59e0b; /* Matte Sun Gold */
+}
+
+body.dark-mode #themeIcon {
+    color: #94a3b8; /* Matte Moon Slate */
+}   
+
+/* --------------------------------------------------------------------------
+   8. RESPONSIVE DESIGN
+   -------------------------------------------------------------------------- */
+@media (max-width: 1024px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+  .today-focus-container {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-main {
+    padding: 20px;
+  }
+  .topbar {
+    padding: 12px 16px;
+    margin-bottom: 25px;
+  }
+}

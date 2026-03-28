@@ -1,0 +1,10 @@
+/* dashboard-master.css */
+@import url('base.css');
+@import url('sidebar.css');
+@import url('layout.css');
+@import url('schedule-courses-resources.css');
+@import url('messages.css');
+@import url('deadlines.css');
+@import url('social.css');
+@import url('responsive.css'); /* Must be last */
+@import url(attendance-payments.css);
