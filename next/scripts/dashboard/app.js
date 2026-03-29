@@ -3,21 +3,21 @@
 // Coordinates Auth, Universal Search, Profile Settings, and Modular Loading.
 // =============================================================================
 
-import { supabaseClient } from '../new/config.js';
-import { showToast } from '../new/utils.js';
-import { updateAllAvatars, switchView } from '../new/ui.js';
+import { supabaseClient } from '../dashboard/config.js';
+import { showToast } from '../dashboard/utils.js';
+import { updateAllAvatars, switchView } from '../dashboard/ui.js';
 
 // Modular Loaders
-import { initProfile } from '../new/profile.js';
-import { loadAttendance } from '../new/attendance.js';
-import { loadCoursesData, loadResources } from '../new/courses-resource.js';
-import { loadDeadlines } from '../new/deadlines.js';
-import { loadGradesData, loadPerformanceChart, initializeChartListener } from '../new/grades.js';
-import { loadMessages, updateUnreadCount, initializeAutocomplete, setupMessageActions } from '../new/messages.js';
-import { loadNotices, loadSmartDashboardData } from '../new/notices-dashboard.js';
-import { loadPaymentData } from '../new/payments.js';
-import { loadTodaysSchedule, loadWeeklySchedule } from '../new/schedule.js';
-import { loadSocialDirectory, initializePresence } from '../new/social.js';
+import { initProfile } from '../dashboard/profile.js';
+import { loadAttendance } from '../dashboard/attendance.js';
+import { loadCoursesData, loadResources } from '../dashboard/courses-resource.js';
+import { loadDeadlines } from '../dashboard/deadlines.js';
+import { loadGradesData, loadPerformanceChart, initializeChartListener } from '../dashboard/grades.js';
+import { loadMessages, updateUnreadCount, initializeAutocomplete, setupMessageActions } from '../dashboard/messages.js';
+import { loadNotices, loadSmartDashboardData } from '../dashboard/notices-dashboard.js';
+import { loadPaymentData } from '../dashboard/payments.js';
+import { loadTodaysSchedule, loadWeeklySchedule } from '../dashboard/schedule.js';
+import { loadSocialDirectory, initializePresence } from '../dashboard/social.js';
 
 // Global state for messaging functionality
 window.secretReceiverId = null; 

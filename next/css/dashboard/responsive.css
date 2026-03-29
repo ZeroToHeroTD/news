@@ -4,12 +4,63 @@
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
+   0. DESKTOP — NATIVE 80% ZOOM HACK
+   -------------------------------------------------------------------------- */
+/* Force the background color to match so there's never a white/gray void */
+html, body {
+  background-color: #0a0c1c !important; 
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+body.app-body {
+  width: 100vw !important;
+  min-height: 100vh !important;
+  overflow-x: hidden !important; 
+}
+
+/* Ensure the font base doesn't mess with the native zoom */
+html {
+  font-size: 16px !important;
+}
+
+@media (min-width: 1024px) {
+  .app-container {
+    /* 1. Stretch the canvas exactly 125% to account for 80% zoom 
+       (because 125 * 0.8 = 100) */
+    width: 125vw !important;
+    min-height: 125vh !important;
+    
+    /* 2. Constrain the maximum width so it doesn't get ridiculously wide 
+       on huge gaming monitors, but center it beautifully. */
+    max-width: 2000px !important; /* This looks like 1600px after the zoom */
+    margin: 0 auto !important; 
+    
+    /* 3. Apply the exact 80% zoom you requested */
+    zoom: 0.80 !important;
+  }
+}
+
+/* Firefox Fallback */
+@-moz-document url-prefix() {
+  @media (min-width: 1024px) {
+    .app-container {
+      width: 125vw !important;
+      min-height: 125vh !important;
+      transform: scale(0.80) !important;
+      transform-origin: top center !important;
+    }
+  }
+}
+
+/* --------------------------------------------------------------------------
    1. MEDIUM SCREENS — Small Laptops / Landscape Tablets (< 1100px)
    -------------------------------------------------------------------------- */
 @media (max-width: 1100px) {
   .app-sidebar {
     width: 240px;
   }
+/* ... KEEP THE REST OF YOUR RESPONSIVE CSS BELOW THIS EXACTLY THE SAME ... */
   
   .dashboard-grid {
     grid-template-columns: 1fr; /* Stack the Bento Grid */

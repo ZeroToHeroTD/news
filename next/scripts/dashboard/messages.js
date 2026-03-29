@@ -254,7 +254,15 @@ window.openConversation = (partnerId) => {
         if (avatarEl) avatarEl.src = avatarUrl;
         if (nameEl) nameEl.textContent = selectedConversationName;
         
-        // Changed from 'Active now' to role/offline since presence isn't built yet
+        // --- GREEN DOT FIX ---
+        // Find the dot on the header avatar and force it to be offline (grey)
+        const headerAvatarDot = document.querySelector('.chat-header-avatar-wrap .conv-status-dot');
+        if (headerAvatarDot) {
+            headerAvatarDot.className = 'conv-status-dot offline';
+            headerAvatarDot.style.backgroundColor = '#64748b'; 
+        }
+        
+        // Set the text status below the name to offline
         setHeaderStatus('offline', partnerProfile.role || 'Student');
     }
 

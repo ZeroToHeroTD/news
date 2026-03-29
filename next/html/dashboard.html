@@ -421,37 +421,129 @@
       </section>
 
 
-      <section class="view-content" id="view-payments">
-        <div class="view-header">
-          <h2>Finance &amp; Tuition</h2>
+<!-- ============================================================
+     DROP-IN REPLACEMENT: Replace your existing <section id="view-payments">
+     block in dashboard.html with this entire block.
+     All existing IDs and event bindings are preserved.
+     ============================================================ -->
+
+<section class="view-content" id="view-payments">
+
+        <div class="view-header payments-view-header">
+          <div class="payments-header-left">
+            <h2>Finance &amp; Tuition</h2>
+            <p class="payments-subtitle">Track balances, review transactions, and manage your account.</p>
+          </div>
+          <div class="payments-header-actions">
+            <button class="pay-header-btn" onclick="window.showToast('Opening payment history...', 'info')">
+              <span class="material-symbols-outlined">history</span>
+              History
+            </button>
+            <button class="pay-header-btn primary" onclick="window.showToast('Redirecting to payment gateway...', 'info')">
+              <span class="material-symbols-outlined">account_balance_wallet</span>
+              Pay Now
+            </button>
+          </div>
         </div>
+
+        <div id="paymentsSummaryHighlight" class="pay-story-mount"></div>
+
         <div class="payment-summary-row">
-          <div class="pay-summary-card">
-            <span class="pay-label">Total Balance</span>
-            <div class="pay-amount" id="payTotalBalance">₱0.00</div>
+
+          <div class="pay-summary-card" data-card="total">
+            <div class="pay-card-inner">
+              <div class="pay-card-header">
+                <span class="pay-label">Total Balance</span>
+                <span class="pay-card-icon total">
+                  <span class="material-symbols-outlined">receipt_long</span>
+                </span>
+              </div>
+              <div class="pay-amount" id="payTotalBalance">₱0.00</div>
+            </div>
           </div>
-          <div class="pay-summary-card green">
-            <span class="pay-label">Paid Amount</span>
-            <div class="pay-amount" id="payPaidAmount">₱0.00</div>
+
+          <div class="pay-summary-card green" data-card="paid">
+            <div class="pay-card-inner">
+              <div class="pay-card-header">
+                <span class="pay-label">Paid Amount</span>
+                <span class="pay-card-icon green">
+                  <span class="material-symbols-outlined">verified</span>
+                </span>
+              </div>
+              <div class="pay-amount" id="payPaidAmount">₱0.00</div>
+            </div>
           </div>
-          <div class="pay-summary-card red">
-            <span class="pay-label">Remaining</span>
-            <div class="pay-amount" id="payRemainingBalance">₱0.00</div>
+
+          <div class="pay-summary-card red" data-card="remaining">
+            <div class="pay-card-inner">
+              <div class="pay-card-header">
+                <span class="pay-label">Remaining</span>
+                <span class="pay-card-icon red">
+                  <span class="material-symbols-outlined">pending_actions</span>
+                </span>
+              </div>
+              <div class="pay-amount" id="payRemainingBalance">₱0.00</div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="pay-progress-card">
+          <div class="pay-progress-header">
+            <span class="pay-progress-label">Payment Completion</span>
+            <span class="pay-progress-pct" id="payProgressPct">0%</span>
+          </div>
+          <div class="pay-progress-track">
+            <div class="pay-progress-fill" id="payProgressBar" style="width: 0%"></div>
+          </div>
+          <div class="pay-progress-footer">
+            <span id="payProgressMsg">Loading your payment summary...</span>
           </div>
         </div>
-        <div class="table-scroll-wrapper">
-          <table class="grades-table">
+
+        <div class="pay-section-header">
+          <h3 class="pay-section-title">
+            <span class="material-symbols-outlined">table_rows</span>
+            Transaction History
+          </h3>
+          <div class="pay-legend">
+            <span class="pay-legend-item paid"><span></span> Paid</span>
+            <span class="pay-legend-item pending"><span></span> Pending</span>
+            <span class="pay-legend-item overdue"><span></span> Overdue</span>
+          </div>
+        </div>
+
+        <div class="table-scroll-wrapper payments-table-wrapper">
+          <table class="grades-table payments-table">
             <thead>
               <tr>
-                <th>Description</th>
-                <th>Amount</th>
-                <th>Due Date</th>
-                <th>Status</th>
+                <th class="col-desc">Description</th>
+                <th class="col-amount">Amount</th>
+                <th class="col-date">Due Date</th>
+                <th class="col-status">Status</th>
+                <th class="col-action" style="text-align:right; padding-right:24px;">Action</th>
               </tr>
             </thead>
-            <tbody id="paymentsTableBody"></tbody>
+            <tbody id="paymentsTableBody">
+              </tbody>
           </table>
         </div>
+
+        <div class="pay-quick-actions">
+          <button class="pay-quick-btn" onclick="window.showToast('Generating statement PDF...', 'success')">
+            <span class="material-symbols-outlined">download</span>
+            Download Statement
+          </button>
+          <button class="pay-quick-btn" onclick="window.showToast('Payment schedule coming soon.', 'info')">
+            <span class="material-symbols-outlined">calendar_month</span>
+            Payment Schedule
+          </button>
+          <button class="pay-quick-btn" onclick="window.showToast('Support contact is available in Settings.', 'info')">
+            <span class="material-symbols-outlined">support_agent</span>
+            Contact Finance
+          </button>
+        </div>
+
       </section>
 
 
@@ -658,7 +750,7 @@
   </div>
 </div>
 
-  <script type="module" src="../scripts/new/app.js"></script>
+  <script type="module" src="../scripts/dashboard/app.js"></script>
 
 </body>
 </html>

@@ -28,7 +28,7 @@ const renderMemberCard = (profile, currentUserId, delay) => {
         <div class="social-card-minimal" data-uid="${profile.id}" style="animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards ${delay}s; opacity: 0;">
             <div style="display: flex; gap: 16px; align-items: center;">
                 <div class="social-avatar-wrapper" style="position: relative;">
-                    <img src="${avatar}" alt="${profile.full_name}" />
+                    <img src="${avatar}" alt="${escapeAttr(profile.full_name)}" />
                     <div id="status-dot-${profile.id}" class="status-dot ${isMe ? 'online' : 'offline'}" style="position: absolute; bottom: -2px; right: -2px; border: 2px solid var(--card-bg);"></div>
                 </div>
 
@@ -52,7 +52,7 @@ const renderMemberCard = (profile, currentUserId, delay) => {
                 </button>
                 ${!isMe ? `
                     <button class="msg-btn-minimal msg-btn-primary" style="flex: 1;"
-                            onclick="if(window.openComposeToInstructor) window.openComposeToInstructor('${escapeAttr(profile.full_name)}', '${profile.id}')">
+                            onclick="window.openDirectMessage('${profile.id}', '${escapeAttr(profile.full_name || 'Unknown User')}')">
                         <span class="material-symbols-outlined" style="font-size: 1.1rem;">chat_bubble</span> Message
                     </button>
                 ` : ''}
@@ -235,5 +235,30 @@ window.copyUserId = async function (id, btn) {
         if (window.showToast) window.showToast('ID Copied to clipboard', 'success');
     } catch (err) { 
         console.error('Copy failed', err); 
+    }
+};
+
+/**
+ * Opens the compose modal from anywhere in the app and pre-fills the recipient.
+ */
+window.openDirectMessage = function(partnerId, partnerName) {
+    // 1. Check if the compose modal function exists
+    if (typeof window.openComposeModal === 'function') {
+        
+        // 2. Open the modal overlay
+        window.openComposeModal();
+        
+        // 3. Wait a tiny fraction of a second for the modal to be visible, then fill it out
+        setTimeout(() => {
+            const recipientInput = document.getElementById('composeRecipientId');
+            if (recipientInput) {
+                recipientInput.value = partnerName; // Show their name in the input box
+                window.secretReceiverId = partnerId; // Set the hidden ID for the database
+            }
+        }, 50);
+
+    } else {
+        console.error("openComposeModal function is not globally available.");
+        if (window.showToast) window.showToast('Messaging module is still loading.', 'error');
     }
 };

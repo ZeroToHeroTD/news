@@ -111,6 +111,18 @@
   animation: dlPulse 2s infinite cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* Makes the overdue hero card pulse subtly */
+.focus-card.urgent.urgent-pulse {
+  animation: heroPulse 2s infinite ease-in-out;
+  border: 1.5px solid rgba(239, 68, 68, 0.5);
+}
+
+@keyframes heroPulse {
+  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
 @keyframes dlPulse {
   0% { transform: scale(0.9); opacity: 0.8; }
   100% { transform: scale(1.4); opacity: 0; }
@@ -238,19 +250,36 @@
   border-color: rgba(239,68,68,0.2);
 }
 
+.status-missing {
+    color: #ef4444 !important; /* Tailwind Red 500 */
+    background: rgba(239, 68, 68, 0.1) !important;
+}
+
 /* --------------------------------------------------------------------------
    7. MODAL COMPONENTS (Inset Premium Surface)
    -------------------------------------------------------------------------- */
+#deadlineModalOverlay .compose-modal-box {
+  width: 90% !important;
+  max-width: 550px !important; /* Widened to stop text from wrapping */
+  max-height: 88vh !important;  /* Stops it from hitting the screen edge */
+  overflow-y: auto !important;  /* Enables internal scrolling */
+  padding: 30px !important;    /* More breathing room */
+  display: flex;
+  flex-direction: column;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-color) transparent;
+}
+
+/* Internal grid adjustments */
 .dl-modal-grid {
   display: flex;
   flex-direction: column;
   margin-top: 20px;
-  max-height: 60vh;
-  overflow-y: auto;
   background: var(--input-bg); 
   border-radius: 18px;
   padding: 10px 24px;
   border: 1px solid var(--border-color);
+  flex-shrink: 0; /* Prevents the grid from collapsing */
 }
 
 .dl-modal-row {
@@ -269,6 +298,7 @@
   font-weight: 800;
   color: #94a3b8;
   text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .dl-modal-value {
@@ -279,29 +309,49 @@
   max-width: 65%;
 }
 
+/* Notes Section spacing */
 .dl-modal-row.col-layout {
   flex-direction: column;
   align-items: flex-start;
-  background: rgba(255,255,255,0.02);
-  margin: 10px -10px;
-  padding: 18px;
-  border-radius: 14px;
-  border: 1px solid var(--border-color);
+  margin: 10px 0;
+  padding: 18px 0;
+  border-bottom: none;
 }
 
 .dl-modal-row.col-layout .dl-modal-value {
   text-align: left;
-  margin-top: 10px;
+  margin-top: 8px;
   font-weight: 500;
-  line-height: 1.6;
+  max-width: 100%;
 }
 
 /* --------------------------------------------------------------------------
-   8. RESPONSIVE ADJUSTMENTS
+   8. DYNAMIC APPEAL FOOTER (The Red Box)
+   -------------------------------------------------------------------------- */
+#dynamicAppealFooter {
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 20px;
+  flex-shrink: 0;
+}
+
+/* Ensure the button stays centered and doesn't wrap */
+#dynamicAppealFooter button {
+  white-space: nowrap !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+}
+
+/* --------------------------------------------------------------------------
+   9. RESPONSIVE ADJUSTMENTS
    -------------------------------------------------------------------------- */
 @media (max-width: 600px) {
-  .deadline-item { flex-direction: column; gap: 12px; }
-  .deadline-icon { width: 40px; height: 40px; font-size: 1.2rem; }
+  #deadlineModalOverlay .compose-modal-box {
+    padding: 20px !important;
+    max-width: 95% !important;
+  }
   .dl-modal-row { flex-direction: column; align-items: flex-start; gap: 8px; }
   .dl-modal-value { text-align: left; max-width: 100%; }
 }
