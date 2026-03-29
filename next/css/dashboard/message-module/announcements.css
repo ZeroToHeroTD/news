@@ -1,0 +1,179 @@
+/* ==========================================================================
+   announcements.css — Announcements / Notices Panel
+   Depends on: variable.css
+   ========================================================================== */
+
+/* ── Panel container ───────────────────────────────────────────────────── */
+.announcements-panel {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 10px 14px;
+  gap: 8px;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.06) transparent;
+}
+
+.announcements-panel::-webkit-scrollbar       { width: 3px; }
+.announcements-panel::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: 10px;
+}
+
+/* ── Announcement card ─────────────────────────────────────────────────── */
+.ann-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.026);
+  border: 1px solid var(--msg-border-subtle);
+  border-radius: 13px;
+  cursor: pointer;
+  transition: var(--msg-transition);
+  overflow: hidden;
+  flex-shrink: 0;
+  position: relative;
+}
+
+/* Left accent stripe */
+.ann-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3px;
+  height: 100%;
+  background: var(--msg-primary);
+  border-radius: 13px 0 0 13px;
+  transition: var(--msg-transition);
+}
+
+.ann-card.unread::before {
+  background: var(--msg-away);
+}
+
+.ann-card:hover {
+  background: rgba(255, 255, 255, 0.044);
+  border-color: rgba(255, 255, 255, 0.09);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.20);
+}
+
+.ann-card.unread {
+  background: rgba(245, 158, 11, 0.028);
+}
+
+/* ── Card inner padding wrapper ────────────────────────────────────────── */
+.ann-card-inner {
+  padding: 12px 14px 12px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* ── Top row: icon + title + badge ────────────────────────────────────── */
+.ann-top {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.ann-icon-wrap {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: var(--msg-primary-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--msg-primary-light);
+}
+
+.ann-icon-wrap .material-symbols-outlined {
+  font-size: 14px;
+  font-variation-settings: 'FILL' 1;
+}
+
+.ann-card.unread .ann-icon-wrap {
+  background: rgba(245, 158, 11, 0.10);
+  color: var(--msg-away);
+}
+
+.ann-title {
+  flex: 1;
+  font-size: 0.845rem;
+  font-weight: 700;
+  color: var(--msg-text-main);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.3;
+}
+
+/* ── Badge ─────────────────────────────────────────────────────────────── */
+.ann-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.55rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  padding: 2px 7px;
+  border-radius: 6px;
+  flex-shrink: 0;
+  background: var(--msg-primary-soft);
+  color: var(--msg-primary-light);
+  border: 1px solid rgba(99, 102, 241, 0.18);
+}
+
+.ann-card.unread .ann-badge {
+  background: rgba(245, 158, 11, 0.10);
+  color: var(--msg-away);
+  border-color: rgba(245, 158, 11, 0.20);
+}
+
+/* ── Body text ─────────────────────────────────────────────────────────── */
+.ann-body {
+  font-size: 0.795rem;
+  color: var(--msg-text-sub);
+  line-height: 1.55;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  padding-left: 1px;
+}
+
+/* ── Footer row ────────────────────────────────────────────────────────── */
+.ann-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 2px;
+  padding-top: 8px;
+  border-top: 1px solid var(--msg-border-subtle);
+}
+
+.ann-from {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.685rem;
+  color: var(--msg-text-muted);
+  font-weight: 600;
+}
+
+.ann-from .material-symbols-outlined {
+  font-size: 12px;
+  font-variation-settings: 'FILL' 1;
+}
+
+.ann-date {
+  font-size: 0.635rem;
+  color: var(--msg-text-muted);
+  font-weight: 500;
+}

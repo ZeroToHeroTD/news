@@ -1,0 +1,176 @@
+/* ==========================================================================
+   popovers.css — Emoji Picker, Options Dropdown & In-Chat Search Bar
+   Depends on: variable.css
+   ========================================================================== */
+
+/* ── Emoji picker ──────────────────────────────────────────────────────── */
+.emoji-picker-popover {
+  position: fixed;
+  background: rgba(11, 13, 30, 0.98);
+  border: 1px solid var(--msg-border);
+  border-radius: 14px;
+  padding: 10px;
+  width: 248px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  box-shadow: var(--msg-shadow-md);
+  z-index: 10001;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(8px);
+  transition: var(--msg-transition);
+}
+
+.emoji-picker-popover.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.emoji-item {
+  font-size: 1.35rem;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 7px;
+  line-height: 1;
+  transition: transform 0.10s ease, background 0.10s ease;
+  user-select: none;
+}
+
+.emoji-item:hover {
+  background: var(--msg-primary-soft);
+  transform: scale(1.22);
+}
+
+/* ── Options dropdown menu ─────────────────────────────────────────────── */
+.chat-dropdown-menu {
+  position: fixed;
+  background: rgba(11, 13, 30, 0.98);
+  border: 1px solid var(--msg-border);
+  border-radius: 12px;
+  padding: 5px;
+  width: 190px;
+  box-shadow: var(--msg-shadow-md);
+  z-index: 10001;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  transition: var(--msg-transition);
+}
+
+.chat-dropdown-menu.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.chat-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  color: var(--msg-text-main);
+  font-size: 0.82rem;
+  font-weight: 600;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: background 0.13s ease;
+}
+
+.chat-menu-item .material-symbols-outlined { font-size: 16px; color: var(--msg-text-muted); }
+.chat-menu-item:hover { background: rgba(255, 255, 255, 0.055); }
+.chat-menu-item:hover .material-symbols-outlined { color: var(--msg-primary-light); }
+
+.chat-menu-item.danger                    { color: #f87171; }
+.chat-menu-item.danger .material-symbols-outlined { color: #f87171; }
+.chat-menu-item.danger:hover              { background: rgba(239, 68, 68, 0.09); }
+
+/* Divider between menu items */
+.chat-menu-divider {
+  height: 1px;
+  background: var(--msg-border-subtle);
+  margin: 4px 0;
+}
+
+/* ── In-chat local search bar ──────────────────────────────────────────── */
+.chat-local-search {
+  position: absolute;
+  top: 60px; /* just below the header */
+  right: 16px;
+  background: rgba(11, 13, 30, 0.98);
+  border: 1px solid var(--msg-border-focus);
+  border-radius: 11px;
+  padding: 6px 11px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  box-shadow: var(--msg-shadow-md);
+  z-index: 50;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  transition: var(--msg-transition);
+  min-width: 240px;
+}
+
+.chat-local-search.active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.chat-local-search input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--msg-text-main);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.83rem;
+  width: 180px;
+}
+
+.chat-local-search input::placeholder { color: var(--msg-text-muted); }
+
+#closeLocalSearch {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--msg-text-muted);
+  display: flex;
+  align-items: center;
+  transition: var(--msg-transition-fast);
+  padding: 0;
+}
+
+#closeLocalSearch:hover { color: var(--msg-text-main); }
+#closeLocalSearch .material-symbols-outlined { font-size: 16px; }
+
+/* Search match highlight */
+.chat-bubble.search-match {
+  outline: 2px solid rgba(99, 102, 241, 0.60);
+  outline-offset: 2px;
+}
+
+/* ── Toast notification ────────────────────────────────────────────────── */
+.msg-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(0);
+  background: rgba(11, 13, 30, 0.96);
+  border: 1px solid var(--msg-border);
+  border-radius: 12px;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.83rem;
+  font-weight: 600;
+  color: var(--msg-text-main);
+  box-shadow: var(--msg-shadow-md);
+  z-index: 99999;
+  white-space: nowrap;
+  animation: slideUp 0.22s ease;
+  backdrop-filter: blur(12px);
+}

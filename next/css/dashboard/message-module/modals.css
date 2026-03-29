@@ -1,0 +1,303 @@
+/* ==========================================================================
+   modals.css — Compose Modal, Announcement View & Shared Button Primitives
+   Depends on: variable.css, layout.css
+   ========================================================================== */
+
+/* ── Overlay backdrop ──────────────────────────────────────────────────── */
+.compose-modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(4, 5, 18, 0.86);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.compose-modal-overlay.active {
+  display: flex;
+  animation: fadeIn 0.18s ease;
+}
+
+/* ── Modal box ─────────────────────────────────────────────────────────── */
+.compose-modal-box {
+  background: rgba(11, 13, 30, 0.98);
+  width: 100%;
+  max-width: 490px;
+  border-radius: 20px;
+  padding: 26px 28px 28px;
+  border: 1px solid rgba(99, 102, 241, 0.16);
+  box-shadow: var(--msg-shadow-lg);
+  animation: slideUp 0.30s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+/* ── Modal header ──────────────────────────────────────────────────────── */
+.compose-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.compose-modal-box h3,
+.compose-modal-header h3 {
+  font-family: 'Sora', sans-serif;
+  font-size: 1.00rem;
+  font-weight: 700;
+  color: var(--msg-text-main);
+  margin: 0;
+}
+
+.modal-close-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: 1px solid var(--msg-border);
+  background: var(--msg-input-bg);
+  color: var(--msg-text-sub);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Material Symbols Outlined';
+  font-size: 17px;
+  transition: var(--msg-transition);
+  flex-shrink: 0;
+}
+
+.modal-close-btn:hover {
+  background: rgba(239, 68, 68, 0.10);
+  color: #f87171;
+  border-color: rgba(239, 68, 68, 0.24);
+}
+
+/* ── Form fields ───────────────────────────────────────────────────────── */
+.compose-field {
+  margin-bottom: 14px;
+  position: relative;
+}
+
+.compose-field label {
+  display: block;
+  font-size: 0.67rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--msg-text-muted);
+  margin-bottom: 6px;
+}
+
+.compose-field input,
+.compose-field textarea {
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--msg-input-bg);
+  border: 1px solid var(--msg-border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  color: var(--msg-text-main);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.86rem;
+  outline: none;
+  transition: var(--msg-transition);
+}
+
+.compose-field input:focus,
+.compose-field textarea:focus {
+  border-color: var(--msg-border-focus);
+  box-shadow: 0 0 0 3px var(--msg-primary-glow);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.compose-field textarea {
+  resize: vertical;
+  min-height: 88px;
+  line-height: 1.55;
+}
+
+/* ── Autocomplete dropdown ─────────────────────────────────────────────── */
+.autocomplete-dropdown,
+#autocompleteDropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  width: 100%;
+  background: rgba(11, 13, 30, 0.99);
+  border: 1px solid rgba(99, 102, 241, 0.20);
+  border-radius: 12px;
+  box-shadow: var(--msg-shadow-md);
+  z-index: 10000;
+  display: none;
+  overflow: hidden;
+}
+
+.autocomplete-dropdown.show,
+#autocompleteDropdown.show { display: block; }
+
+.autocomplete-item,
+.ac-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  cursor: pointer;
+  transition: background 0.14s ease;
+}
+
+.autocomplete-item:hover,
+.ac-item:hover { background: var(--msg-primary-soft); }
+
+.ac-img {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.ac-text-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.ac-name {
+  font-size: 0.83rem;
+  font-weight: 700;
+  color: var(--msg-text-main);
+}
+
+.ac-role {
+  font-size: 0.70rem;
+  color: var(--msg-text-muted);
+}
+
+/* ── Modal footer action row ───────────────────────────────────────────── */
+.compose-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+/* Ghost / cancel */
+.btn-ghost,
+.btn-cancel {
+  padding: 8px 16px;
+  border-radius: 9px;
+  border: 1px solid var(--msg-border);
+  background: transparent;
+  color: var(--msg-text-sub);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.83rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--msg-transition);
+}
+
+.btn-ghost:hover,
+.btn-cancel:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--msg-text-main);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+/* Primary / send */
+.btn-primary-msg,
+.btn-send {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  border-radius: 9px;
+  border: none;
+  background: var(--msg-sent-bg);
+  color: #fff;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.83rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--msg-transition);
+  box-shadow: var(--msg-shadow-sent);
+  letter-spacing: 0.01em;
+}
+
+.btn-primary-msg:hover,
+.btn-send:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(99, 102, 241, 0.38);
+}
+
+.btn-primary-msg:active,
+.btn-send:active { transform: scale(0.95); }
+
+.btn-send .material-symbols-outlined { font-size: 16px; }
+
+/* ── Announcement view modal ───────────────────────────────────────────── */
+.ann-modal-box {
+  position: relative;
+  background: rgba(11, 13, 30, 0.98);
+  width: 100%;
+  max-width: 540px;
+  border-radius: 20px;
+  padding: 36px 32px 32px;
+  border: 1px solid rgba(99, 102, 241, 0.14);
+  box-shadow: var(--msg-shadow-lg);
+  animation: slideUp 0.30s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ann-modal-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.62rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--msg-primary-light);
+  background: var(--msg-primary-soft);
+  padding: 4px 10px;
+  border-radius: 7px;
+  margin-bottom: 12px;
+}
+
+.ann-modal-title {
+  font-family: 'Sora', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--msg-text-main);
+  margin: 0 0 14px;
+  line-height: 1.35;
+}
+
+.ann-modal-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 18px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--msg-border-subtle);
+}
+
+.ann-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.75rem;
+  color: var(--msg-text-muted);
+  font-weight: 500;
+}
+
+.ann-meta-item .material-symbols-outlined { font-size: 15px; }
+
+.ann-modal-body {
+  font-size: 0.875rem;
+  color: var(--msg-text-sub);
+  line-height: 1.70;
+}

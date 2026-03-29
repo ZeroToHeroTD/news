@@ -61,12 +61,12 @@ export async function loadGradesData(userId) {
             if (isGraded) { totalNum += numeric; gradedCount++; }
 
             return `
-                <tr class="grade-row" style="animation-delay: ${idx * 0.05}s">
-                    <td class="col-course"><strong>${g.course_name}</strong></td>
-                    <td class="col-instructor" style="color: var(--text-muted); font-size: 0.85rem;">${g.instructor_name || 'TBA'}</td>
-                    <td class="col-term">${g.midterm ?? '--'}%</td>
-                    <td class="col-term">${g.finals ?? '--'}%</td>
-                    <td class="col-grade" style="font-weight: 800; color: var(--primary);">${display}</td>
+                <tr class="grade-row" style="animation: slideInRight 0.4s ease forwards ${idx * 0.05}s; opacity: 0;">
+                    <td class="col-course" style="font-weight:700; color:var(--text-main);">${g.course_name}</td>
+                    <td class="col-instructor" style="color: var(--text-muted); font-size: 0.85rem; font-weight: 500;">${g.instructor_name || 'TBA'}</td>
+                    <td class="col-term" style="font-weight: 600;">${g.midterm ?? '--'}%</td>
+                    <td class="col-term" style="font-weight: 600;">${g.finals ?? '--'}%</td>
+                    <td class="col-grade" style="font-weight: 800; font-family: var(--font-mono, monospace); color: var(--text-main);">${display}</td>
                     <td class="col-status"><span class="status-badge ${badgeClass}">${status}</span></td>
                 </tr>`;
         }).join('');
@@ -76,11 +76,13 @@ export async function loadGradesData(userId) {
             gwaDisplay.textContent = finalGwa;
             if (typeof updateGwaComparison === 'function') updateGwaComparison(parseFloat(finalGwa));
         }
-    } catch (err) { console.error("Grades Engine Error:", err.message); }
+    } catch (err) { 
+        console.error("Grades Engine Error:", err.message); 
+    }
 }
 
 function renderEmptyTable(body, display) {
-    body.innerHTML = `<tr><td colspan="6" class="empty-cell" style="text-align:center; padding:40px;">No grades recorded yet.</td></tr>`;
+    body.innerHTML = `<tr><td colspan="6" class="empty-cell" style="text-align:center; padding:60px; color:var(--text-muted);">No academic records found.</td></tr>`;
     if (display) display.textContent = '--';
 }
 
@@ -88,9 +90,6 @@ function renderEmptyTable(body, display) {
 // 3. PERFORMANCE CHART ENGINE (LIVE UPGRADE)
 // ==========================================
 
-/**
- * NEW: Attaches a listener to the dropdown so charts update without refresh.
- */
 export function initializeChartListener(userId) {
     const filter = document.getElementById('chartFilter');
     if (!filter) return;
@@ -102,6 +101,8 @@ export function initializeChartListener(userId) {
 
 export async function loadPerformanceChart(userId, filterType = 'grades') {
     const canvas = document.getElementById('performanceChart');
+    const placeholder = document.getElementById('chartPlaceholder');
+    
     if (!canvas) return;
 
     if (myChart) {
@@ -117,13 +118,34 @@ export async function loadPerformanceChart(userId, filterType = 'grades') {
         bg: isDark ? '#1e293b' : '#ffffff'
     };
 
+    const ctx = canvas.getContext('2d');
+
     try {
+        // 1. Instantly hide the ugly HTML text placeholder if it exists
+        if (placeholder) placeholder.style.display = 'none';
+        
+        // 2. Show the canvas and draw a sleek loading text directly on it
+        canvas.style.display = 'block';
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.font = "600 14px 'Sora', sans-serif";
+        ctx.fillStyle = theme.text;
+        ctx.textAlign = "center";
+        ctx.fillText("Loading chart data...", canvas.width / 2, canvas.height / 2);
+
+        // 3. Fetch data
         const config = await getChartConfig(userId, filterType, theme, isDark);
+        
+        // 4. Render chart or empty state
         if (config) {
             myChart = new Chart(canvas, config);
+        } else {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillText("No analytical data available yet", canvas.width / 2, canvas.height / 2);
         }
     } catch (err) {
         console.error("Chart Engine Error:", err.message);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillText("Failed to load chart", canvas.width / 2, canvas.height / 2);
     }
 }
 
@@ -143,8 +165,8 @@ async function getChartConfig(userId, type, theme, isDark) {
                     label: 'GWA Trend',
                     data: points,
                     borderColor: theme.accent,
-                    backgroundColor: 'transparent',
-                    fill: false, 
+                    backgroundColor: 'rgba(0, 98, 255, 0.1)',
+                    fill: true,
                     tension: 0.4,
                     pointRadius: 6,
                     pointBackgroundColor: theme.accent,
@@ -152,7 +174,7 @@ async function getChartConfig(userId, type, theme, isDark) {
                     pointBorderWidth: 3
                 }]
             },
-            options: getCommonOptions(theme, true) // Reversed for Grades
+            options: getCommonOptions(theme, true) // Reversed for Grades (1.0 is at the top)
         };
     } 
     
@@ -161,7 +183,7 @@ async function getChartConfig(userId, type, theme, isDark) {
         if (!data?.length) return null;
 
         return {
-            type: 'bar', // UPGRADE: Bar is standard for completion
+            type: 'bar',
             data: {
                 labels: data.map(c => c.course_name.split(' ')[0]),
                 datasets: [{
@@ -171,16 +193,17 @@ async function getChartConfig(userId, type, theme, isDark) {
                     borderRadius: 8
                 }]
             },
-            // UPGRADE: Progress charts should NOT be reversed (0 at bottom, 100 at top)
             options: {
                 ...getCommonOptions(theme, false),
                 scales: {
                     y: {
                         min: 0,
                         max: 100,
-                        ticks: { color: theme.text, callback: (v) => v + '%' }
+                        grid: { color: theme.grid, drawTicks: false },
+                        border: { display: false },
+                        ticks: { color: theme.text, padding: 10, font: { size: 11, weight: '600' }, callback: (v) => v + '%' }
                     },
-                    x: { grid: { display: false }, ticks: { color: theme.text } }
+                    x: { grid: { display: false }, ticks: { color: theme.text, font: { size: 11, weight: '600' } } }
                 }
             }
         };
@@ -196,7 +219,9 @@ function getCommonOptions(theme, reverseY) {
         plugins: { 
             legend: { display: false },
             tooltip: {
-                backgroundColor: '#1e293b',
+                backgroundColor: theme.bg === '#ffffff' ? '#1e293b' : '#334155',
+                titleColor: '#ffffff',
+                bodyColor: '#e2e8f0',
                 padding: 12,
                 cornerRadius: 8,
                 displayColors: false

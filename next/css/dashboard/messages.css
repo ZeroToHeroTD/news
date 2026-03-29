@@ -34,9 +34,12 @@
   display: flex;
   flex-direction: column;
   gap: 0;
-  height: var(--hub-height);
+  /* FIX: Use an absolute height, not just min-height, to enforce boundaries */
+  height: calc(100vh - 200px); 
   min-height: 520px;
   font-family: 'DM Sans', sans-serif;
+  /* FIX: Prevent the wrapper itself from stretching */
+  overflow: hidden; 
 }
 
 .msg-hub-header {
@@ -51,12 +54,13 @@
   font-family: 'Sora', sans-serif;
   font-size: 1.5rem;
   font-weight: 800;
-  color: var(--msg-text-main);
+  /* UPGRADE: Hooked into global text color for Light/Dark mode */
+  color: var(--text-main); 
   letter-spacing: -0.03em;
 }
 
 .msg-hub-title span {
-  background: linear-gradient(135deg, #6366f1, #a78bfa);
+  background: linear-gradient(135deg, var(--primary), #a78bfa);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -68,18 +72,22 @@
 .msg-hub-body {
   display: grid;
   grid-template-columns: 300px 1fr;
+  /* FIX: min-height: 0 tells the grid NOT to expand past its parent's height */
+  min-height: 0; 
   flex: 1;
-  height: 100%;
-  background: var(--msg-hub-bg);
-  border: 1px solid var(--msg-border);
-  border-radius: var(--msg-radius);
+  
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 20px; 
+  
   overflow: hidden;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  box-shadow: var(--msg-shadow);
+  
+  box-shadow: 0 4px 20px rgba(0,0,0,0.03); 
   position: relative;
+  transition: background-color var(--transition), border-color var(--transition);
 }
-
 /* --------------------------------------------------------------------------
    3. LEFT SIDEBAR — CONVERSATIONS LIST
    -------------------------------------------------------------------------- */
@@ -337,11 +345,18 @@
 /* --------------------------------------------------------------------------
    4. RIGHT PANEL — CHAT THREAD
    -------------------------------------------------------------------------- */
+/* ==========================================================================
+   MESSENGER UI - THEME SYNC & SCROLL FIX
+   ========================================================================== */
+
 .msg-chat-panel {
   display: flex;
   flex-direction: column;
+  /* FIX: Ensure the panel respects the grid cell size */
+  height: 100%;
+  min-height: 0; 
   overflow: hidden;
-  background: transparent;
+  background: var(--card-bg);
   position: relative;
 }
 
@@ -351,9 +366,11 @@
   align-items: center;
   justify-content: space-between;
   padding: 16px 20px;
-  border-bottom: 1px solid var(--msg-border);
+  /* UPGRADE: Global border color */
+  border-bottom: 1px solid var(--border-color);
   flex-shrink: 0;
-  background: rgba(15, 18, 38, 0.4);
+  /* UPGRADE: Removed hardcoded dark rgba to fix Light Mode */
+  background: var(--card-bg);
   backdrop-filter: blur(10px);
 }
 
@@ -370,36 +387,40 @@
 .chat-header-avatar {
   width: 42px;
   height: 42px;
-  border-radius: 13px;
+  /* UPGRADE: Inherits the perfect circle fix from earlier */
+  border-radius: 50%;
   object-fit: cover;
-  background: linear-gradient(135deg, #6366f1, #a78bfa);
+  background: var(--input-bg);
+  border: 1px solid var(--border-color);
 }
 
 .chat-header-info h4 {
   font-family: 'Sora', sans-serif;
   font-size: 0.92rem;
   font-weight: 700;
-  color: var(--msg-text-main);
+  /* UPGRADE: Global text color */
+  color: var(--text-main);
   margin: 0 0 2px;
 }
 
 .chat-header-status {
   font-size: 0.72rem;
-  color: var(--msg-text-sub);
+  /* UPGRADE: Global muted text */
+  color: var(--text-muted);
   font-weight: 500;
   display: flex;
   align-items: center;
   gap: 5px;
 }
 
-.chat-header-status.online { color: var(--msg-online); }
-.chat-header-status.typing-status { color: var(--msg-primary); }
+.chat-header-status.online { color: var(--accent-green, #10b981); }
+.chat-header-status.typing-status { color: var(--primary); }
 
 .header-status-dot {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: var(--msg-online);
+  background: var(--accent-green, #10b981);
   flex-shrink: 0;
 }
 
@@ -412,18 +433,24 @@
   width: 36px;
   height: 36px;
   border-radius: 10px;
-  border: 1px solid var(--msg-border);
-  background: var(--msg-input-bg);
-  color: var(--msg-text-sub);
+  /* UPGRADE: Mapped to global inputs and borders */
+  border: 1px solid var(--border-color);
+  background: var(--input-bg);
+  color: var(--text-muted);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: var(--msg-transition);
+  transition: all 0.2s ease;
   font-size: 18px;
 }
 
-.chat-action-btn:hover { background: var(--msg-primary-soft); color: var(--msg-primary); }
+.chat-action-btn:hover { 
+  background: var(--primary); 
+  color: #ffffff; 
+  border-color: var(--primary); 
+}
+
 .chat-action-btn .material-symbols-outlined { font-size: 18px; }
 
 /* Empty State */
@@ -434,7 +461,8 @@
   justify-content: center;
   height: 100%;
   gap: 16px;
-  color: var(--msg-text-sub);
+  /* UPGRADE: Global muted text */
+  color: var(--text-muted);
   padding: 40px;
   text-align: center;
 }
@@ -443,11 +471,12 @@
   width: 80px;
   height: 80px;
   border-radius: 24px;
-  background: var(--msg-primary-soft);
+  /* UPGRADE: Transparent primary tint instead of hardcoded hex */
+  background: rgba(0, 98, 255, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--msg-primary);
+  color: var(--primary);
   font-size: 36px;
   margin-bottom: 8px;
 }
@@ -456,7 +485,8 @@
   font-family: 'Sora', sans-serif;
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--msg-text-main);
+  /* UPGRADE: Global text color */
+  color: var(--text-main);
   margin: 0;
 }
 
@@ -469,17 +499,27 @@
 
 /* Thread Area */
 .chat-thread-area {
+  /* FIX: flex: 1 allows it to take remaining space, min-height: 0 forces it to scroll! */
   flex: 1;
+  min-height: 0; 
   overflow-y: auto;
+  
   padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 6px;
   scroll-behavior: smooth;
+  
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-color) transparent;
 }
 
-.chat-thread-area::-webkit-scrollbar { width: 4px; }
-.chat-thread-area::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 4px; }
+.chat-thread-area::-webkit-scrollbar { width: 6px; }
+.chat-thread-area::-webkit-scrollbar-thumb { 
+  /* UPGRADE: Removed hardcoded white scrollbar */
+  background: var(--border-color); 
+  border-radius: 10px; 
+}
 
 /* Date Divider */
 .date-divider {
@@ -1129,6 +1169,129 @@
 
 .hidden { display: none !important; }
 
+
+/* ==========================================================================
+   MESSENGER HUB - POPOVERS & INTERACTIVE WIDGETS
+   ========================================================================== */
+
+/* 1. Emoji Picker */
+.emoji-picker-popover {
+  position: fixed;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 12px;
+  width: 260px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.emoji-picker-popover.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+.emoji-item {
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 8px;
+  transition: transform 0.1s ease, background 0.1s ease;
+}
+.emoji-item:hover {
+  background: var(--input-bg);
+  transform: scale(1.2);
+}
+
+/* 2. More Options Dropdown */
+.chat-dropdown-menu {
+  position: fixed;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 8px;
+  width: 200px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.chat-dropdown-menu.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+.chat-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  color: var(--text-main);
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.chat-menu-item:hover {
+  background: var(--input-bg);
+}
+.chat-menu-item.danger:hover {
+  background: rgba(239,68,68,0.1);
+  color: #ef4444;
+}
+.chat-menu-item .material-symbols-outlined { font-size: 18px; }
+
+/* 3. In-Chat Search Bar */
+.chat-local-search {
+  position: absolute;
+  top: 100%;
+  right: 20px;
+  background: var(--card-bg);
+  border: 1px solid var(--primary);
+  border-radius: 12px;
+  padding: 6px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  z-index: 50;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-5px);
+  transition: all 0.2s ease;
+}
+.chat-local-search.active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(10px);
+}
+.chat-local-search input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-main);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem;
+  width: 200px;
+}
+.chat-local-search button {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+.chat-local-search button:hover { color: var(--accent-red); }
 /* --------------------------------------------------------------------------
    10. RESPONSIVE
    -------------------------------------------------------------------------- */

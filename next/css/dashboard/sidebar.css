@@ -104,6 +104,28 @@
   margin-top: 2px;
 }
 
+/* ==========================================================================
+   AVATAR LIGHT MODE FIX (Forces perfect circle mask)
+   ========================================================================== */
+.sidebar-avatar, 
+.avatar, 
+#settingsAvatar, 
+.chat-header-avatar,
+.conv-avatar {
+    border-radius: 50% !important;
+    background-color: transparent !important;
+    object-fit: cover;
+    overflow: hidden;
+    /* Removes any default white background bleeding through */
+    box-shadow: 0 0 0 1px var(--border-color); 
+}
+
+/* Ensure the wrapper doesn't have a white background */
+.topbar-avatar-wrapper, 
+.sidebar-user-card {
+    background-color: transparent !important;
+}
+
 /* --------------------------------------------------------------------------
    3. MIDDLE SECTION — Nav Links
    -------------------------------------------------------------------------- */

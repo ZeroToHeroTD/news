@@ -1,10 +1,23 @@
-/* ========================================================================== 
-   attendance-payments.css — REFACTORED (Premium UI Upgrade)
+/* ==========================================================================
+   attendance-payments.css — MERGED & CLEANED (v3)
+   Integrates: attendance-payments.css (v1) + payments-upgrade.css (v2)
+   - Duplicates removed
+   - Conflicts resolved (v2 values preferred where they differ)
+   - Sections reorganised for logical reading order
    ========================================================================== */
 
-/* -------------------------------------------------------------------------- 
-   1. ATTENDANCE WIDGET (Premium Depth & Balance)
+/* --------------------------------------------------------------------------
+   CSS CUSTOM PROPERTIES (referenced throughout — define in :root externally)
+   --primary, --card-bg, --input-bg, --border-color, --shadow-md,
+   --text-main, --text-muted,
+   --accent-green (#10b981), --accent-amber (#f59e0b), --accent-red (#ef4444)
    -------------------------------------------------------------------------- */
+
+
+/* ==========================================================================
+   1. ATTENDANCE WIDGET
+   ========================================================================== */
+
 .attendance-summary {
   display: flex;
   align-items: center;
@@ -27,12 +40,12 @@
   color: var(--text-main);
   line-height: 1;
   letter-spacing: -1px;
-  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Subtle text depth */
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .attendance-stats {
   display: flex;
-  gap: 32px; /* Increased breathing room */
+  gap: 32px;
   flex-wrap: wrap;
 }
 
@@ -60,311 +73,37 @@
 .att-value.red   { color: var(--accent-red); }
 .att-value.amber { color: var(--accent-amber); }
 
-/* Progress Bar (Glass + Glow) */
+/* Attendance Progress Bar */
 .attendance-bar-track {
   width: 100%;
-  height: 14px; /* Slightly thicker for better visibility */
+  height: 14px;
   background: var(--input-bg);
   border-radius: 999px;
   overflow: hidden;
   border: 1px solid var(--border-color);
   position: relative;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.04); /* Inner depth */
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.04);
 }
 
 .attendance-bar-fill {
   height: 100%;
   border-radius: 999px;
   min-width: 8px;
-  transition: width 1.2s cubic-bezier(0.22, 1, 0.36, 1); /* Smoother, more organic easing */
+  transition: width 1.2s cubic-bezier(0.22, 1, 0.36, 1);
   position: relative;
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.2); /* Base glow */
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
 }
 
-/* Gradient States */
-.bg-attendance-good {
-  background: linear-gradient(90deg, #22c55e, #10b981);
-}
-.bg-attendance-warning {
-  background: linear-gradient(90deg, #f59e0b, #fbbf24);
-}
-.bg-attendance-danger {
-  background: linear-gradient(90deg, #ef4444, #f87171);
-}
+/* Attendance bar gradient states */
+.bg-attendance-good    { background: linear-gradient(90deg, #22c55e, #10b981); }
+.bg-attendance-warning { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+.bg-attendance-danger  { background: linear-gradient(90deg, #ef4444, #f87171); }
 
-/* -------------------------------------------------------------------------- 
-   2. PAYMENTS — Cards (Interactive Depth & Hierarchy)
-   -------------------------------------------------------------------------- */
-.payment-summary-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px;
-  margin-bottom: 28px;
-}
-
-.pay-summary-card {
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 20px;
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
-  position: relative;
-  overflow: hidden;
-  backdrop-filter: blur(10px); /* Glassmorphism base */
-}
-
-/* Subtle inner glow / Shine effect */
-.pay-summary-card::before {
-  content: "";
-  position: absolute;
-  top: 0; left: -100%; width: 50%; height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
-  transform: skewX(-20deg);
-  transition: 0.5s;
-}
-
-.pay-summary-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-md);
-}
-
-.pay-summary-card:hover::before {
-  left: 150%; /* Triggers the shine on hover */
-}
-
-/* Default (Blue/Primary Accent) */
-.pay-summary-card:not(.green):not(.red) {
-  border-top: 4px solid var(--primary);
-}
-.pay-summary-card:not(.green):not(.red):hover {
-  border-color: var(--primary);
-}
-
-/* GREEN (Paid) */
-.pay-summary-card.green {
-  background: linear-gradient(145deg, rgba(34, 197, 94, 0.02), rgba(34, 197, 94, 0.08));
-  border: 1px solid rgba(34, 197, 94, 0.2);
-  border-top: 4px solid var(--accent-green, #10b981);
-}
-.pay-summary-card.green:hover {
-  box-shadow: 0 12px 24px rgba(34, 197, 94, 0.12);
-  border-color: rgba(34, 197, 94, 0.4);
-}
-
-/* RED (Remaining/Overdue) */
-.pay-summary-card.red {
-  background: linear-gradient(145deg, rgba(239, 68, 68, 0.02), rgba(239, 68, 68, 0.08));
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  border-top: 4px solid var(--accent-red, #ef4444);
-}
-.pay-summary-card.red:hover {
-  box-shadow: 0 12px 24px rgba(239, 68, 68, 0.12);
-  border-color: rgba(239, 68, 68, 0.4);
-}
-
-.pay-label {
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--text-muted);
-  z-index: 1; /* Sit above the shine effect */
-}
-
-.pay-amount {
-  font-size: clamp(1.6rem, 3vw, 2.2rem);
-  font-weight: 900;
-  letter-spacing: -0.5px;
-  color: var(--text-main);
-  overflow-wrap: break-word;
-  word-break: break-word;
-  z-index: 1;
-}
-
-.pay-summary-card.green .pay-amount { color: var(--accent-green, #10b981); }
-.pay-summary-card.red   .pay-amount { color: var(--accent-red, #ef4444); }
-
-/* -------------------------------------------------------------------------- 
-   3. STATUS BADGES (Crisp & Modern)
-   -------------------------------------------------------------------------- */
-.payment-status, .dl-status-value {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 6px 14px;
-  border-radius: 999px; /* Perfect pill */
-  font-size: 0.7rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  white-space: nowrap;
-  transition: all 0.2s ease;
-  backdrop-filter: blur(4px);
-}
-
-.status-paid {
-  background: rgba(16, 185, 129, 0.1);
-  color: #047857;
-  border: 1px solid rgba(16, 185, 129, 0.3);
-}
-.status-pending {
-  background: rgba(245, 158, 11, 0.1);
-  color: #b45309;
-  border: 1px solid rgba(245, 158, 11, 0.3);
-}
-.status-overdue {
-  background: rgba(239, 68, 68, 0.1);
-  color: #dc2626;
-  border: 1px solid rgba(239, 68, 68, 0.3);
-}
-
-/* Dark Mode Adjustments */
-.dark-mode .status-paid { color: #34d399; background: rgba(52, 211, 153, 0.15); }
-.dark-mode .status-pending { color: #fbbf24; background: rgba(251, 191, 36, 0.15); }
-.dark-mode .status-overdue { color: #f87171; background: rgba(248, 113, 113, 0.15); }
-
-/* -------------------------------------------------------------------------- 
-   4. TABLES (Highly Readable + Custom Scrollbar)
-   -------------------------------------------------------------------------- */
-.table-scroll-wrapper {
-  width: 100%;
-  max-height: 400px; /* Enables inner scrolling if table gets too long */
-  overflow-x: auto;
-  overflow-y: auto;
-  border-radius: 16px;
-  border: 1px solid var(--border-color);
-  background: var(--card-bg);
-  box-shadow: 0 4px 15px rgba(0,0,0,0.02);
-}
-
-/* Custom sleek scrollbar just for the table wrapper */
-.table-scroll-wrapper::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-.table-scroll-wrapper::-webkit-scrollbar-track {
-  background: transparent;
-}
-.table-scroll-wrapper::-webkit-scrollbar-thumb {
-  background: var(--border-color);
-  border-radius: 10px;
-}
-.table-scroll-wrapper::-webkit-scrollbar-thumb:hover {
-  background: var(--text-muted);
-}
-
-.grades-table {
-  width: 100%;
-  border-collapse: separate; /* Changed from collapse for better rounded corners/borders */
-  border-spacing: 0;
-  min-width: 600px; /* Slightly wider for breathing room */
-}
-
-.grades-table th {
-  padding: 16px 24px;
-  text-align: left;
-  color: var(--text-muted);
-  font-size: 0.75rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  border-bottom: 2px solid var(--border-color); /* Thicker bottom border for header */
-  background: var(--input-bg);
-  position: sticky; /* Sticky header when scrolling */
-  top: 0;
-  z-index: 10;
-  backdrop-filter: blur(8px); /* Glassy sticky header */
-}
-
-.grades-table td {
-  padding: 18px 24px;
-  color: var(--text-main);
-  border-bottom: 1px solid var(--border-color);
-  font-size: 0.95rem;
-  font-weight: 500;
-  vertical-align: middle;
-  overflow-wrap: break-word;
-  word-break: break-word;
-  max-width: 260px;
-}
-
-.grades-table tbody tr {
-  transition: background-color 0.2s ease, transform 0.2s ease;
-}
-
-/* Smoother hover with slight scale */
-.grades-table tbody tr:hover,
-#paymentsTableBody tr:hover {
-  background: var(--input-bg);
-  transform: scale(1.002);
-  cursor: default;
-}
-
-/* Zebra striping - improved for light/dark modes */
-.grades-table tbody tr:nth-child(even) {
-  background: rgba(0, 0, 0, 0.015);
-}
-.dark-mode .grades-table tbody tr:nth-child(even) {
-  background: rgba(255, 255, 255, 0.015);
-}
-
-.grades-table tbody tr:last-child td {
-  border-bottom: none;
-}
-
-.status-badge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 6px 12px;
-    border-radius: 8px; /* Slightly boxy matte look */
-    font-size: 0.7rem;
-    font-weight: 800;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    width: 100px; /* Fixed width for alignment */
-}
-
-/* Passed - Clean Green */
-.status-passed {
-    background: rgba(34, 197, 94, 0.15);
-    color: #22c55e;
-    border: 1px solid rgba(34, 197, 94, 0.2);
-}
-
-/* Failed - Clean Red */
-.status-failed {
-    background: rgba(239, 68, 68, 0.15);
-    color: #ef4444;
-    border: 1px solid rgba(239, 68, 68, 0.2);
-}
-
-/* Incomplete - Matte Amber */
-.status-inc {
-    background: rgba(245, 158, 11, 0.15);
-    color: #f59e0b;
-    border: 1px solid rgba(245, 158, 11, 0.2);
-}
-
-/* Pending/Others - Slate */
-.status-pending {
-    background: var(--input-bg);
-    color: var(--text-muted);
-    border: 1px solid var(--border-color);
-}
 
 /* ==========================================================================
-   payments-upgrade.css — Premium Payment Section UI (v2)
-   Add this file AFTER attendance-payments.css, or append to the bottom of it.
-   All existing selectors in attendance-payments.css are preserved.
+   2. PAYMENTS PAGE HEADER
    ========================================================================== */
 
-/* --------------------------------------------------------------------------
-   PAYMENTS PAGE HEADER
-   -------------------------------------------------------------------------- */
 .payments-view-header {
   display: flex;
   align-items: flex-start;
@@ -392,6 +131,7 @@
   flex-shrink: 0;
 }
 
+/* Header buttons */
 .pay-header-btn {
   display: inline-flex;
   align-items: center;
@@ -404,14 +144,14 @@
   font-size: 0.82rem;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s ease;
   letter-spacing: 0.01em;
+  transition: all 0.2s ease;
 }
 
 .pay-header-btn:hover {
   background: var(--input-bg);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .pay-header-btn:active {
@@ -434,14 +174,167 @@
   font-size: 1.05rem;
 }
 
-/* --------------------------------------------------------------------------
-   HERO STORY CARD MOUNT — populated by payments.js renderFinancialStory()
-   -------------------------------------------------------------------------- */
+
+/* ==========================================================================
+   3. PAYMENT SUMMARY CARDS
+   ========================================================================== */
+
+.payment-summary-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 28px;
+}
+
+.pay-summary-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+/* Shine sweep on hover */
+.pay-summary-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+  transform: skewX(-20deg);
+  transition: left 0.5s ease;
+}
+
+.pay-summary-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.pay-summary-card:hover::before {
+  left: 150%;
+}
+
+/* Default (primary accent) */
+.pay-summary-card:not(.green):not(.red) {
+  border-top: 4px solid var(--primary);
+}
+
+.pay-summary-card:not(.green):not(.red):hover {
+  border-color: var(--primary);
+}
+
+/* Green (Paid) */
+.pay-summary-card.green {
+  background: linear-gradient(145deg, rgba(34, 197, 94, 0.02), rgba(34, 197, 94, 0.08));
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  border-top: 4px solid var(--accent-green, #10b981);
+}
+
+.pay-summary-card.green:hover {
+  box-shadow: 0 12px 24px rgba(34, 197, 94, 0.12);
+  border-color: rgba(34, 197, 94, 0.4);
+}
+
+/* Red (Remaining / Overdue) */
+.pay-summary-card.red {
+  background: linear-gradient(145deg, rgba(239, 68, 68, 0.02), rgba(239, 68, 68, 0.08));
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-top: 4px solid var(--accent-red, #ef4444);
+}
+
+.pay-summary-card.red:hover {
+  box-shadow: 0 12px 24px rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+/* Card label & amount */
+.pay-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  z-index: 1;
+}
+
+.pay-amount {
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  color: var(--text-main);
+  overflow-wrap: break-word;
+  word-break: break-word;
+  z-index: 1;
+}
+
+.pay-summary-card.green .pay-amount { color: var(--accent-green, #10b981); }
+.pay-summary-card.red   .pay-amount { color: var(--accent-red, #ef4444); }
+
+/* Card inner layout (injected by JS) */
+.pay-card-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  position: relative;
+  z-index: 1;
+  height: 100%;
+}
+
+.pay-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Card icon badge */
+.pay-card-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+.pay-card-icon.total { background: rgba(99, 102, 241, 0.12); color: var(--primary); }
+.pay-card-icon.green { background: rgba(16, 185, 129, 0.12); color: var(--accent-green, #10b981); }
+.pay-card-icon.red   { background: rgba(239, 68, 68, 0.12);  color: var(--accent-red, #ef4444); }
+
+.pay-card-icon .material-symbols-outlined { font-size: 1.1rem; }
+
+/* Mini progress bar (injected by JS inside cards) */
+.pay-mini-bar {
+  height: 4px;
+  border-radius: 999px;
+  background: var(--input-bg);
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.pay-mini-bar > div {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+
+/* ==========================================================================
+   4. STORY / HERO CARD
+   ========================================================================== */
+
 .pay-story-mount {
   margin-bottom: 24px;
 }
 
-/* Story Card Base (applies to the card injected by JS) */
 .pay-story-card {
   display: flex;
   align-items: center;
@@ -452,10 +345,11 @@
   background: var(--card-bg);
   position: relative;
   overflow: hidden;
-  transition: box-shadow 0.3s ease;
   flex-wrap: wrap;
+  transition: box-shadow 0.3s ease;
 }
 
+/* Radial glow overlay */
 .pay-story-card::before {
   content: "";
   position: absolute;
@@ -468,37 +362,41 @@
 
 /* State: Fully Paid */
 .pay-story-card.story-success {
-  background: linear-gradient(135deg, rgba(16,185,129,0.06), rgba(16,185,129,0.02));
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.06), rgba(16, 185, 129, 0.02));
   border-color: rgba(16, 185, 129, 0.25);
   border-left: 5px solid var(--accent-green, #10b981);
 }
+
 .pay-story-card.story-success::before {
-  background: radial-gradient(ellipse at top left, rgba(16,185,129,0.08) 0%, transparent 60%);
+  background: radial-gradient(ellipse at top left, rgba(16, 185, 129, 0.08) 0%, transparent 60%);
   opacity: 1;
 }
 
 /* State: Pending / Partial */
 .pay-story-card.story-warning {
-  background: linear-gradient(135deg, rgba(245,158,11,0.06), rgba(245,158,11,0.02));
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.06), rgba(245, 158, 11, 0.02));
   border-color: rgba(245, 158, 11, 0.25);
   border-left: 5px solid var(--accent-amber, #f59e0b);
 }
+
 .pay-story-card.story-warning::before {
-  background: radial-gradient(ellipse at top left, rgba(245,158,11,0.08) 0%, transparent 60%);
+  background: radial-gradient(ellipse at top left, rgba(245, 158, 11, 0.08) 0%, transparent 60%);
   opacity: 1;
 }
 
 /* State: Overdue */
 .pay-story-card.story-danger {
-  background: linear-gradient(135deg, rgba(239,68,68,0.06), rgba(239,68,68,0.02));
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.06), rgba(239, 68, 68, 0.02));
   border-color: rgba(239, 68, 68, 0.25);
   border-left: 5px solid var(--accent-red, #ef4444);
 }
+
 .pay-story-card.story-danger::before {
-  background: radial-gradient(ellipse at top left, rgba(239,68,68,0.08) 0%, transparent 60%);
+  background: radial-gradient(ellipse at top left, rgba(239, 68, 68, 0.08) 0%, transparent 60%);
   opacity: 1;
 }
 
+/* Story icon */
 .story-icon {
   width: 54px;
   height: 54px;
@@ -509,23 +407,13 @@
   flex-shrink: 0;
 }
 
-.story-success .story-icon {
-  background: rgba(16, 185, 129, 0.12);
-  color: var(--accent-green, #10b981);
-}
-.story-warning .story-icon {
-  background: rgba(245, 158, 11, 0.12);
-  color: var(--accent-amber, #f59e0b);
-}
-.story-danger .story-icon {
-  background: rgba(239, 68, 68, 0.12);
-  color: var(--accent-red, #ef4444);
-}
+.story-success .story-icon { background: rgba(16, 185, 129, 0.12); color: var(--accent-green, #10b981); }
+.story-warning .story-icon { background: rgba(245, 158, 11, 0.12); color: var(--accent-amber, #f59e0b); }
+.story-danger  .story-icon { background: rgba(239, 68, 68, 0.12);  color: var(--accent-red, #ef4444); }
 
-.story-icon .material-symbols-outlined {
-  font-size: 1.6rem;
-}
+.story-icon .material-symbols-outlined { font-size: 1.6rem; }
 
+/* Story text */
 .story-content {
   flex: 1;
   min-width: 0;
@@ -546,7 +434,7 @@
   line-height: 1.5;
 }
 
-/* Pay Balance Now button (in story card) */
+/* Pay Now button (inside story card) */
 .pay-now-btn {
   display: inline-flex;
   align-items: center;
@@ -560,15 +448,15 @@
   font-weight: 700;
   cursor: pointer;
   letter-spacing: 0.02em;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 14px rgba(99,102,241,0.3);
   white-space: nowrap;
   flex-shrink: 0;
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3);
+  transition: all 0.2s ease;
 }
 
 .pay-now-btn:hover {
   filter: brightness(1.12);
-  box-shadow: 0 6px 20px rgba(99,102,241,0.4);
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
   transform: translateY(-2px);
 }
 
@@ -576,86 +464,29 @@
   transform: translateY(0);
 }
 
-/* Story slide-in animation */
+/* Story entrance animation */
 @keyframes slideInDown {
   from { opacity: 0; transform: translateY(-14px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* --------------------------------------------------------------------------
-   SUMMARY CARDS OVERRIDE (augments attendance-payments.css base)
-   -------------------------------------------------------------------------- */
-.pay-card-inner {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  height: 100%;
-}
 
-.pay-card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
+/* ==========================================================================
+   5. PAYMENT PROGRESS CARD
+   ========================================================================== */
 
-.pay-card-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1rem;
-}
-
-.pay-card-icon.total {
-  background: rgba(99,102,241,0.12);
-  color: var(--primary);
-}
-.pay-card-icon.green {
-  background: rgba(16,185,129,0.12);
-  color: var(--accent-green, #10b981);
-}
-.pay-card-icon.red {
-  background: rgba(239,68,68,0.12);
-  color: var(--accent-red, #ef4444);
-}
-
-.pay-card-icon .material-symbols-outlined {
-  font-size: 1.1rem;
-}
-
-/* Mini progress bars injected by JS */
-.pay-mini-bar {
-  height: 4px;
-  border-radius: 999px;
-  background: var(--input-bg);
-  overflow: hidden;
-  margin-top: 8px;
-}
-
-.pay-mini-bar > div {
-  height: 100%;
-  border-radius: 999px;
-  transition: width 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-/* --------------------------------------------------------------------------
-   PROGRESS CARD
-   -------------------------------------------------------------------------- */
 .pay-progress-card {
   background: var(--card-bg);
   border: 1px solid var(--border-color);
   border-radius: 20px;
   padding: 20px 24px;
   margin-bottom: 24px;
+  backdrop-filter: blur(10px);
   transition: box-shadow 0.2s ease;
 }
 
 .pay-progress-card:hover {
-  box-shadow: var(--shadow-md, 0 8px 24px rgba(0,0,0,0.06));
+  box-shadow: var(--shadow-md, 0 8px 24px rgba(0, 0, 0, 0.06));
 }
 
 .pay-progress-header {
@@ -693,16 +524,16 @@
   height: 100%;
   border-radius: 999px;
   background: linear-gradient(90deg, var(--primary, #6366f1), var(--accent-green, #10b981));
-  transition: width 1.4s cubic-bezier(0.34, 1.56, 0.64, 1);
   position: relative;
+  transition: width 1.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* Shimmer on fill */
+/* Shimmer animation on progress fill */
 .pay-progress-fill::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.25) 50%, transparent 100%);
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%);
   animation: shimmer 2s ease-in-out infinite;
 }
 
@@ -718,8 +549,155 @@
   font-weight: 500;
 }
 
+
+/* ==========================================================================
+   6. STATUS BADGES
+   ========================================================================== */
+
+/* Payment / deadline status pill */
+.payment-status,
+.dl-status-value {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  backdrop-filter: blur(4px);
+  transition: all 0.2s ease;
+}
+
+.status-paid    { background: rgba(16, 185, 129, 0.1); color: #047857; border: 1px solid rgba(16, 185, 129, 0.3); }
+.status-pending { background: rgba(245, 158, 11, 0.1); color: #b45309; border: 1px solid rgba(245, 158, 11, 0.3); }
+.status-overdue { background: rgba(239, 68, 68, 0.1);  color: #dc2626; border: 1px solid rgba(239, 68, 68, 0.3); }
+
+/* Dark mode overrides */
+.dark-mode .status-paid    { color: #34d399; background: rgba(52, 211, 153, 0.15); }
+.dark-mode .status-pending { color: #fbbf24; background: rgba(251, 191, 36, 0.15); }
+.dark-mode .status-overdue { color: #f87171; background: rgba(248, 113, 113, 0.15); }
+
+/* Grades table status badge (boxy variant) */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  width: 100px;
+}
+
+.status-passed  { background: rgba(34, 197, 94, 0.15); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.2); }
+.status-failed  { background: rgba(239, 68, 68, 0.15);  color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); }
+.status-inc     { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.2); }
+
+/* Deadline status badge (pill variant) */
+.deadline-status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  backdrop-filter: blur(4px);
+}
+
+.deadline-status-badge.status-submitted { background: rgba(16, 185, 129, 0.12); color: #059669; border: 1px solid rgba(16, 185, 129, 0.3); }
+.deadline-status-badge.status-pending   { background: rgba(245, 158, 11, 0.12); color: #b45309; border: 1px solid rgba(245, 158, 11, 0.3); }
+.deadline-status-badge.status-late      { background: rgba(239, 68, 68, 0.12);  color: #dc2626; border: 1px solid rgba(239, 68, 68, 0.3); }
+
+.dark-mode .deadline-status-badge.status-submitted { color: #34d399; }
+.dark-mode .deadline-status-badge.status-pending   { color: #fbbf24; }
+.dark-mode .deadline-status-badge.status-late      { color: #f87171; }
+
+
+/* ==========================================================================
+   7. TABLES
+   ========================================================================== */
+
+.table-scroll-wrapper {
+  width: 100%;
+  max-height: 400px;
+  overflow-x: auto;
+  overflow-y: auto;
+  border-radius: 16px;
+  border: 1px solid var(--border-color);
+  background: var(--card-bg);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+}
+
+/* Custom scrollbar */
+.table-scroll-wrapper::-webkit-scrollbar         { width: 6px; height: 6px; }
+.table-scroll-wrapper::-webkit-scrollbar-track   { background: transparent; }
+.table-scroll-wrapper::-webkit-scrollbar-thumb   { background: var(--border-color); border-radius: 10px; }
+.table-scroll-wrapper::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+.grades-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 600px;
+}
+
+/* Sticky glass header */
+.grades-table th {
+  padding: 16px 24px;
+  text-align: left;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-bottom: 2px solid var(--border-color);
+  background: var(--input-bg);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  backdrop-filter: blur(8px);
+}
+
+.grades-table td {
+  padding: 18px 24px;
+  color: var(--text-main);
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.95rem;
+  font-weight: 500;
+  vertical-align: middle;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  max-width: 260px;
+}
+
+.grades-table tbody tr {
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.grades-table tbody tr:hover,
+#paymentsTableBody tr:hover {
+  background: var(--input-bg);
+  transform: scale(1.002);
+  cursor: default;
+}
+
+/* Zebra striping */
+.grades-table tbody tr:nth-child(even)            { background: rgba(0, 0, 0, 0.015); }
+.dark-mode .grades-table tbody tr:nth-child(even) { background: rgba(255, 255, 255, 0.015); }
+
+.grades-table tbody tr:last-child td { border-bottom: none; }
+
 /* --------------------------------------------------------------------------
-   SECTION HEADER (table title + legend)
+   Payment table — section header & legend
    -------------------------------------------------------------------------- */
 .pay-section-header {
   display: flex;
@@ -740,10 +718,7 @@
   margin: 0;
 }
 
-.pay-section-title .material-symbols-outlined {
-  font-size: 1.1rem;
-  color: var(--text-muted);
-}
+.pay-section-title .material-symbols-outlined { font-size: 1.1rem; color: var(--text-muted); }
 
 .pay-legend {
   display: flex;
@@ -763,79 +738,23 @@
   color: var(--text-muted);
 }
 
-.pay-legend-item span {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  display: inline-block;
-  flex-shrink: 0;
-}
-
-.pay-legend-item.paid span    { background: var(--accent-green, #10b981); }
-.pay-legend-item.pending span { background: var(--accent-amber, #f59e0b); }
-.pay-legend-item.overdue span { background: var(--accent-red, #ef4444); }
+.pay-legend-item span           { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+.pay-legend-item.paid span      { background: var(--accent-green, #10b981); }
+.pay-legend-item.pending span   { background: var(--accent-amber, #f59e0b); }
+.pay-legend-item.overdue span   { background: var(--accent-red, #ef4444); }
 
 /* --------------------------------------------------------------------------
-   PAYMENTS TABLE OVERRIDES
+   Payment table — row colour coding by status
    -------------------------------------------------------------------------- */
-.payments-table-wrapper {
-  margin-bottom: 20px;
-}
+.payments-table-wrapper { margin-bottom: 20px; }
 
-.payments-table .payment-row {
-  position: relative;
-}
+.payment-row.status-is-paid    td:first-child { border-left: 3px solid var(--accent-green, #10b981); padding-left: 21px; }
+.payment-row.status-is-pending td:first-child { border-left: 3px solid var(--accent-amber, #f59e0b); padding-left: 21px; }
+.payment-row.status-is-overdue td:first-child { border-left: 3px solid var(--accent-red, #ef4444);  padding-left: 21px; }
 
-/* Colored left border based on status */
-.payment-row.status-is-paid td:first-child {
-  border-left: 3px solid var(--accent-green, #10b981);
-  padding-left: 21px;
-}
-.payment-row.status-is-pending td:first-child {
-  border-left: 3px solid var(--accent-amber, #f59e0b);
-  padding-left: 21px;
-}
-.payment-row.status-is-overdue td:first-child {
-  border-left: 3px solid var(--accent-red, #ef4444);
-  padding-left: 21px;
-}
-
-/* Status badge aliases from your existing .deadline-status-badge system */
-.deadline-status-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 5px 12px;
-  border-radius: 999px;
-  font-size: 0.68rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  white-space: nowrap;
-  backdrop-filter: blur(4px);
-}
-
-.deadline-status-badge.status-submitted {
-  background: rgba(16,185,129,0.12);
-  color: #059669;
-  border: 1px solid rgba(16,185,129,0.3);
-}
-.deadline-status-badge.status-pending {
-  background: rgba(245,158,11,0.12);
-  color: #b45309;
-  border: 1px solid rgba(245,158,11,0.3);
-}
-.deadline-status-badge.status-late {
-  background: rgba(239,68,68,0.12);
-  color: #dc2626;
-  border: 1px solid rgba(239,68,68,0.3);
-}
-
-.dark-mode .deadline-status-badge.status-submitted { color: #34d399; }
-.dark-mode .deadline-status-badge.status-pending   { color: #fbbf24; }
-.dark-mode .deadline-status-badge.status-late      { color: #f87171; }
-
-/* Action button in table rows */
+/* --------------------------------------------------------------------------
+   Payment table — action button
+   -------------------------------------------------------------------------- */
 .pay-action-btn {
   display: inline-flex;
   align-items: center;
@@ -847,8 +766,8 @@
   background: var(--card-bg);
   color: var(--text-muted);
   cursor: pointer;
-  transition: all 0.2s ease;
   padding: 0;
+  transition: all 0.2s ease;
 }
 
 .pay-action-btn:hover {
@@ -856,311 +775,20 @@
   color: var(--primary);
   border-color: var(--primary);
   transform: translateY(-1px);
-  box-shadow: 0 4px 10px rgba(99,102,241,0.15);
+  box-shadow: 0 4px 10px rgba(99, 102, 241, 0.15);
 }
 
-/* Row entrance animation */
+/* Row entrance animation (applied via JS) */
 @keyframes slideInRight {
   from { opacity: 0; transform: translateX(16px); }
   to   { opacity: 1; transform: translateX(0); }
 }
 
-/* --------------------------------------------------------------------------
-   QUICK ACTIONS FOOTER
-   -------------------------------------------------------------------------- */
-.pay-quick-actions {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin-top: 8px;
-  padding-top: 20px;
-  border-top: 1px solid var(--border-color);
-}
 
-.pay-quick-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 18px;
-  border-radius: 12px;
-  border: 1px solid var(--border-color);
-  background: var(--card-bg);
-  color: var(--text-muted);
-  font-size: 0.8rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  letter-spacing: 0.01em;
-}
-
-.pay-quick-btn:hover {
-  background: var(--input-bg);
-  color: var(--text-main);
-  border-color: var(--primary);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.07);
-}
-
-.pay-quick-btn:active {
-  transform: translateY(0);
-}
-
-.pay-quick-btn .material-symbols-outlined {
-  font-size: 1rem;
-}
-
-/* --------------------------------------------------------------------------
-   MOBILE RESPONSIVE
-   -------------------------------------------------------------------------- */
-@media (max-width: 680px) {
-  .payments-view-header {
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .payments-header-actions {
-    width: 100%;
-  }
-
-  .pay-header-btn {
-    flex: 1;
-    justify-content: center;
-  }
-
-  .pay-story-card {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 16px;
-    padding: 20px;
-  }
-
-  .pay-now-btn {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .payment-summary-row {
-    grid-template-columns: 1fr;
-  }
-
-  .pay-section-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .pay-quick-actions {
-    flex-direction: column;
-  }
-
-  .pay-quick-btn {
-    width: 100%;
-    justify-content: center;
-  }
-
-  /* On mobile: collapse table to readable density */
-  .payments-table .col-date {
-    display: none;
-  }
-}
-
-/* ========================================================================== 
-   PAYMENTS UI UPGRADE (v2) — Layout & Structure Fixes
+/* ==========================================================================
+   8. QUICK ACTIONS FOOTER
    ========================================================================== */
 
-/* --- 1. PAGE HEADER --- */
-.payments-view-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  flex-wrap: wrap;
-  margin-bottom: 28px;
-}
-
-.payments-header-left h2 { margin: 0 0 4px; }
-.payments-subtitle { font-size: 0.85rem; color: var(--text-muted); margin: 0; font-weight: 500; }
-
-.payments-header-actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.pay-header-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 9px 16px;
-  border-radius: 12px;
-  border: 1px solid var(--border-color);
-  background: var(--card-bg);
-  color: var(--text-main);
-  font-size: 0.82rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.pay-header-btn:hover { 
-  background: var(--input-bg); 
-  transform: translateY(-2px); 
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
-}
-
-.pay-header-btn.primary { 
-  background: var(--primary); 
-  border-color: var(--primary); 
-  color: #fff; 
-}
-
-.pay-header-btn.primary:hover { 
-  box-shadow: 0 6px 18px rgba(99, 102, 241, 0.4); 
-  filter: brightness(1.1); 
-}
-
-/* --- 2. SUMMARY CARDS (Inner Layout) --- */
-.pay-story-mount { margin-bottom: 24px; }
-
-.pay-card-inner {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  position: relative;
-  z-index: 1;
-}
-
-.pay-card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.pay-card-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.pay-card-icon.total { background: rgba(99,102,241,0.12); color: var(--primary); }
-.pay-card-icon.green { background: rgba(16,185,129,0.12); color: var(--accent-green, #10b981); }
-.pay-card-icon.red   { background: rgba(239,68,68,0.12); color: var(--accent-red, #ef4444); }
-
-/* --- 3. PROGRESS BAR CARD --- */
-.pay-progress-card {
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 20px;
-  padding: 20px 24px;
-  margin-bottom: 24px;
-  backdrop-filter: blur(10px);
-}
-
-.pay-progress-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 14px;
-}
-
-.pay-progress-label { 
-  font-size: 0.78rem; 
-  font-weight: 800; 
-  text-transform: uppercase; 
-  letter-spacing: 0.1em; 
-  color: var(--text-muted); 
-}
-
-.pay-progress-pct { 
-  font-size: 1.1rem; 
-  font-weight: 900; 
-  color: var(--text-main); 
-}
-
-.pay-progress-track {
-  width: 100%;
-  height: 12px;
-  background: var(--input-bg);
-  border-radius: 999px;
-  overflow: hidden;
-  border: 1px solid var(--border-color);
-}
-
-.pay-progress-fill {
-  height: 100%;
-  border-radius: 999px;
-  background: linear-gradient(90deg, var(--primary), var(--accent-green));
-  position: relative;
-}
-
-.pay-progress-fill::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
-  animation: shimmer 2s infinite;
-}
-
-@keyframes shimmer { 
-  0% { transform: translateX(-100%); } 
-  100% { transform: translateX(200%); } 
-}
-
-.pay-progress-footer { 
-  margin-top: 10px; 
-  font-size: 0.8rem; 
-  color: var(--text-muted); 
-  font-weight: 500; 
-}
-
-/* --- 4. TABLE HEADER & LEGEND --- */
-.pay-section-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 14px;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-
-.pay-section-title { 
-  display: flex; 
-  align-items: center; 
-  gap: 8px; 
-  font-size: 1rem; 
-  font-weight: 800; 
-  margin: 0; 
-}
-
-.pay-legend { 
-  display: flex; 
-  align-items: center; 
-  gap: 16px; 
-}
-
-.pay-legend-item { 
-  display: flex; 
-  align-items: center; 
-  gap: 6px; 
-  font-size: 0.72rem; 
-  font-weight: 700; 
-  text-transform: uppercase; 
-  color: var(--text-muted); 
-}
-
-.pay-legend-item span { width: 8px; height: 8px; border-radius: 50%; }
-.pay-legend-item.paid span { background: var(--accent-green, #10b981); }
-.pay-legend-item.pending span { background: var(--accent-amber, #f59e0b); }
-.pay-legend-item.overdue span { background: var(--accent-red, #ef4444); }
-
-/* --- 5. TABLE ROW HIGHLIGHTS --- */
-.payment-row.status-is-paid td:first-child { border-left: 3px solid var(--accent-green, #10b981); padding-left: 21px; }
-.payment-row.status-is-pending td:first-child { border-left: 3px solid var(--accent-amber, #f59e0b); padding-left: 21px; }
-.payment-row.status-is-overdue td:first-child { border-left: 3px solid var(--accent-red, #ef4444); padding-left: 21px; }
-
-/* --- 6. QUICK ACTIONS FOOTER --- */
 .pay-quick-actions {
   display: flex;
   gap: 12px;
@@ -1182,26 +810,66 @@
   font-size: 0.8rem;
   font-weight: 700;
   cursor: pointer;
+  letter-spacing: 0.01em;
   transition: all 0.2s ease;
 }
 
-.pay-quick-btn:hover { 
-  background: var(--input-bg); 
-  color: var(--text-main); 
-  border-color: var(--primary); 
-  transform: translateY(-2px); 
-  box-shadow: 0 4px 12px rgba(0,0,0,0.07); 
+.pay-quick-btn:hover {
+  background: var(--input-bg);
+  color: var(--text-main);
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07);
 }
 
-/* --- 7. MOBILE RESPONSIVE --- */
+.pay-quick-btn:active {
+  transform: translateY(0);
+}
+
+.pay-quick-btn .material-symbols-outlined { font-size: 1rem; }
+
+
+/* ==========================================================================
+   9. MOBILE RESPONSIVE  (max-width: 680px)
+   ========================================================================== */
+
 @media (max-width: 680px) {
-  .payments-view-header, .pay-section-header, .pay-quick-actions { 
-    flex-direction: column; 
-    align-items: flex-start; 
+  /* Stack header, section header and quick actions vertically */
+  .payments-view-header,
+  .pay-section-header,
+  .pay-quick-actions {
+    flex-direction: column;
+    align-items: flex-start;
   }
-  .pay-header-btn, .pay-quick-btn { 
-    width: 100%; 
-    justify-content: center; 
+
+  /* Full-width buttons */
+  .pay-header-btn,
+  .pay-quick-btn {
+    width: 100%;
+    justify-content: center;
   }
+
   .payments-header-actions { width: 100%; }
+
+  /* Story card stacks vertically */
+  .pay-story-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 20px;
+  }
+
+  /* Pay now button fills width */
+  .pay-now-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Summary cards collapse to single column */
+  .payment-summary-row {
+    grid-template-columns: 1fr;
+  }
+
+  /* Hide date column in payments table on small screens */
+  .payments-table .col-date { display: none; }
 }

@@ -1,0 +1,118 @@
+/* ==========================================================================
+   input.css — Chat Input Area, Compose Bar & Send Button
+   Depends on: variable.css
+   ========================================================================== */
+
+/* ── Input area container ──────────────────────────────────────────────── */
+/*
+ * flex-shrink: 0 ensures the bar is NEVER pushed off-screen when the
+ * thread fills up with messages.
+ */
+.chat-input-area {
+  padding: 10px 16px 14px;
+  flex-shrink: 0;
+  border-top: 1px solid var(--msg-border-subtle);
+  background: rgba(8, 10, 24, 0.28);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* ── Row wrapper ───────────────────────────────────────────────────────── */
+.chat-input-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 9px;
+}
+
+/* ── Input pill ────────────────────────────────────────────────────────── */
+.chat-input-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--msg-input-bg);
+  border: 1px solid var(--msg-border);
+  border-radius: 14px;
+  padding: 9px 12px;
+  transition: var(--msg-transition);
+  min-height: 42px;
+}
+
+.chat-input-wrap:focus-within {
+  border-color: var(--msg-border-focus);
+  box-shadow: 0 0 0 3px var(--msg-primary-glow);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* ── Textarea ──────────────────────────────────────────────────────────── */
+#chatMainInput {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--msg-text-main);
+  font-size: 0.87rem;
+  font-family: 'DM Sans', sans-serif;
+  resize: none;
+  max-height: 108px;
+  line-height: 1.55;
+  padding: 0;
+}
+
+#chatMainInput::placeholder { color: var(--msg-text-muted); }
+
+/* ── Icon buttons inside the input pill ───────────────────────────────── */
+.input-action-btn,
+.input-emoji-btn {
+  background: transparent;
+  border: none;
+  color: var(--msg-text-sub);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  border-radius: 7px;
+  transition: var(--msg-transition);
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+}
+
+.input-action-btn .material-symbols-outlined,
+.input-emoji-btn .material-symbols-outlined {
+  font-size: 19px;
+}
+
+.input-action-btn:hover,
+.input-emoji-btn:hover {
+  color: var(--msg-primary-light);
+  background: var(--msg-primary-soft);
+}
+
+/* ── Send button ───────────────────────────────────────────────────────── */
+.chat-send-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 13px;
+  border: none;
+  background: var(--msg-sent-bg);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: var(--msg-transition);
+  box-shadow: var(--msg-shadow-sent);
+}
+
+.chat-send-btn .material-symbols-outlined { font-size: 18px; }
+
+.chat-send-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.42);
+  background: var(--msg-sent-bg-hover);
+}
+
+.chat-send-btn:active { transform: scale(0.93); }

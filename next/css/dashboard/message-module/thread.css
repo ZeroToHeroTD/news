@@ -1,0 +1,339 @@
+/* ==========================================================================
+   thread.css — Chat Panel: Header, Thread Scroll Area & Message Bubbles
+   Depends on: variable.css, layout.css
+   ========================================================================== */
+
+/* ── Chat panel container ──────────────────────────────────────────────── */
+/*
+ * KEY: width: 100% + min-width: 0 + min-height: 0 keeps it inside its
+ * grid column. overflow: hidden clips the children so the panel itself
+ * never expands beyond its cell.
+ */
+.msg-chat-panel {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--msg-chat-bg);
+  position: relative;
+}
+
+/* ── Chat header ───────────────────────────────────────────────────────── */
+.chat-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--msg-border);
+  flex-shrink: 0;
+  background: var(--msg-header-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  min-height: 60px;
+}
+
+.chat-header-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Avatar with status */
+.chat-header-avatar-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.chat-header-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  object-fit: cover;
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  border: 1px solid var(--msg-border);
+  display: block;
+}
+
+/* Status dot on chat header avatar */
+.chat-header-avatar-wrap .conv-status-dot {
+  bottom: -1px;
+  right: -1px;
+  width: 9px;
+  height: 9px;
+}
+
+.chat-header-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.chat-header-info h4 {
+  font-family: 'Sora', sans-serif;
+  font-size: 0.90rem;
+  font-weight: 700;
+  color: var(--msg-text-main);
+  margin: 0;
+  line-height: 1.3;
+}
+
+/* Status label under name */
+.chat-header-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.68rem;
+  font-weight: 500;
+  color: var(--msg-text-muted);
+  line-height: 1;
+}
+
+.chat-header-status.online { color: var(--msg-online); }
+.chat-header-status.typing-status { color: var(--msg-primary-light); font-style: italic; }
+
+.header-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+/* ── Header action buttons ─────────────────────────────────────────────── */
+.chat-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.chat-action-btn,
+.chat-icon-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  border: 1px solid var(--msg-border);
+  background: var(--msg-input-bg);
+  color: var(--msg-text-sub);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--msg-transition);
+  flex-shrink: 0;
+}
+
+.chat-action-btn .material-symbols-outlined,
+.chat-icon-btn .material-symbols-outlined {
+  font-size: 17px;
+}
+
+.chat-action-btn:hover,
+.chat-icon-btn:hover {
+  background: var(--msg-primary-soft);
+  color: var(--msg-primary-light);
+  border-color: rgba(99, 102, 241, 0.22);
+}
+
+/* ── Thread scroll area ────────────────────────────────────────────────── */
+/*
+ * KEY: flex: 1 + min-height: 0 allows this to shrink so the input bar
+ * below it is always visible. overflow-y: auto handles the scroll.
+ */
+.chat-thread-area {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 18px 20px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.06) transparent;
+}
+
+.chat-thread-area::-webkit-scrollbar       { width: 3px; }
+.chat-thread-area::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: 10px;
+}
+
+/* ── Date divider ──────────────────────────────────────────────────────── */
+.date-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--msg-text-muted);
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin: 6px 0 2px;
+  flex-shrink: 0;
+}
+
+.date-divider::before,
+.date-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--msg-border-subtle);
+}
+
+/* ── Bubble groups ─────────────────────────────────────────────────────── */
+.bubble-group {
+  display: flex;
+  flex-direction: column;
+  max-width: 68%;
+  gap: 3px;
+  animation: bubbleIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.bubble-group.sent {
+  align-self: flex-end;
+  align-items: flex-end;
+}
+
+.bubble-group.received {
+  align-self: flex-start;
+  align-items: flex-start;
+}
+
+/* Sender name (received only) */
+.bubble-sender-label {
+  font-size: 0.67rem;
+  font-weight: 700;
+  color: var(--msg-primary-light);
+  margin-bottom: 2px;
+  padding: 0 3px;
+  letter-spacing: 0.01em;
+}
+
+/* ── Individual bubble ─────────────────────────────────────────────────── */
+.chat-bubble {
+  padding: 9px 14px;
+  font-size: 0.870rem;
+  line-height: 1.58;
+  word-wrap: break-word;
+  word-break: break-word;
+  position: relative;
+  transition: transform 0.16s ease;
+  max-width: 100%;
+}
+
+.chat-bubble:hover { transform: translateY(-1px); }
+
+/* Sent */
+.chat-bubble.sent {
+  background: var(--msg-sent-bg);
+  color: #fff;
+  border-radius: 18px 18px 5px 18px;
+  box-shadow: var(--msg-shadow-sent);
+}
+
+/* Received */
+.chat-bubble.received {
+  background: var(--msg-received-bg);
+  color: var(--msg-text-main);
+  border: 1px solid var(--msg-border);
+  border-radius: 18px 18px 18px 5px;
+  backdrop-filter: blur(8px);
+}
+
+/* ── Timestamp row ─────────────────────────────────────────────────────── */
+.bubble-time-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+  padding: 0 4px;
+}
+
+.bubble-time {
+  font-size: 0.60rem;
+  color: var(--msg-text-muted);
+  font-weight: 500;
+}
+
+/* Read / seen receipt */
+.bubble-seen .material-symbols-outlined {
+  font-size: 13px;
+  color: var(--msg-primary-light);
+  display: block;
+  line-height: 1;
+}
+
+/* ── Typing indicator ──────────────────────────────────────────────────── */
+.typing-bubble {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 11px 15px;
+  background: var(--msg-received-bg);
+  border: 1px solid var(--msg-border);
+  border-radius: 18px 18px 18px 5px;
+  width: fit-content;
+}
+
+.typing-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--msg-primary-light);
+  animation: typingBounce 1.2s ease infinite;
+}
+
+.typing-dot:nth-child(2) { animation-delay: 0.18s; }
+.typing-dot:nth-child(3) { animation-delay: 0.36s; }
+
+@keyframes typingBounce {
+  0%, 60%, 100% { transform: translateY(0);   opacity: 0.35; }
+  30%            { transform: translateY(-5px); opacity: 1;   }
+}
+
+/* ── Empty / placeholder state ─────────────────────────────────────────── */
+.chat-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+  padding: 60px 40px;
+  gap: 12px;
+}
+
+.chat-empty-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
+  background: var(--msg-primary-soft);
+  border: 1px solid rgba(99, 102, 241, 0.16);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+
+.chat-empty-icon .material-symbols-outlined {
+  font-size: 28px;
+  color: var(--msg-primary-light);
+}
+
+.chat-empty-state h3 {
+  font-family: 'Sora', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--msg-text-main);
+  margin: 0;
+}
+
+.chat-empty-state p {
+  font-size: 0.815rem;
+  max-width: 260px;
+  line-height: 1.65;
+  color: var(--msg-text-sub);
+  margin: 0;
+}

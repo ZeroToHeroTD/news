@@ -6,12 +6,34 @@
   <title>Student Portal | Dashboard</title>
 
   <link rel="stylesheet" href="../css/dashboard/dashboard-master.css">
+  <link rel="stylesheet" href="../css/dashboard/message-module/messenger-hub.css">
 
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <style>
+    /* Payment Modal Specific Styles */
+    .method-option {
+      border: 2px solid var(--border-color);
+      padding: 20px;
+      border-radius: 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .method-option:hover {
+      border-color: var(--primary);
+      background: rgba(99, 102, 241, 0.05);
+    }
+    .form-group label { display: block; margin-bottom: 8px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); }
+    .form-group input { width: 100%; padding: 12px; border-radius: 8px; background: var(--input-bg); border: 1px solid var(--border-color); color: white; }
+  </style>
 </head>
 
 <body class="app-body">
@@ -100,7 +122,6 @@
       </div>
     </aside>
 
-
     <main class="app-main">
 
       <header class="topbar">
@@ -125,7 +146,6 @@
           </div>
         </div>
       </header>
-
 
       <section class="view-content active" id="view-dashboard">
         <div class="dashboard-hero">
@@ -194,8 +214,14 @@
                   <option value="progress">Course Completion</option>
                 </select>
               </div>
-              <div class="chart-container">
-                <canvas id="performanceChart"></canvas>
+              <div class="chart-container" style="position: relative; min-height: 250px;">
+                  <div id="chartPlaceholder" class="chart-skeleton-table">
+                      <div class="skel-row header"><span>Term</span><span>GWA</span></div>
+                      <div class="skel-row"><span>Prelims</span><span class="skel-bar"></span></div>
+                      <div class="skel-row"><span>Midterms</span><span class="skel-bar"></span></div>
+                      <div class="skel-row"><span>Finals</span><span class="skel-bar"></span></div>
+                  </div>
+                  <canvas id="performanceChart"></canvas>
               </div>
               <div class="stats-row">
                 <div class="data-card mini">
@@ -258,14 +284,12 @@
         </div>
       </section>
 
-
       <section class="view-content" id="view-courses">
         <div class="view-header">
           <h2>My Enrolled Courses</h2>
         </div>
         <div id="db-courses-container" class="courses-grid"></div>
       </section>
-
 
       <section class="view-content" id="view-grades">
         <div class="view-header">
@@ -288,7 +312,6 @@
         </div>
       </section>
 
-
       <section class="view-content" id="view-schedule">
         <div class="view-header">
           <h2>Weekly Class Schedule</h2>
@@ -296,9 +319,7 @@
         <div id="weeklyScheduleGrid"></div>
       </section>
 
-
       <section class="view-content" id="view-messages">
-
         <div class="msg-hub-header">
           <h2 class="msg-hub-title">Messenger <span>Hub</span></h2>
           <button type="button" class="compose-fab-btn" id="composeNewBtn" onclick="window.openComposeModal()">
@@ -308,30 +329,27 @@
         </div>
 
         <div class="msg-hub-body messaging-hub-wrapper">
-
           <div class="msg-sidebar">
             <div class="msg-sidebar-top">
               <div class="sidebar-search-bar">
                 <span class="material-symbols-outlined">search</span>
                 <input type="text" class="sidebar-search-input" id="convSearchInput" placeholder="Search people...">
               </div>
-<div class="sidebar-tabs">
-  <button class="sidebar-tab active" data-tab="personal" onclick="switchMsgTab('personal')">
-    <span class="material-symbols-outlined">chat</span> Messages
-    <span id="personalBadge" class="tab-pill" style="display: none;"></span>
-  </button>
-  
-  <button class="sidebar-tab" data-tab="announcements" onclick="switchMsgTab('announcements')">
-    <span class="material-symbols-outlined">campaign</span> Notices
-    <span id="announceBadge" class="tab-pill">2</span>
-  </button>
-</div>
-            </div>
-            <div class="conv-list-scroll" id="conversationList">
+              <div class="sidebar-tabs">
+                <button class="sidebar-tab active" data-tab="personal" onclick="switchMsgTab('personal')">
+                  <span class="material-symbols-outlined">chat</span> Messages
+                  <span id="personalBadge" class="tab-pill" style="display: none;"></span>
+                </button>
+                <button class="sidebar-tab" data-tab="announcements" onclick="switchMsgTab('announcements')">
+                  <span class="material-symbols-outlined">campaign</span> Notices
+                  <span id="announceBadge" class="tab-pill">2</span>
+                </button>
               </div>
+            </div>
+            <div class="conv-list-scroll" id="conversationList"></div>
           </div>
+          
           <div class="msg-chat-panel" id="msgChatPanel">
-
             <div class="chat-panel-header hidden" id="chatPanelHeader">
               <div class="chat-header-user">
                 <div class="chat-header-avatar-wrap">
@@ -364,8 +382,7 @@
               <p>Select a conversation from the sidebar or start a new one to begin chatting.</p>
             </div>
 
-            <div class="chat-thread-area hidden" id="chatThreadArea">
-              </div>
+            <div class="chat-thread-area hidden" id="chatThreadArea"></div>
 
             <div class="chat-input-area hidden" id="chatInputArea">
               <div class="chat-input-row">
@@ -383,8 +400,8 @@
                 </button>
               </div>
             </div>
-
           </div>
+
           <div class="msg-chat-panel hidden" id="msgAnnPanel">
             <div class="chat-panel-header">
               <div class="chat-header-user">
@@ -397,11 +414,11 @@
                 </div>
               </div>
             </div>
-            <div class="announcements-panel" id="announcementsPanel">
-              </div>
+            <div class="announcements-panel" id="announcementsPanel"></div>
           </div>
-          </div>
-        </section>
+        </div>
+      </section>
+
       <section class="view-content" id="view-social">
         <div class="view-header" style="flex-direction:column; align-items:flex-start; gap:10px;">
           <h2>Campus Network</h2>
@@ -412,7 +429,6 @@
         <div id="socialDirectoryContainer"></div>
       </section>
 
-
       <section class="view-content" id="view-deadlines">
         <div class="view-header">
           <h2>Submission Deadlines</h2>
@@ -420,28 +436,18 @@
         <div id="deadlinesContainer"></div>
       </section>
 
-
-<!-- ============================================================
-     DROP-IN REPLACEMENT: Replace your existing <section id="view-payments">
-     block in dashboard.html with this entire block.
-     All existing IDs and event bindings are preserved.
-     ============================================================ -->
-
-<section class="view-content" id="view-payments">
-
+      <section class="view-content" id="view-payments">
         <div class="view-header payments-view-header">
           <div class="payments-header-left">
             <h2>Finance &amp; Tuition</h2>
             <p class="payments-subtitle">Track balances, review transactions, and manage your account.</p>
           </div>
           <div class="payments-header-actions">
-            <button class="pay-header-btn" onclick="window.showToast('Opening payment history...', 'info')">
-              <span class="material-symbols-outlined">history</span>
-              History
+            <button class="pay-header-btn" onclick="window.scrollToHistory()">
+              <span class="material-symbols-outlined">history</span> History
             </button>
-            <button class="pay-header-btn primary" onclick="window.showToast('Redirecting to payment gateway...', 'info')">
-              <span class="material-symbols-outlined">account_balance_wallet</span>
-              Pay Now
+            <button class="pay-header-btn primary" onclick="window.openPaymentGateway()">
+              <span class="material-symbols-outlined">account_balance_wallet</span> Pay Now
             </button>
           </div>
         </div>
@@ -449,7 +455,6 @@
         <div id="paymentsSummaryHighlight" class="pay-story-mount"></div>
 
         <div class="payment-summary-row">
-
           <div class="pay-summary-card" data-card="total">
             <div class="pay-card-inner">
               <div class="pay-card-header">
@@ -485,7 +490,6 @@
               <div class="pay-amount" id="payRemainingBalance">₱0.00</div>
             </div>
           </div>
-
         </div>
 
         <div class="pay-progress-card">
@@ -524,32 +528,25 @@
                 <th class="col-action" style="text-align:right; padding-right:24px;">Action</th>
               </tr>
             </thead>
-            <tbody id="paymentsTableBody">
-              </tbody>
+            <tbody id="paymentsTableBody"></tbody>
           </table>
         </div>
 
         <div class="pay-quick-actions">
-          <button class="pay-quick-btn" onclick="window.showToast('Generating statement PDF...', 'success')">
-            <span class="material-symbols-outlined">download</span>
-            Download Statement
+          <button class="pay-quick-btn" onclick="window.downloadDocument('Statement of Account')">
+            <span class="material-symbols-outlined">download</span> Download Statement
           </button>
-          <button class="pay-quick-btn" onclick="window.showToast('Payment schedule coming soon.', 'info')">
-            <span class="material-symbols-outlined">calendar_month</span>
-            Payment Schedule
+          <button class="pay-quick-btn" onclick="window.viewPaymentSchedule()">
+            <span class="material-symbols-outlined">calendar_month</span> Payment Schedule
           </button>
-          <button class="pay-quick-btn" onclick="window.showToast('Support contact is available in Settings.', 'info')">
-            <span class="material-symbols-outlined">support_agent</span>
-            Contact Finance
+          <button class="pay-quick-btn" onclick="window.contactFinance()">
+            <span class="material-symbols-outlined">support_agent</span> Contact Finance
           </button>
         </div>
-
       </section>
-
 
       <section class="view-content" id="view-resources">
         <div class="resources-header">
-          <h2>Academic Resources</h2>
           <div class="resources-filter-bar">
             <div class="filter-pill active">All Files</div>
             <div class="filter-pill">PDFs</div>
@@ -558,7 +555,6 @@
         </div>
         <div id="resourcesGrid" class="resources-grid"></div>
       </section>
-
 
       <section class="view-content" id="view-settings">
         <div class="view-header">
@@ -618,12 +614,13 @@
       </section>
 
     </main>
-    </div>
+  </div>
+
   <div class="compose-modal-overlay" id="composeModalOverlay">
     <div class="compose-modal-box">
       <div class="compose-modal-header">
         <h3>New Message</h3>
-        <button type="button" class="modal-close-btn" id="composeCloseBtn">close</button>
+        <button type="button" class="modal-close-btn" id="composeCloseBtn"><span class="material-symbols-outlined">close</span></button>
       </div>
       <div class="compose-field">
         <label for="composeRecipientId">To</label>
@@ -647,35 +644,11 @@
     </div>
   </div>
 
-  <div class="compose-modal-overlay" id="annViewOverlay">
-    <div class="ann-modal-box">
-      <div class="compose-modal-header">
-        <span class="ann-modal-tag" id="annViewTag">
-          <span class="material-symbols-outlined" style="font-size:14px;">campaign</span>
-          Announcement
-        </span>
-        <button type="button" class="modal-close-btn" id="annViewClose">close</button>
-      </div>
-      <div class="ann-modal-title" id="annViewTitle">---</div>
-      <div class="ann-modal-meta">
-        <div class="ann-meta-item">
-          <span class="material-symbols-outlined">admin_panel_settings</span>
-          <span id="annViewFrom">Administration</span>
-        </div>
-        <div class="ann-meta-item">
-          <span class="material-symbols-outlined">calendar_today</span>
-          <span id="annViewDate">---</span>
-        </div>
-      </div>
-      <div class="ann-modal-body" id="annViewBody"></div>
-    </div>
-  </div>
-
   <div class="compose-modal-overlay" id="deleteConfirmOverlay">
     <div class="compose-modal-box" style="max-width:400px; text-align:center;">
       <div class="compose-modal-header">
         <h3>Delete Message?</h3>
-        <button type="button" class="modal-close-btn" onclick="document.getElementById('deleteConfirmOverlay').classList.remove('active')">close</button>
+        <button type="button" class="modal-close-btn" onclick="document.getElementById('deleteConfirmOverlay').classList.remove('active')"><span class="material-symbols-outlined">close</span></button>
       </div>
       <p style="color:rgba(241,245,249,0.5); margin-bottom:24px; line-height:1.6;">
         This action is permanent and cannot be undone.
@@ -689,11 +662,67 @@
     </div>
   </div>
 
+  <div class="compose-modal-overlay" id="paymentModalOverlay">
+    <div class="compose-modal-box" style="max-width: 450px;">
+      
+      <div class="compose-modal-header">
+        <h3 id="paymentModalTitle">Secure Payment</h3>
+        <button type="button" class="modal-close-btn" onclick="window.closePaymentModal()"><span class="material-symbols-outlined">close</span></button>
+      </div>
+
+      <div id="paymentStep1">
+        <div style="text-align: center; margin: 20px 0;">
+          <span style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; font-weight: 700;">Amount Due</span>
+          <div id="payAmountDisplay" style="font-size: 2.5rem; font-weight: 800; color: var(--accent-green);">₱0.00</div>
+        </div>
+
+        <div class="method-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 25px;">
+          <div class="method-option" onclick="window.selectPaymentMethod('gcash')">
+            <img src="../Gcash.jpg" alt="GCash" style="height: 25px;">
+            <span>GCash</span>
+          </div>
+          <div class="method-option" onclick="window.selectPaymentMethod('maya')">
+            <img src="../maya-logo.jpg" alt="Maya" style="height: 25px;">
+            <span>Maya</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="paymentStep2" style="display: none;">
+        <div style="text-align: center; background: rgba(255,255,255,0.03); padding: 20px; border-radius: 15px; border: 1px solid var(--border-color);">
+          <h4 id="methodNameDisplay" style="color: var(--primary); margin-bottom: 10px;">GCash Payment</h4>
+          
+<img src="" id="methodQRCode" style="width: 220px; height: auto; max-height: 280px; object-fit: contain; border-radius: 10px; border: 5px solid #fff; margin-bottom: 15px; background: #fff;">          
+          <p style="font-size: 0.85rem; color: var(--text-muted);">1. Scan the QR code and pay exactly <strong id="finalAmountText" style="color:white;"></strong></p>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">2. Take a screenshot of the successful receipt.</p>
+        </div>
+
+        <div class="form-group" style="margin-top: 20px;">
+          <label>Ref Number / Transaction ID</label>
+          <input type="text" id="payRefNumber" placeholder="Enter the 13-digit Ref No.">
+        </div>
+
+        <div class="form-group" style="margin-top: 15px;">
+          <label>Upload Proof of Payment</label>
+          <input type="file" id="payReceiptFile" accept="image/*" class="custom-file-input">
+        </div>
+
+        <div class="compose-modal-actions" style="margin-top: 25px;">
+          <button class="btn-cancel" onclick="window.backToStep1()">Back</button>
+          <button class="btn-send" id="btnConfirmPayment" onclick="window.handlePaymentSubmission()">
+            <span class="material-symbols-outlined">verified</span> Submit Proof
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
   <div class="compose-modal-overlay" id="deadlineModalOverlay">
     <div class="compose-modal-box">
       <div class="compose-modal-header">
         <h3 id="dlModalTitle">Deadline Details</h3>
-        <button type="button" class="modal-close-btn" id="dlModalClose">close</button>
+        <button type="button" class="modal-close-btn" id="dlModalClose"><span class="material-symbols-outlined">close</span></button>
       </div>
       <div class="dl-modal-grid">
         <div class="dl-modal-row">
@@ -725,30 +754,30 @@
   </div>
 
   <div id="annViewOverlay" class="compose-modal-overlay">
-  <div class="ann-modal-box">
-    <button id="annViewClose" class="modal-close-btn" style="position:absolute; top:20px; right:20px;">
-      <span class="material-symbols-outlined">close</span>
-    </button>
-    
-    <div id="annViewTag" class="ann-modal-tag">Announcement</div>
-    <h2 id="annViewTitle" class="ann-modal-title">Announcement Title</h2>
-    
-    <div class="ann-modal-meta">
-      <div class="ann-meta-item">
-        <span class="material-symbols-outlined">admin_panel_settings</span>
-        <span id="annViewFrom">Administration</span>
+    <div class="ann-modal-box">
+      <button id="annViewClose" class="modal-close-btn" style="position:absolute; top:20px; right:20px;">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+      
+      <div id="annViewTag" class="ann-modal-tag">Announcement</div>
+      <h2 id="annViewTitle" class="ann-modal-title">Announcement Title</h2>
+      
+      <div class="ann-modal-meta">
+        <div class="ann-meta-item">
+          <span class="material-symbols-outlined">admin_panel_settings</span>
+          <span id="annViewFrom">Administration</span>
+        </div>
+        <div class="ann-meta-item">
+          <span class="material-symbols-outlined">calendar_today</span>
+          <span id="annViewDate">Date goes here</span>
+        </div>
       </div>
-      <div class="ann-meta-item">
-        <span class="material-symbols-outlined">calendar_today</span>
-        <span id="annViewDate">Date goes here</span>
+      
+      <div id="annViewBody" class="ann-modal-body">
+        Message content goes here...
       </div>
-    </div>
-    
-    <div id="annViewBody" class="ann-modal-body">
-      Message content goes here...
     </div>
   </div>
-</div>
 
   <script type="module" src="../scripts/dashboard/app.js"></script>
 

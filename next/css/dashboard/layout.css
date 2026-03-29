@@ -1,10 +1,12 @@
 /* ==========================================================================
    layout.css — Topbar, Main Area, Dashboard Hero, Section Cards, Stats
+   PREMIUM UPGRADE: Enhanced transitions, shadows, and theme compatibility
    ========================================================================== */
 
-/* FIX FOR THE GRAY VOID AT 67% SCALE */
+/* FIX FOR THE GRAY VOID AT 67% SCALE (Now Theme Compatible) */
 html, body {
-  background-color: #0a0c1c !important; /* Matches your app's dark background */
+  background-color: var(--bg-app) !important; 
+  transition: background-color var(--transition);
 }
 
 /* --------------------------------------------------------------------------
@@ -29,7 +31,7 @@ html, body {
 }
 
 /* --------------------------------------------------------------------------
-   2. TOPBAR & PROFILE (Glassmorphism + Sticky)
+   2. TOPBAR & PROFILE (Premium Glassmorphism + Sticky)
    -------------------------------------------------------------------------- */
 .topbar {
   display: flex;
@@ -44,14 +46,15 @@ html, body {
   
   /* Premium Glass Effect */
   background: var(--glass-bg);
-  backdrop-filter: var(--blur);
-  -webkit-backdrop-filter: var(--blur);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--glass-border);
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03); /* Softer, wider shadow */
   
   position: sticky;
   top: 0;
   z-index: 40;
+  transition: all 0.3s ease;
 }
 
 .search-bar {
@@ -60,21 +63,27 @@ html, body {
 }
 
 .search-bar input {
-  padding: 14px 22px;
+  padding: 12px 22px;
   background: var(--card-bg);
   color: var(--text-main);
   border: 1.5px solid var(--border-color);
   border-radius: 16px;
   width: 100%;
   outline: none;
-  transition: var(--transition);
-  box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.01);
+  font-weight: 500;
+}
+
+.search-bar input::placeholder {
+  color: var(--text-muted);
+  font-weight: 500;
 }
 
 .search-bar input:focus {
   border-color: var(--primary);
   box-shadow: 0 0 0 4px var(--primary-soft);
-  background: var(--card-bg);
+  background: var(--input-bg);
 }
 
 .user-profile {
@@ -84,16 +93,16 @@ html, body {
   display: flex;
   align-items: center;
   gap: 12px;
-  font-weight: 600;
+  font-weight: 700;
   border: 1px solid var(--border-color);
-  transition: var(--transition);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   cursor: pointer;
 }
 
 .user-profile:hover {
   transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
-  border-color: var(--primary-soft);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+  border-color: var(--border-color);
 }
 
 .topbar-avatar-wrapper {
@@ -104,11 +113,43 @@ html, body {
 .avatar {
   width: 42px;
   height: 42px;
-  border-radius: 50%;
+  border-radius: 50% !important;
   object-fit: cover;
   border: 2px solid var(--bg-app);
   background: var(--input-bg);
 }
+
+.topbar-right-group {
+  margin-left: auto; /* Pushes the whole group to the right */
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.theme-toggle-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  background: var(--input-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.theme-toggle-btn:hover {
+  background: var(--card-bg);
+  border-color: var(--primary-soft);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+/* Icon Color Logic */
+body:not(.dark-mode) #themeIcon { color: #f59e0b; } /* Matte Sun Gold */
+body.dark-mode #themeIcon { color: #94a3b8; } /* Matte Moon Slate */
 
 /* --------------------------------------------------------------------------
    3. DASHBOARD HERO + FOCUS CARDS
@@ -120,14 +161,16 @@ html, body {
   margin-bottom: 35px;
   gap: 20px;
   flex-wrap: wrap;
-  padding: 24px 30px;
+  padding: 24px 32px;
   border-radius: 24px;
   background: linear-gradient(135deg, var(--card-bg), var(--input-bg));
   border: 1px solid var(--border-color);
   box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
 }
 
-.welcome-mini { min-width: 0; }
+.welcome-mini { min-width: 0; z-index: 1; }
 .welcome-mini h1 {
   font-size: clamp(1.4rem, 3vw, 1.8rem);
   font-weight: 800;
@@ -135,6 +178,7 @@ html, body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  letter-spacing: -0.5px;
 }
 
 .today-focus-container {
@@ -144,6 +188,7 @@ html, body {
   min-width: 0;
   flex: 1;
   justify-content: flex-end;
+  z-index: 1;
 }
 
 .focus-card {
@@ -158,25 +203,26 @@ html, body {
   flex: 1 1 220px;
   max-width: 300px;
   min-height: 76px;
-  transition: var(--transition);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   cursor: pointer;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.02);
 }
 
 .focus-card:hover {
   transform: translateY(-4px);
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.06);
 }
 
 /* Gradient Tints for Focus Cards */
 .focus-card.urgent { 
   border-left: 4px solid var(--accent-red); 
-  background: linear-gradient(to right, rgba(239,68,68,0.04), transparent 60%);
+  background: linear-gradient(to right, rgba(239,68,68,0.05), transparent 70%);
 }
 .focus-card.warning { 
   border-left: 4px solid var(--accent-amber); 
-  background: linear-gradient(to right, rgba(245,158,11,0.04), transparent 60%);
+  background: linear-gradient(to right, rgba(245,158,11,0.05), transparent 70%);
 }
 
 .focus-info { min-width: 0; }
@@ -194,7 +240,7 @@ html, body {
 .focus-info h4 {
   color: var(--text-main);
   font-size: 0.95rem;
-  font-weight: 700;
+  font-weight: 800;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -207,6 +253,7 @@ html, body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-weight: 500;
 }
 
 /* --------------------------------------------------------------------------
@@ -229,15 +276,15 @@ html, body {
   gap: 16px;
   cursor: pointer;
   border: 1px solid var(--border-color);
-  transition: var(--transition);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
   overflow: hidden;
 }
 
 .action-card:hover {
   transform: translateY(-4px);
-  box-shadow: var(--shadow-md);
-  border-color: var(--primary-soft);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.05);
+  border-color: var(--border-color);
 }
 
 .action-icon {
@@ -259,8 +306,8 @@ html, body {
 .action-icon.green  { background: rgba(34,197,94,0.1);  color: var(--accent-green); }
 
 .action-content { min-width: 0; overflow: hidden; }
-.action-content h4 { font-size: 1rem; font-weight: 700; color: var(--text-main); margin-bottom: 2px;}
-.action-content p { font-size: 0.8rem; font-weight: 500; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+.action-content h4 { font-size: 1.05rem; font-weight: 800; color: var(--text-main); margin-bottom: 2px;}
+.action-content p { font-size: 0.8rem; font-weight: 600; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
 
 /* --------------------------------------------------------------------------
    5. DASHBOARD GRID & SECTION CARDS
@@ -279,19 +326,20 @@ html, body {
   border-radius: 24px;
   padding: 28px;
   border: 1px solid var(--border-color);
-  box-shadow: var(--shadow-sm);
-  transition: var(--transition);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .section-card:hover {
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.04);
 }
 
 .section-card h2, .section-card h3 { 
   font-size: 1.15rem; 
   font-weight: 800; 
   color: var(--text-main);
-  margin-bottom: 10px;
+  margin-bottom: 12px;
+  letter-spacing: -0.3px;
 }
 
 /* --------------------------------------------------------------------------
@@ -311,28 +359,28 @@ html, body {
   background: var(--input-bg);
   border: 1px solid var(--border-color);
   border-radius: 20px;
-  transition: var(--transition);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .data-card.mini:hover { 
   border-color: var(--primary-soft); 
   transform: translateY(-2px); 
-  box-shadow: var(--shadow-sm); 
+  box-shadow: 0 6px 16px rgba(0,0,0,0.04); 
 }
 
 .data-card.mini h3 { 
-  font-size: 0.75rem; 
+  font-size: 0.72rem; 
   font-weight: 800; 
-  letter-spacing: 0.08em; 
+  letter-spacing: 0.1em; 
   color: var(--text-muted); 
   text-transform: uppercase; 
 }
 
 .data-card.mini h2 { 
   font-size: 1.8rem; 
-  font-weight: 800; 
+  font-weight: 900; 
   margin-top: 8px; 
-  color: var(--primary); 
+  color: var(--text-main); 
 }
 
 .chart-select {
@@ -345,12 +393,14 @@ html, body {
   font-weight: 700;
   cursor: pointer;
   outline: none;
-  transition: var(--transition);
+  transition: all 0.2s ease;
+  appearance: none; /* Cleaner native look */
 }
 
 .chart-select:focus, .chart-select:hover { 
   border-color: var(--primary); 
   box-shadow: 0 0 0 3px var(--primary-soft); 
+  background: var(--card-bg);
 }
 
 /* --------------------------------------------------------------------------
@@ -359,7 +409,7 @@ html, body {
 .notice-item, .missing-output-item {
   padding: 16px;
   border-bottom: 1px dashed var(--border-color);
-  transition: var(--transition);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   border-radius: 16px;
   cursor: pointer;
   margin-bottom: 4px;
@@ -368,6 +418,7 @@ html, body {
 .notice-item:hover, .missing-output-item:hover {
   background: var(--input-bg);
   transform: translateX(6px);
+  border-bottom-color: transparent; /* Cleaner hover state */
 }
 
 .notice-item:last-child, .missing-output-item:last-child { 
@@ -376,7 +427,7 @@ html, body {
 
 .notice-item h4 { 
   font-size: 0.95rem; 
-  font-weight: 700; 
+  font-weight: 800; 
   color: var(--text-main); 
   margin-bottom: 6px; 
 }
@@ -385,39 +436,8 @@ html, body {
   font-size: 0.85rem; 
   color: var(--text-muted); 
   line-height: 1.5; 
+  font-weight: 500;
 }
-
-.topbar-right-group {
-    margin-left: auto; /* Pushes the whole group to the right */
-}
-
-.theme-toggle-btn {
-    width: 40px;
-    height: 40px;
-    border-radius: 12px;
-    background: var(--input-bg);
-    border: 1px solid var(--border-color);
-    color: var(--text-main);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-}
-
-.theme-toggle-btn:hover {
-    background: var(--border-color);
-    transform: translateY(-2px);
-}
-
-/* Icon Color Logic */
-body:not(.dark-mode) #themeIcon {
-    color: #f59e0b; /* Matte Sun Gold */
-}
-
-body.dark-mode #themeIcon {
-    color: #94a3b8; /* Matte Moon Slate */
-}   
 
 /* --------------------------------------------------------------------------
    8. RESPONSIVE DESIGN

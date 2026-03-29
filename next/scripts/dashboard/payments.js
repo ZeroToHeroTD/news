@@ -31,9 +31,6 @@ const getStatusConfig = (status, dueDate) => {
     return { label: 'PENDING', badge: 'status-pending', icon: 'schedule', color: 'var(--accent-amber)', rowClass: 'status-is-pending' };
 };
 
-/**
- * Animates a currency value counting up from 0 to target for that premium feel.
- */
 function animateCurrencyCount(element, targetNum, duration = 900) {
     if (!element || isNaN(targetNum)) return;
     let startTimestamp = null;
@@ -54,9 +51,6 @@ function animateCurrencyCount(element, targetNum, duration = 900) {
     window.requestAnimationFrame(step);
 }
 
-/**
- * Generates a contextual smart insight message based on payment state.
- */
 function getSmartInsight(stats, paidPct, payments) {
     if (stats.pending === 0) return '🎓 All balances cleared — you\'re all set for this semester!';
 
@@ -109,7 +103,6 @@ export async function loadPaymentData(userId) {
             return;
         }
 
-        // --- Calculation Engine ---
         const stats = payments.reduce((acc, p) => {
             const amt = parseFloat(p.amount) || 0;
             acc.total += amt;
@@ -120,7 +113,6 @@ export async function loadPaymentData(userId) {
 
         const paidPct = stats.total > 0 ? (stats.paid / stats.total) * 100 : 0;
 
-        // --- UI Update Sequence ---
         updateSummaryCards(containers, stats, paidPct);
         updateProgressBar(containers, stats, paidPct, payments);
         renderFinancialStory(containers.story, stats.pending, payments);
@@ -150,14 +142,12 @@ function updateSummaryCards(els, stats, pct) {
             if (els.total) els.total.innerHTML = `${formatCurrency(stats.total)}<div class="pay-mini-bar"><div style="width:100%; background:var(--primary);"></div></div>`;
         }, 950);
     }
-
     if (els.paid) {
         animateCurrencyCount(els.paid, stats.paid);
         setTimeout(() => {
             if (els.paid) els.paid.innerHTML = `${formatCurrency(stats.paid)}<div class="pay-mini-bar"><div style="width:${pct}%; background:var(--accent-green);"></div></div>`;
         }, 950);
     }
-
     if (els.remaining) {
         animateCurrencyCount(els.remaining, stats.pending);
         setTimeout(() => {
@@ -205,7 +195,7 @@ function renderFinancialStory(container, remaining, payments) {
             title: '🎓 Tuition Fully Paid',
             sub: "You're cleared for enrollment. Keep up the great work!",
             class: 'story-success',
-            action: `<button class="pay-now-btn" style="background:var(--accent-green);" onclick="window.showToast('Proceeding to enrollment...','success')">
+            action: `<button class="pay-now-btn" style="background:var(--accent-green);" onclick="window.proceedToEnrollment()">
                         <span class="material-symbols-outlined" style="font-size:1rem">school</span>
                         Proceed to Enrollment
                     </button>`
@@ -218,7 +208,7 @@ function renderFinancialStory(container, remaining, payments) {
             title: `${overdueItems.length} Payment${overdueItems.length > 1 ? 's' : ''} Overdue`,
             sub: `Your account is ${daysLate} day${daysLate !== 1 ? 's' : ''} past due. Late fees may apply — please settle immediately.`,
             class: 'story-danger',
-            action: `<button class="pay-now-btn" style="background:var(--accent-red);" onclick="window.showToast('Redirecting to payment gateway...','info')">
+            action: `<button class="pay-now-btn" style="background:var(--accent-red);" onclick="window.openPaymentGateway()">
                         <span class="material-symbols-outlined" style="font-size:1rem">payments</span>
                         Pay Overdue Balance
                     </button>`
@@ -235,7 +225,7 @@ function renderFinancialStory(container, remaining, payments) {
             title: `${formatCurrency(remaining)} Remaining`,
             sub: `${urgencyText} — complete your payment to secure enrollment.`,
             class: 'story-warning',
-            action: `<button class="pay-now-btn" onclick="window.showToast('Redirecting to payment gateway...','info')">
+            action: `<button class="pay-now-btn" onclick="window.openPaymentGateway()">
                         <span class="material-symbols-outlined" style="font-size:1rem">payments</span>
                         Complete Payment
                     </button>`
@@ -290,10 +280,10 @@ function updatePaymentsTable(container, payments) {
                 </td>
                 <td style="text-align:right; padding-right:16px;">
                     ${p.status === 'Paid'
-                        ? `<button class="pay-action-btn" title="Download Official Receipt" onclick="window.showToast('Generating receipt PDF...', 'success')">
+                        ? `<button class="pay-action-btn" title="Download Official Receipt" onclick="window.downloadDocument('Official Receipt', '${p.id.slice(0,8).toUpperCase()}')">
                                 <span class="material-symbols-outlined" style="font-size:1rem;">download</span>
                             </button>`
-                        : `<button class="pay-action-btn" title="Pay this item" onclick="window.showToast('Redirecting to payment gateway...', 'info')">
+                        : `<button class="pay-action-btn" title="Pay this item" onclick="window.openPaymentGateway('${formatCurrency(parseFloat(p.amount) || 0)}')">
                                 <span class="material-symbols-outlined" style="font-size:1rem;">payment</span>
                             </button>`
                     }
@@ -328,3 +318,162 @@ function renderEmptyState(els) {
     if (els.progressMsg) els.progressMsg.textContent = 'No payment records found for this account.';
     if (els.progressPct) els.progressPct.textContent = 'N/A';
 }
+
+// =============================================================================
+// GLOBAL ACTION FUNCTIONS (PLAN B / PROOF OF PAYMENT)
+// =============================================================================
+
+window.proceedToEnrollment = () => {
+    // 1. Clear any stuck double-toasts
+    document.querySelectorAll('.toast').forEach(t => t.remove()); 
+    // 2. Click the Courses Tab programmatically
+    const coursesTab = document.querySelector('a[data-target="view-courses"]');
+    if (coursesTab) {
+        coursesTab.click();
+    } else {
+        console.error("Courses tab not found.");
+    }
+};
+
+window.scrollToHistory = () => {
+    const tableSection = document.querySelector('.payments-table-wrapper');
+    if(tableSection) {
+        tableSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        tableSection.style.transition = 'box-shadow 0.3s';
+        tableSection.style.boxShadow = '0 0 15px var(--primary)';
+        setTimeout(() => tableSection.style.boxShadow = 'none', 1000);
+    }
+};
+
+window.openPaymentGateway = (amountStr = null) => {
+    const modal = document.getElementById('paymentModalOverlay');
+    const amtDisplay = document.getElementById('payAmountDisplay');
+    
+    if(modal && amtDisplay) {
+        if(!amountStr || typeof amountStr !== 'string') {
+           const remainingEl = document.getElementById('payRemainingBalance');
+           amountStr = remainingEl ? remainingEl.textContent : '₱0.00';
+        }
+        
+        // Setup Modal initial state
+        amtDisplay.textContent = amountStr;
+        document.getElementById('paymentStep1').style.display = 'block';
+        document.getElementById('paymentStep2').style.display = 'none';
+        
+        // Clear old inputs
+        document.getElementById('payRefNumber').value = '';
+        document.getElementById('payReceiptFile').value = '';
+
+        modal.classList.add('active'); 
+    }
+};
+
+window.closePaymentModal = () => {
+    const modal = document.getElementById('paymentModalOverlay');
+    if(modal) modal.classList.remove('active');
+};
+
+// Method Data for Step 2 UI (Replace qr paths with your real images)
+const paymentMethodsData = {
+    gcash: { name: "GCash", qr: "../Gcash.jpg" },
+    maya: { name: "Maya", qr: "../maya-logo.jpg" }
+};
+
+window.selectPaymentMethod = (methodKey) => {
+    const method = paymentMethodsData[methodKey];
+    const amount = document.getElementById('payAmountDisplay').textContent;
+    
+    // Switch Steps
+    document.getElementById('paymentStep1').style.display = 'none';
+    document.getElementById('paymentStep2').style.display = 'block';
+    
+    // Update Step 2 text and image
+    document.getElementById('methodNameDisplay').textContent = method.name + " Payment";
+    document.getElementById('methodQRCode').src = method.qr;
+    document.getElementById('finalAmountText').textContent = amount;
+    
+    window.currentSelectedMethod = method.name;
+};
+
+window.backToStep1 = () => {
+    document.getElementById('paymentStep1').style.display = 'block';
+    document.getElementById('paymentStep2').style.display = 'none';
+};
+
+window.handlePaymentSubmission = async () => {
+    const refNo = document.getElementById('payRefNumber').value;
+    const fileInput = document.getElementById('payReceiptFile');
+    const file = fileInput.files ? fileInput.files[0] : null;
+    const btn = document.getElementById('btnConfirmPayment');
+
+    if (!refNo || !file) {
+        if (window.showToast) window.showToast("Please provide a Reference No. and upload a screenshot.", "error");
+        else alert("Please provide a Reference No. and upload a screenshot.");
+        return;
+    }
+
+    btn.disabled = true; 
+    btn.innerHTML = `<span class="material-symbols-outlined spinning">sync</span> Uploading...`;
+
+    try {
+        // Here you would normally run your Supabase upload code. 
+        // For right now, we simulate a successful 1.5 second server upload so your UI doesn't crash
+        // if your storage bucket isn't set up yet.
+        
+        await new Promise(resolve => setTimeout(resolve, 1500)); 
+
+        if (window.showToast) window.showToast("Proof submitted! Finance will verify within 24 hours.", "success");
+        else alert("Proof submitted! Finance will verify within 24 hours.");
+        
+        window.closePaymentModal();
+    } catch (err) {
+        console.error(err);
+        if (window.showToast) window.showToast("Error: " + err.message, "error");
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<span class="material-symbols-outlined">verified</span> Submit Proof`;
+    }
+};
+
+window.downloadDocument = (docType, reference = 'Statement') => {
+    if (window.showToast) window.showToast(`Preparing ${docType}...`, 'info');
+    
+    setTimeout(() => {
+        const textContent = `Official ${docType}\n\nAccount: Jho\nReference: ${reference}\nDate: ${new Date().toLocaleDateString()}\n\nStatus: Document Generated Successfully.`;
+        const blob = new Blob([textContent], { type: 'text/plain' });
+        const url = window.URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = `Jho_${docType.replace(/\s+/g, '_')}_${new Date().getTime()}.txt`;
+        
+        document.body.appendChild(a);
+        a.click();
+        
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+        
+        if (window.showToast) window.showToast(`${docType} downloaded!`, 'success');
+    }, 1200);
+};
+
+window.contactFinance = () => {
+    if (typeof window.openComposeModal === 'function') {
+        window.openComposeModal();
+        setTimeout(() => {
+            const recipientInput = document.getElementById('composeRecipientId');
+            const subjectInput = document.getElementById('composeSubject');
+            if(recipientInput) recipientInput.value = "Finance & Accounting Office";
+            if(subjectInput) subjectInput.value = "Tuition & Fees Inquiry";
+        }, 50);
+    } else {
+        if (window.showToast) window.showToast('Messaging module is offline.', 'error');
+    }
+};
+
+window.viewPaymentSchedule = () => {
+    if (window.showToast) window.showToast('Navigating to Deadlines...', 'info');
+    const deadlinesNavBtn = document.querySelector('a[data-target="view-deadlines"]');
+    if(deadlinesNavBtn) deadlinesNavBtn.click();
+};

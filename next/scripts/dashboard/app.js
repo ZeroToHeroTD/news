@@ -1,6 +1,5 @@
 // =============================================================================
 // app.js — The Master Dashboard Orchestrator
-// Coordinates Auth, Universal Search, Profile Settings, and Modular Loading.
 // =============================================================================
 
 import { supabaseClient } from '../dashboard/config.js';
@@ -13,14 +12,19 @@ import { loadAttendance } from '../dashboard/attendance.js';
 import { loadCoursesData, loadResources } from '../dashboard/courses-resource.js';
 import { loadDeadlines } from '../dashboard/deadlines.js';
 import { loadGradesData, loadPerformanceChart, initializeChartListener } from '../dashboard/grades.js';
-import { loadMessages, updateUnreadCount, initializeAutocomplete, setupMessageActions } from '../dashboard/messages.js';
 import { loadNotices, loadSmartDashboardData } from '../dashboard/notices-dashboard.js';
 import { loadPaymentData } from '../dashboard/payments.js';
 import { loadTodaysSchedule, loadWeeklySchedule } from '../dashboard/schedule.js';
 import { loadSocialDirectory, initializePresence } from '../dashboard/social.js';
 
-// Global state for messaging functionality
-window.secretReceiverId = null; 
+// Message Module Imports (FIXED: Added missing function imports)
+import { loadMessages } from './message-modules/index.js';
+import { 
+    initializeAutocomplete, 
+    setupMessageActions, 
+    openComposeModal, 
+    selectRecipient 
+} from './message-modules/ui-actions.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
 
@@ -30,14 +34,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     const { data: { session }, error: authError } = await supabaseClient.auth.getSession();
     
     if (authError || !session) {
-        window.location.href = '../index.html'; 
+        window.location.href = 'index.html'; // Stays in same folder
         return;
     }
     const user = session.user;
     const userId = user.id;
 
     // -------------------------------------------------------------------------
-    // 2. UNIVERSAL LIVE SEARCH (Optimized with Debounce)
+    // 2. UNIVERSAL LIVE SEARCH
     // -------------------------------------------------------------------------
     const topSearchInput = document.querySelector('.search-bar input');
     let searchTimeout;
@@ -54,7 +58,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     'view-grades': '#gradesTableBody tr',
                     'view-courses': '.course-card',
                     'view-resources': '.resource-card',
-                    'view-messages': '.message-card', // Updated to match new CSS
+                    'view-messages': '.conv-item', // Updated to match sidebar items
                     'view-social': '.social-card-minimal',
                     'view-deadlines': '.deadline-item'
                 };
@@ -63,16 +67,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (targetSelector) {
                     document.querySelectorAll(targetSelector).forEach(el => {
                         const isMatch = el.textContent.toLowerCase().includes(term);
-                        // Use flex/table-row depending on element type, or default to empty string
                         el.style.display = isMatch ? "" : "none";
                     });
                 }
-            }, 200); // 200ms debounce for performance
+            }, 200);
         });
     }
 
     // -------------------------------------------------------------------------
-    // 3. SETTINGS: PROFILE, GWA, & AVATAR UPLOAD
+    // 3. SETTINGS & PROFILE
     // -------------------------------------------------------------------------
     const settingsForm = document.getElementById('settingsForm');
     if (settingsForm) {
@@ -94,7 +97,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (!error) {
                 showToast('Profile updated successfully!', 'success');
-                initProfile(user); 
+                await initProfile(user); 
             } else {
                 showToast('Update failed. Please try again.', 'error');
             }
@@ -105,25 +108,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         });
     }
-
-    // Target GWA Save Logic
-    document.getElementById('saveGwaBtn')?.addEventListener('click', async () => {
-        const val = parseFloat(document.getElementById('targetGwaInput')?.value);
-        if (isNaN(val) || val < 1.0 || val > 5.0) {
-            showToast('Please enter a valid GWA (1.0 - 5.0)', 'error');
-            return;
-        }
-
-        const { error } = await supabaseClient
-            .from('profiles')
-            .update({ target_gwa: val })
-            .eq('id', userId);
-
-        if (!error) {
-            showToast('Target GWA saved!', 'success');
-            initProfile(user);
-        }
-    });
 
     // Avatar Upload Logic
     const uploadBtn = document.getElementById('uploadBtn');
@@ -157,82 +141,68 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // -------------------------------------------------------------------------
-    // 4. THEME, TABS & MOBILE SIDEBAR NAVIGATION
+    // 4. THEME & NAVIGATION
     // -------------------------------------------------------------------------
-// Inside your DOMContentLoaded in app.js
-const themeBtn = document.getElementById('themeToggle');
-const themeIcon = document.getElementById('themeIcon');
+    const themeBtn = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
 
-// Initial setup based on localStorage
-if (localStorage.getItem('theme') === 'light') {
-    document.body.classList.remove('dark-mode');
-    if (themeIcon) themeIcon.textContent = 'light_mode';
-} else {
-    document.body.classList.add('dark-mode');
-    if (themeIcon) themeIcon.textContent = 'dark_mode';
-}
+    if (localStorage.getItem('theme') === 'light') {
+        document.body.classList.remove('dark-mode');
+        if (themeIcon) themeIcon.textContent = 'light_mode';
+    } else {
+        document.body.classList.add('dark-mode');
+        if (themeIcon) themeIcon.textContent = 'dark_mode';
+    }
 
-if (themeBtn) {
-    themeBtn.addEventListener('click', () => {
-        // Add rotation class for the animation
-        themeBtn.classList.add('rotating');
-        setTimeout(() => themeBtn.classList.remove('rotating'), 500);
+    if (themeBtn) {
+        themeBtn.addEventListener('click', () => {
+            themeBtn.classList.add('rotating');
+            setTimeout(() => themeBtn.classList.remove('rotating'), 500);
 
-        document.body.classList.toggle('dark-mode');
-        const isDark = document.body.classList.contains('dark-mode');
-        
-        // SWAP THE ICONS
-        if (themeIcon) {
-            themeIcon.textContent = isDark ? 'dark_mode' : 'light_mode';
-        }
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            
+            if (themeIcon) themeIcon.textContent = isDark ? 'dark_mode' : 'light_mode';
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
 
-        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            // Re-render chart for theme sync
+            const chartFilter = document.getElementById('chartFilter');
+            if (typeof loadPerformanceChart === 'function' && chartFilter) {
+                loadPerformanceChart(userId, chartFilter.value || 'grades');
+            }
+        });
+    }
 
-        // Re-render chart if necessary
-        const chartFilter = document.getElementById('chartFilter');
-        if (typeof loadPerformanceChart === 'function' && chartFilter) {
-            loadPerformanceChart(userId, chartFilter.value || 'grades');
-        }
-    });
-}
-    // Mobile Sidebar Elements
+    // Tab & Sidebar Navigation
     const sidebar = document.querySelector('.app-sidebar');
-    const sidebarOverlay = document.getElementById('sidebarOverlay') || document.querySelector('.sidebar-overlay');
-    const hamburgerBtn = document.getElementById('hamburgerBtn') || document.querySelector('.hamburger-btn');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    const hamburgerBtn = document.getElementById('hamburgerBtn');
 
-    // Toggle Mobile Menu
     if (hamburgerBtn && sidebar && sidebarOverlay) {
         hamburgerBtn.addEventListener('click', () => {
             sidebar.classList.add('open');
             sidebarOverlay.classList.add('active');
         });
 
-        // Close when clicking overlay
         sidebarOverlay.addEventListener('click', () => {
             sidebar.classList.remove('open');
             sidebarOverlay.classList.remove('active');
         });
     }
 
-    // Tab Navigation Logic
     document.addEventListener('click', (e) => {
         const target = e.target.closest('[data-target]');
         if (target) {
             e.preventDefault();
             const viewId = target.getAttribute('data-target');
-            
-            if(typeof switchView === 'function') {
-                switchView(viewId);
-            }
-            
-            // Auto-close mobile sidebar if it's open
+            switchView(viewId);
             if(sidebar) sidebar.classList.remove('open');
             if(sidebarOverlay) sidebarOverlay.classList.remove('active');
         }
     });
 
     // -------------------------------------------------------------------------
-    // 5. MASTER INITIALIZATION (Parallel Loading)
+    // 5. MASTER INITIALIZATION
     // -------------------------------------------------------------------------
     async function startDashboard() {
         try {
@@ -243,10 +213,10 @@ if (themeBtn) {
                 });
             }
 
-            // A. Load critical profile data first to set names and avatars
+            // A. Load critical data first
             await initProfile(user);
 
-            // B. Load all data modules simultaneously for maximum speed
+            // B. Parallel Data Loading
             await Promise.all([
                 loadSmartDashboardData(userId),
                 loadPerformanceChart(userId, 'grades'),
@@ -261,14 +231,17 @@ if (themeBtn) {
                 loadDeadlines(userId),
                 loadAttendance(userId),
                 loadSocialDirectory(userId)
-                
             ]);
 
-            // C. Final interactive wiring
+            // C. Setup Interactive Features (Messaging & Presence)
             initializeAutocomplete();
             setupMessageActions();
             initializePresence(userId);
             initializeChartListener(userId);
+
+            // Expose these to window so your courses cards can click them
+            window.openComposeModal = openComposeModal;
+            window.selectRecipient = selectRecipient;
 
         } catch (error) {
             console.error("Dashboard Initialization Error:", error);
@@ -276,13 +249,10 @@ if (themeBtn) {
         }
     }
 
-    // Ignite the engine
     startDashboard();
 });
 
-// Exposed Global Helpers for inline HTML event handlers
 window.handleLogout = async () => {
     await supabaseClient.auth.signOut();
-    // Removed the ../ so it stays in the same folder
     window.location.replace('index.html'); 
 };

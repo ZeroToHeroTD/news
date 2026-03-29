@@ -1,0 +1,277 @@
+/* ==========================================================================
+   sidebar.css — Sidebar: Container, Search, Tabs & Conversation List
+   Depends on: variable.css, layout.css
+   ========================================================================== */
+
+/* ── Sidebar container ─────────────────────────────────────────────────── */
+.msg-sidebar {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;          /* ← critical: lets children scroll */
+  overflow: hidden;
+  border-right: 1px solid var(--msg-border);
+  background: var(--msg-sidebar-bg);
+}
+
+/* ── Top section ───────────────────────────────────────────────────────── */
+.msg-sidebar-top {
+  padding: 14px 12px 10px;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--msg-border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+/* ── Search bar ────────────────────────────────────────────────────────── */
+.sidebar-search-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--msg-input-bg);
+  border: 1px solid var(--msg-border);
+  border-radius: 11px;
+  padding: 8px 12px;
+  transition: var(--msg-transition);
+}
+
+.sidebar-search-bar:focus-within {
+  border-color: var(--msg-border-focus);
+  box-shadow: 0 0 0 3px var(--msg-primary-glow);
+  background: rgba(255, 255, 255, 0.064);
+}
+
+.sidebar-search-bar svg,
+.sidebar-search-bar .material-symbols-outlined {
+  color: var(--msg-text-muted);
+  flex-shrink: 0;
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+.sidebar-search-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--msg-text-main);
+  font-size: 0.82rem;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.sidebar-search-input::placeholder { color: var(--msg-text-muted); }
+
+/* ── Tabs ──────────────────────────────────────────────────────────────── */
+.sidebar-tabs {
+  display: flex;
+  gap: 3px;
+  background: rgba(0, 0, 0, 0.22);
+  border-radius: 10px;
+  padding: 3px;
+}
+
+.sidebar-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 7px 8px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--msg-text-sub);
+  font-size: 0.73rem;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: var(--msg-transition);
+  white-space: nowrap;
+  letter-spacing: 0.01em;
+}
+
+.sidebar-tab .material-symbols-outlined {
+  font-size: 15px;
+}
+
+.sidebar-tab.active {
+  background: var(--msg-primary-soft);
+  color: var(--msg-primary-light);
+  box-shadow: inset 0 0 0 1px rgba(99, 102, 241, 0.20);
+}
+
+.sidebar-tab:not(.active):hover {
+  color: var(--msg-text-main);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* Tab unread pill */
+.tab-pill {
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  border-radius: 9px;
+  background: var(--msg-primary);
+  color: #fff;
+  font-size: 0.58rem;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Conversation list scroll area ─────────────────────────────────────── */
+.conv-list-scroll {
+  flex: 1;
+  min-height: 0;          /* ← critical: allows scroll */
+  overflow-y: auto;
+  padding: 6px 7px 10px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.07) transparent;
+}
+
+.conv-list-scroll::-webkit-scrollbar       { width: 3px; }
+.conv-list-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+}
+
+/* ── Section label ─────────────────────────────────────────────────────── */
+.conv-section-label {
+  font-size: 0.60rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--msg-text-muted);
+  padding: 8px 6px 4px;
+  flex-shrink: 0;
+}
+
+/* ── Conversation item ─────────────────────────────────────────────────── */
+.conv-item {
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 11px;
+  cursor: pointer;
+  transition: var(--msg-transition);
+  position: relative;
+}
+
+.conv-item + .conv-item { margin-top: 1px; }
+
+.conv-item:hover  { background: rgba(255, 255, 255, 0.040); }
+.conv-item.active {
+  background: var(--msg-primary-soft);
+  box-shadow: inset 0 0 0 1px rgba(99, 102, 241, 0.14);
+}
+
+/* ── Avatar ────────────────────────────────────────────────────────────── */
+.conv-avatar-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.conv-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 13px;
+  object-fit: cover;
+  display: block;
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  border: 1px solid var(--msg-border);
+}
+
+/* Status dot */
+.conv-status-dot {
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid #0a0c1c;
+}
+
+.conv-status-dot.online  { background: var(--msg-online); }
+.conv-status-dot.away    { background: var(--msg-away); }
+.conv-status-dot.offline { background: var(--msg-offline); }
+.conv-status-dot.typing  {
+  background: var(--msg-primary);
+  animation: pulseDot 1s ease infinite;
+}
+
+@keyframes pulseDot {
+  0%, 100% { opacity: 1;   transform: scale(1);    }
+  50%       { opacity: 0.5; transform: scale(0.80); }
+}
+
+/* ── Text details ──────────────────────────────────────────────────────── */
+.conv-details {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.conv-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.conv-name {
+  font-size: 0.845rem;
+  font-weight: 700;
+  color: var(--msg-text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3;
+}
+
+.conv-time {
+  font-size: 0.620rem;
+  color: var(--msg-text-muted);
+  flex-shrink: 0;
+  margin-left: 6px;
+  font-weight: 500;
+}
+
+.conv-preview {
+  font-size: 0.765rem;
+  color: var(--msg-text-sub);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.4;
+}
+
+.conv-preview.is-typing {
+  color: var(--msg-primary-light);
+  font-style: italic;
+  font-size: 0.75rem;
+}
+
+/* ── Unread badge ──────────────────────────────────────────────────────── */
+.conv-unread-badge {
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: var(--msg-primary);
+  color: #fff;
+  font-size: 0.58rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-left: 5px;
+}

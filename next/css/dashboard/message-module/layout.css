@@ -1,0 +1,114 @@
+/* ==========================================================================
+   layout.css — Messaging Hub Wrapper, Header & Two-Column Body Grid
+   Depends on: variable.css
+   ========================================================================== */
+
+/* ── Utilities & keyframes ─────────────────────────────────────────────── */
+.hidden { display: none !important; }
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(16px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)     scale(1);   }
+}
+
+@keyframes bubbleIn {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0)   scale(1);    }
+}
+
+/* ── Outermost wrapper ─────────────────────────────────────────────────── */
+/*
+ * Uses a fixed calc height so the inner grid can fill it without
+ * overflowing the page. Tweak the subtracted value to match your
+ * topbar + page-padding height.
+ */
+.messaging-hub-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 200px);
+  min-height: 540px;
+  overflow: hidden;
+  font-family: 'DM Sans', system-ui, sans-serif;
+}
+
+/* ── Page-level header (title + compose button) ────────────────────────── */
+.msg-hub-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 0 16px 0;
+  flex-shrink: 0;
+}
+
+.msg-hub-title {
+  font-family: 'Sora', sans-serif;
+  font-size: 1.40rem;
+  font-weight: 800;
+  color: var(--msg-text-main);
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.msg-hub-title span {
+  background: linear-gradient(120deg, var(--msg-primary) 0%, var(--msg-primary-light) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Compose FAB */
+.compose-fab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 18px;
+  border-radius: 12px;
+  border: none;
+  background: var(--msg-sent-bg);
+  color: #fff;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.84rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--msg-transition);
+  box-shadow: var(--msg-shadow-sent);
+  letter-spacing: 0.01em;
+}
+
+.compose-fab-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.40);
+}
+
+.compose-fab-btn:active { transform: scale(0.96); }
+
+.compose-fab-btn .material-symbols-outlined {
+  font-size: 18px;
+}
+
+/* ── Two-column body grid ──────────────────────────────────────────────── */
+/*
+ * KEY FIXES:
+ *   1. grid-template-columns: sidebar fixed at 296px, chat takes rest.
+ *   2. flex: 1 + min-height: 0 let this fill the wrapper without overflow.
+ *   3. overflow: hidden clips children; each child manages its own scroll.
+ */
+.msg-hub-body {
+  display: grid;
+  grid-template-columns: 296px 1fr;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+
+  background: var(--msg-panel-bg);
+  border: 1px solid var(--msg-border);
+  border-radius: var(--msg-radius);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  box-shadow: var(--msg-shadow-lg);
+}

@@ -26,17 +26,10 @@ html {
 
 @media (min-width: 1024px) {
   .app-container {
-    /* 1. Stretch the canvas exactly 125% to account for 80% zoom 
-       (because 125 * 0.8 = 100) */
     width: 125vw !important;
     min-height: 125vh !important;
-    
-    /* 2. Constrain the maximum width so it doesn't get ridiculously wide 
-       on huge gaming monitors, but center it beautifully. */
-    max-width: 2000px !important; /* This looks like 1600px after the zoom */
+    max-width: 2000px !important;
     margin: 0 auto !important; 
-    
-    /* 3. Apply the exact 80% zoom you requested */
     zoom: 0.80 !important;
   }
 }
@@ -60,10 +53,9 @@ html {
   .app-sidebar {
     width: 240px;
   }
-/* ... KEEP THE REST OF YOUR RESPONSIVE CSS BELOW THIS EXACTLY THE SAME ... */
-  
+
   .dashboard-grid {
-    grid-template-columns: 1fr; /* Stack the Bento Grid */
+    grid-template-columns: 1fr;
   }
   
   .grid-right {
@@ -85,7 +77,6 @@ html {
    2. TABLET — Portrait Tablets / Large Phones (< 900px)
    -------------------------------------------------------------------------- */
 @media (max-width: 900px) {
-  /* Show Menu Trigger */
   .hamburger-btn {
     display: flex;
     align-items: center;
@@ -102,20 +93,18 @@ html {
     background: var(--border-color);
   }
 
-  /* Remove outer app wrapper styling for mobile */
   .app-container {
     height: 100dvh;
     border-radius: 0;
     border: none;
   }
 
-  /* Sidebar becomes an off-canvas drawer */
   .app-sidebar {
     position: fixed;
     top: 0;
     left: 0;
     height: 100dvh;
-    z-index: 100; /* Above topbar */
+    z-index: 100;
     transform: translateX(-100%);
     transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
     width: 280px;
@@ -128,14 +117,13 @@ html {
     transform: translateX(0);
   }
 
-  /* Overlay Fade */
   .sidebar-overlay {
     position: fixed;
     inset: 0;
     background: rgba(15, 23, 42, 0.6);
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
-    z-index: 90; /* Below sidebar, above topbar */
+    z-index: 90;
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s ease;
@@ -157,7 +145,7 @@ html {
   }
 
   .search-bar input {
-    max-width: 100%; /* Search bar takes available space */
+    max-width: 100%;
   }
 
   .dashboard-hero {
@@ -169,7 +157,7 @@ html {
   .today-focus-container {
     width: 100%;
     display: grid;
-    grid-template-columns: 1fr 1fr; /* Side-by-side on tablets */
+    grid-template-columns: 1fr 1fr;
   }
 
   .focus-card {
@@ -181,7 +169,6 @@ html {
     flex-direction: column;
   }
 
-  /* Restore Sidebar Nav Items Layout on Mobile */
   .nav-links {
     flex-direction: column; 
     overflow-x: hidden; 
@@ -198,7 +185,7 @@ html {
 
   .app-main {
     padding: 16px;
-    padding-bottom: calc(20px + env(safe-area-inset-bottom)); /* iOS safe area */
+    padding-bottom: calc(20px + env(safe-area-inset-bottom));
   }
 
   .topbar {
@@ -207,18 +194,17 @@ html {
     border-radius: 16px;
   }
 
-  /* Hide name to save space, rely on avatar */
   #topbarName {
     display: none; 
   }
 
   .user-profile {
     padding: 4px;
-    border-radius: 50%; /* Collapse to a perfect circle */
+    border-radius: 50%;
   }
 
   .search-bar {
-    display: none; /* Hide on smallest screens to keep header clean */
+    display: none;
   }
 
   .welcome-mini h1 {
@@ -226,7 +212,7 @@ html {
   }
 
   .today-focus-container {
-    grid-template-columns: 1fr; /* Stack focus cards */
+    grid-template-columns: 1fr;
   }
 
   .focus-card {
@@ -234,7 +220,6 @@ html {
     min-height: 70px;
   }
 
-  /* Action Grid - 2x2 Layout */
   .smart-action-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 12px;
@@ -243,12 +228,11 @@ html {
   .action-card {
     padding: 16px 12px;
     gap: 10px;
-    flex-direction: column; /* Stack icon and text */
+    flex-direction: column;
     text-align: center;
     align-items: center;
   }
 
-  /* Split Stats evenly */
   .stats-row {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -267,10 +251,9 @@ html {
     border-radius: 20px;
   }
 
-  /* Mobile Modals */
   .compose-modal-overlay {
     padding: 16px;
-    align-items: flex-end; /* Drop to bottom on mobile */
+    align-items: flex-end;
   }
 
   .compose-modal-box {
@@ -286,17 +269,14 @@ html {
   }
 
   .compose-modal-actions {
-    flex-direction: column-reverse; /* Put 'Send' on top for thumbs */
+    flex-direction: column-reverse;
     gap: 12px;
     margin-top: 24px;
   }
 
-  /* --------------------------------------------------
-     Tables: Mobile Optimization (Safe Horizontal Scroll)
-     -------------------------------------------------- */
   .grades-table {
     font-size: 0.85rem;
-    min-width: 450px; /* Allows safe scrolling inside .table-scroll-wrapper */
+    min-width: 450px;
   }
 
   .grades-table th,
@@ -311,13 +291,10 @@ html {
     line-height: 1.4;
   }
 
-  /* --------------------------------------------------
-     Card Refinements (Deadlines/Messages)
-     -------------------------------------------------- */
   .deadline-item,
   .message-card {
     padding: 16px;
-    flex-direction: column; /* Stack icons on top of info */
+    flex-direction: column;
     gap: 14px;
   }
 
@@ -343,15 +320,168 @@ html {
     padding-top: 12px;
   }
 
-  /* --------------------------------------------------
-     Touch Target Sizing (Accessibility)
-     -------------------------------------------------- */
   .view-btn,
   .compose-new-btn,
   .btn-send,
   .btn-cancel {
-    min-height: 50px; /* Generous iOS/Android touch target */
+    min-height: 50px;
     width: 100%;
     justify-content: center;
+  }
+}
+
+/* ==========================================================================
+   MESSENGER HUB — RESPONSIVE OVERRIDES
+   ========================================================================== */
+
+/* 👉 FIX: Hide the mobile back button on desktop natively! */
+.chat-back-btn {
+  display: none !important;
+}
+
+/* --------------------------------------------------------------------------
+   MESSENGER — TABLET (< 900px)
+   -------------------------------------------------------------------------- */
+@media (max-width: 900px) {
+
+  .messaging-hub-wrapper {
+    height: calc(100dvh - 160px);
+    min-height: 0;
+  }
+
+  .msg-hub-header { padding-bottom: 12px; }
+  .msg-hub-title { font-size: 1.20rem; }
+
+/* ── Fix: Perfect Mobile New Message Button ── */
+  .compose-fab-btn span:last-child { 
+    display: block !important; /* Forces the icon to come out of hiding */
+  }
+  
+  .compose-fab-btn {
+    width: 42px !important;
+    height: 42px !important;
+    padding: 0 !important;
+    border-radius: 12px !important;
+    justify-content: center !important;
+    font-size: 0 !important; /* Hides the raw "New Message" text */
+  }
+
+  .compose-fab-btn .material-symbols-outlined {
+    font-size: 20px !important; 
+    margin: 0 !important;
+    display: block !important;
+  }
+
+  /* ── Strict Container Overrides for Animation ── */
+  .msg-hub-body {
+    grid-template-columns: 1fr;
+    position: relative;
+    overflow: hidden !important; 
+  }
+
+  /* ── Panels Absolute Positioning ── */
+  .msg-sidebar, 
+  .msg-chat-panel,
+  #msgAnnPanel {
+    position: absolute !important;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+
+  /* ── Initial States (List Visible, Chats Hidden Right) ── */
+  .msg-sidebar { 
+    transform: translateX(0); 
+    z-index: 10; 
+    border-right: none !important;
+  }
+  
+  .msg-chat-panel, 
+  #msgAnnPanel { 
+    transform: translateX(100%); 
+    z-index: 20; 
+    display: flex !important; /* Overrides `.hidden` so animations trigger smoothly */
+  }
+
+  /* ── Active (Open) States ── */
+  .msg-sidebar.conv-open { 
+    transform: translateX(-100%); 
+    pointer-events: none; 
+  }
+  
+  .msg-chat-panel.conv-open, 
+  #msgAnnPanel.conv-open { 
+    transform: translateX(0); 
+  }
+
+  /* ── The Back Button Style (Theme Compatible) ── */
+  .chat-back-btn {
+    display: flex !important; /* 👉 FIX: Re-enable it on mobile sizes */
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
+    border: 1px solid var(--border-color);
+    background: var(--input-bg);
+    color: var(--text-main);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+    margin-right: 8px;
+  }
+
+  .chat-back-btn:hover {
+    background: var(--primary);
+    color: #ffffff;
+    border-color: var(--primary);
+  }
+
+  .chat-back-btn .material-symbols-outlined { font-size: 18px; }
+
+  .chat-thread-area { padding: 14px 16px 10px; }
+  .bubble-group { max-width: 82%; }
+}
+
+/* --------------------------------------------------------------------------
+   MESSENGER — MOBILE (< 600px)
+   -------------------------------------------------------------------------- */
+@media (max-width: 600px) {
+
+  .messaging-hub-wrapper { height: calc(100dvh - 130px); }
+  .msg-hub-title { font-size: 1.10rem; }
+  .msg-sidebar-top { padding: 10px 10px 8px; }
+  .conv-item { padding: 8px 9px; }
+  .conv-avatar { width: 40px; height: 40px; border-radius: 12px; }
+  .conv-name  { font-size: 0.82rem; }
+  .conv-preview { font-size: 0.74rem; }
+  .conv-time  { font-size: 0.60rem; }
+
+  .chat-panel-header { padding: 10px 13px; min-height: 54px; }
+  .chat-header-avatar { width: 34px; height: 34px; border-radius: 10px; }
+  .chat-header-info h4 { font-size: 0.86rem; }
+  .chat-header-status  { font-size: 0.64rem; }
+
+  .bubble-group { max-width: 88%; }
+  .chat-bubble { font-size: 0.845rem; padding: 8px 13px; }
+
+  .chat-input-area { padding: 8px 12px calc(10px + env(safe-area-inset-bottom)); }
+  .chat-input-wrap { padding: 8px 10px; border-radius: 13px; }
+  #chatMainInput { font-size: 0.84rem; }
+  .chat-send-btn { width: 40px; height: 40px; border-radius: 12px; }
+
+  .sidebar-tab { font-size: 0.70rem; padding: 6px 6px; }
+  .sidebar-tab .material-symbols-outlined { font-size: 14px; }
+
+  .ann-card-inner { padding: 10px 12px 10px 16px; }
+  .ann-title   { font-size: 0.80rem; }
+  .ann-body    { font-size: 0.76rem; }
+  .ann-footer  { padding-top: 6px; }
+
+  .compose-modal-box {
+    border-radius: 20px 20px 14px 14px;
+    padding: 22px 18px 20px;
   }
 }
