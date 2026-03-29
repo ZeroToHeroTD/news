@@ -283,5 +283,6 @@ if (themeBtn) {
 // Exposed Global Helpers for inline HTML event handlers
 window.handleLogout = async () => {
     await supabaseClient.auth.signOut();
-    window.location.href = '../index.html';
+    // Removed the ../ so it stays in the same folder
+    window.location.replace('index.html'); 
 };
