@@ -4,15 +4,58 @@
    All new classes are prefixed with .admin- to prevent conflicts.
    ========================================================================== */
 
-/* --------------------------------------------------------------------------
-   1. ADMIN THEME TOKENS (Extend :root from base.css)
-   -------------------------------------------------------------------------- */
+/* ==========================================================================
+   ADMIN UI/UX OVERHAUL (SaaS Standard)
+   ========================================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 :root {
-  --admin-primary: #ef4444;
-  --admin-primary-hover: #dc2626;
-  --admin-primary-soft: rgba(239, 68, 68, 0.10);
-  --admin-orange: #f97316;
-  --admin-orange-soft: rgba(249, 115, 22, 0.10);
+  /* SaaS Design System */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-modal: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+body.app-body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+.chart-select, .admin-modal select, .admin-search-input, .admin-modal input, .admin-modal textarea {
+  appearance: none; /* Hide native styling */
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 10px 36px 10px 14px;
+  font-family: var(--font-sans);
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--text-main);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.chart-select, .admin-modal select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 14px;
+  padding: 10px 36px 10px 14px;
+}
+
+.chart-select:hover, .admin-modal select:hover, .admin-search-input:hover {
+  border-color: #94a3b8;
+}
+
+.chart-select:focus, .admin-modal select:focus, .admin-search-input:focus, .admin-modal input:focus {
+  outline: none;
+  border-color: var(--admin-primary);
+  box-shadow: 0 0 0 3px var(--admin-primary-soft);
+  background-color: var(--card-bg);
 }
 
 /* --------------------------------------------------------------------------
@@ -131,7 +174,54 @@
 /* --------------------------------------------------------------------------
    5. ADMIN TABLE HELPERS
    -------------------------------------------------------------------------- */
-.admin-table { min-width: 750px; }
+.table-scroll-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  background: var(--card-bg);
+}
+
+.admin-table {
+  width: 100%;
+  min-width: 800px;
+  border-collapse: collapse; /* Cleaner than separate */
+  text-align: left;
+}
+
+.admin-table th {
+  background: var(--input-bg);
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  white-space: nowrap;
+}
+
+.admin-table td {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.88rem;
+  color: var(--text-main);
+  vertical-align: middle;
+}
+
+.admin-table tbody tr {
+  transition: background 0.15s ease;
+}
+
+.admin-table tbody tr:hover {
+  background: rgba(0, 0, 0, 0.02); /* Subtle hover row effect */
+}
+
 
 .admin-loading-cell {
   text-align: center;
@@ -319,10 +409,160 @@
 /* --------------------------------------------------------------------------
    8. ADMIN MODAL OVERRIDES
    -------------------------------------------------------------------------- */
+/* ==========================================================================
+   ADMIN UI/UX OVERHAUL (SaaS Standard)
+   ========================================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  /* SaaS Design System */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-modal: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+body.app-body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* --------------------------------------------------------------------------
+   A. MODERN DROPDOWNS & INPUTS (Stripe/Linear style)
+   -------------------------------------------------------------------------- */
+.chart-select, .admin-modal select, .admin-search-input, .admin-modal input, .admin-modal textarea {
+  appearance: none; /* Hide native styling */
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 10px 36px 10px 14px;
+  font-family: var(--font-sans);
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--text-main);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Custom Dropdown Arrow */
+.chart-select, .admin-modal select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 14px;
+}
+
+.chart-select:hover, .admin-modal select:hover, .admin-search-input:hover {
+  border-color: #94a3b8;
+}
+
+.chart-select:focus, .admin-modal select:focus, .admin-search-input:focus, .admin-modal input:focus {
+  outline: none;
+  border-color: var(--admin-primary);
+  box-shadow: 0 0 0 3px var(--admin-primary-soft);
+  background-color: var(--card-bg);
+}
+
+/* --------------------------------------------------------------------------
+   B. TABLE UI REDESIGN (No overlapping, sticky headers, row hover)
+   -------------------------------------------------------------------------- */
+.table-scroll-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  background: var(--card-bg);
+}
+
+.admin-table {
+  width: 100%;
+  min-width: 800px;
+  border-collapse: collapse; /* Cleaner than separate */
+  text-align: left;
+}
+
+.admin-table th {
+  background: var(--input-bg);
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  white-space: nowrap;
+}
+
+.admin-table td {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.88rem;
+  color: var(--text-main);
+  vertical-align: middle;
+}
+
+.admin-table tbody tr {
+  transition: background 0.15s ease;
+}
+
+.admin-table tbody tr:hover {
+  background: rgba(0, 0, 0, 0.02); /* Subtle hover row effect */
+}
+
+/* --------------------------------------------------------------------------
+   C. RESPONSIVE MODALS (No 100vh, smooth animations)
+   -------------------------------------------------------------------------- */
+.compose-modal-overlay {
+  display: none; /* CRITICAL FIX: Keeps them hidden until clicked! */
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(4px); 
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+/* Ensure it only uses flexbox when JS adds the 'active' class */
+.compose-modal-overlay.active {
+  display: flex;
+  animation: overlayFadeIn 0.2s ease;
+}
+
 .admin-modal {
   background: var(--card-bg) !important;
-  border: 1px solid var(--border-color) !important;
-  color: var(--text-main) !important;
+  border-radius: var(--radius-xl) !important;
+  box-shadow: var(--shadow-modal) !important;
+  width: 100% !important;
+  max-width: 520px;
+  max-height: 90vh !important; /* CRITICAL: Prevents stretching off screen */
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important; /* Contain inner scrolling */
+  transform: scale(0.98);
+  animation: modalPopIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Scrollable Form Body inside Modal */
+.admin-modal form, .admin-modal .modal-scroll-area {
+  overflow-y: auto !important;
+  padding: 24px !important;
+  scrollbar-width: thin;
+}
+
+.compose-modal-header { padding: 20px 24px; border-bottom: 1px solid var(--border-color); z-index: 2;}
+.compose-modal-actions { padding: 20px 24px; border-top: 1px solid var(--border-color); z-index: 2; background: var(--input-bg);}
+
+@keyframes overlayFadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes modalPopIn {
+  from { opacity: 0; transform: scale(0.96) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
 }
 
 .admin-modal h3, .admin-modal .compose-modal-header h3 {
@@ -336,7 +576,13 @@
   letter-spacing: 0.06em;
 }
 
-.admin-modal input,
+/* Hide native number input spinners */
+.admin-modal input[type="number"]::-webkit-inner-spin-button,
+.admin-modal input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
 .admin-modal select,
 .admin-modal textarea {
   background: var(--input-bg) !important;
@@ -696,6 +942,136 @@
   line-height: 1.6;
   margin: 0;
 }
+
+/* --------------------------------------------------------------------------
+   16. MODAL FORM GRID IMPROVEMENTS
+   -------------------------------------------------------------------------- */
+.admin-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 10px;
+}
+
+.admin-full-width {
+  grid-column: 1 / -1;
+}
+
+.admin-enroll-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+/* Sleek Select All Badge */
+.admin-text-btn {
+  background: rgba(0, 98, 255, 0.08);
+  color: #0062ff;
+  border: 1px solid rgba(0, 98, 255, 0.15);
+  padding: 5px 14px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.admin-text-btn:hover {
+  background: #0062ff;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 98, 255, 0.2);
+  cursor: pointer;
+}
+
+/* Make the enroll list look like a clean selection box */
+.admin-enroll-list {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1.5px solid var(--border-color);
+  border-radius: 12px;
+  background: var(--card-bg); /* Matches the modal background */
+  padding: 6px;
+}
+
+/* Custom Modern Checkboxes */
+.admin-enroll-item input[type="checkbox"] {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border-color);
+  border-radius: 6px;
+  background: var(--input-bg);
+  cursor: pointer;
+  position: relative;
+  margin: 0;
+  flex-shrink: 0;
+  outline: none;
+}
+
+/* Custom Checkmark Icon */
+.admin-enroll-item input[type="checkbox"]:checked {
+  background: var(--admin-primary) !important;
+  border-color: var(--admin-primary) !important;
+}
+
+.admin-enroll-item input[type="checkbox"]:checked::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 45%; /* Slightly above true center looks best */
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.admin-enroll-item:has(input[type="checkbox"]:checked) {
+  background: var(--admin-primary-soft);
+  border-color: rgba(239, 68, 68, 0.2);
+}
+
+/* Highlight the entire row when selected */
+
+
+.admin-enroll-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border: 1px solid transparent;
+  margin-bottom: 4px;
+}
+
+.admin-enroll-item:hover {
+  background: var(--input-bg);
+  border-color: var(--border-color);
+}
+
+.admin-enroll-item label {
+  flex: 1; /* Stretches the clickable area across the whole row */
+  cursor: pointer;
+  font-size: 0.88rem !important;
+  font-weight: 600 !important;
+  color: var(--text-main) !important;
+  margin: 0 !important;
+  
+  /* Overrides the ugly global modal label styles */
+  text-transform: none !important;
+  letter-spacing: normal !important;
+}
+/* Responsive modal grid */
+
 
 /* --------------------------------------------------------------------------
    15. RESPONSIVE

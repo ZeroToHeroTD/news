@@ -232,7 +232,7 @@ async function loadGrades(adminRole, adminId) {
   if (!tbody) return;
 
   try {
-    let query = supabase.from('student_grades').select('*').order('created_at', { ascending: false });
+let query = supabase.from('student_grades').select('*');
 
     // Instructors see only grades for their students/courses
     if (adminRole === ROLES.TEACHER) {
@@ -265,7 +265,7 @@ async function loadGrades(adminRole, adminId) {
 
       return `
         <tr style="animation: slideInRight 0.3s ease forwards ${idx * 0.025}s; opacity:0;">
-          <td style="font-weight:700; color:var(--text-main);">${g.student_name || '—'}</td>
+          <td style="font-weight:700; color:var(--text-main);">${g.student?.full_name || g.student_name || '—'}</td>
           <td style="color:var(--text-muted); font-size:0.85rem;">${g.course_name || '—'}</td>
           <td style="color:var(--text-muted); font-size:0.82rem;">${g.instructor_name || '—'}</td>
           <td style="font-weight:600;">${g.midterm ?? '—'}%</td>
@@ -437,7 +437,7 @@ async function loadAttendance(adminRole, adminId) {
   if (!tbody) return;
 
   try {
-    let query = supabase.from('attendance').select('*').order('date', { ascending: false });
+let query = supabase.from('attendance').select('*').order('date', { ascending: false });
     if (adminRole === ROLES.TEACHER) query = query.eq('instructor_id', adminId);
 
     const studentFilter = document.getElementById('attendanceStudentFilter')?.value;
@@ -484,7 +484,7 @@ async function loadAttendance(adminRole, adminId) {
       const canEdit = can(adminRole, 'EDIT_ATTENDANCE');
       return `
         <tr style="animation: slideInRight 0.3s ease forwards ${idx * 0.025}s; opacity:0;">
-          <td style="font-weight:700; color:var(--text-main);">${r.student_name || '—'}</td>
+          <td style="font-weight:700; color:var(--text-main);">${r.student?.full_name || r.student_name || '—'}</td>
           <td style="color:var(--text-muted); font-size:0.85rem;">${r.course_name || '—'}</td>
           <td style="color:var(--text-muted); font-size:0.85rem; font-weight:600;">${r.date || '—'}</td>
           <td><span class="deadline-status-badge ${ss.class}">${ss.label}</span></td>
@@ -576,7 +576,7 @@ async function loadAdminPayments(adminRole, adminId) {
   if (!tbody) return;
 
   try {
-    let query = supabase.from('student_payments').select('*').order('due_date', { ascending: true });
+let query = supabase.from('student_payments').select('*').order('due_date', { ascending: true });
     const statusFilter = document.getElementById('paymentStatusFilter')?.value || 'all';
     if (statusFilter !== 'all') query = query.eq('status', statusFilter);
 
@@ -610,7 +610,7 @@ async function loadAdminPayments(adminRole, adminId) {
 
       return `
         <tr style="animation: slideInRight 0.3s ease forwards ${idx * 0.025}s; opacity:0;">
-          <td style="font-weight:700; color:var(--text-main);">${p.student_name || '—'}</td>
+          <td style="font-weight:700; color:var(--text-main);">${p.student?.full_name || p.student_name || '—'}</td>
           <td style="color:var(--text-muted); font-size:0.85rem;">${p.description || '—'}</td>
           <td style="font-weight:800; font-family:monospace;">₱${parseFloat(p.amount||0).toLocaleString('en-PH',{minimumFractionDigits:2})}</td>
           <td style="color:var(--text-muted); font-size:0.82rem;">${p.due_date ? new Date(p.due_date).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '—'}</td>

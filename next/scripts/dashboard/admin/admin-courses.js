@@ -293,3 +293,30 @@ window._adminDeleteCourse = async function (courseId, courseName) {
 export function getCourseStats() {
   return { total: state.allCourses.length, all: state.allCourses };
 }   
+
+document.getElementById('cmSelectAllBtn')?.addEventListener('click', () => {
+  const checkboxes = document.querySelectorAll('#cmStudentEnrollList input[type="checkbox"]');
+  const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+  
+  checkboxes.forEach(cb => {
+    cb.checked = !allChecked; // Toggle all on or all off
+  });
+});
+
+// Live Search for Student Enrollment
+  document.getElementById('cmStudentSearch')?.addEventListener('input', (e) => {
+    const searchTerm = e.target.value.toLowerCase();
+    const studentItems = document.querySelectorAll('#cmStudentEnrollList .admin-enroll-item');
+    
+    studentItems.forEach(item => {
+      // Look at the label text (the student's name) inside each row
+      const studentName = item.querySelector('label').textContent.toLowerCase();
+      
+      // If the name matches the search, show it (flex). If not, hide it (none).
+      if (studentName.includes(searchTerm)) {
+        item.style.display = 'flex';
+      } else {
+        item.style.display = 'none';
+      }
+    });
+  });

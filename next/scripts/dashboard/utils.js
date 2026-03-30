@@ -330,3 +330,69 @@ export function updateGwaComparison(currentGwa) {
   const label = same ? 'On target' : improved ? `${Math.abs(diff)} above target` : `${diff} below target`;
   el.innerHTML = `<span style="color:${color}; font-weight:700;">${label}</span>`;
 }
+
+// =============================================================================
+// ENHANCED UTILITIES (Add to utils.js)
+// =============================================================================
+
+// 1. Debounce for Search Performance
+// =============================================================================
+// ENHANCED UTILITIES (Add to utils.js)
+// =============================================================================
+
+// 1. Debounce for Search Performance
+export function debounce(func, wait = 300) {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => { clearTimeout(timeout); func(...args); };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}
+
+// 2. Upgraded Search Logic (Case-insensitive, trims, includes ID)
+export function filterBySearch(items, term, keys) {
+  if (!term) return items;
+  const lowerTerm = term.toLowerCase().trim();
+  
+  return items.filter(item => {
+    // Always check the strict ID first
+    if (item.id && String(item.id).toLowerCase().includes(lowerTerm)) return true;
+    
+    // Check the dynamic keys (name, email, course, etc.)
+    return keys.some(key => {
+      const val = item[key];
+      return val && String(val).toLowerCase().includes(lowerTerm);
+    });
+  });
+}
+
+// 3. Upgraded Modal Behavior (ESC Key + Outside Click)
+export function setupModalClose(overlayId, closeBtnId, cancelBtnId) {
+  const overlay = document.getElementById(overlayId);
+  const closeBtn = document.getElementById(closeBtnId);
+  const cancelBtn = document.getElementById(cancelBtnId);
+
+  const closeModal = () => {
+    if(!overlay) return;
+    // Add slide-out animation class here if desired, then hide
+    overlay.style.display = 'none';
+  };
+
+  if (closeBtn) closeBtn.addEventListener('click', closeModal);
+  if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+
+  // Close on outside click
+  if (overlay) {
+    overlay.addEventListener('mousedown', (e) => {
+      if (e.target === overlay) closeModal();
+    });
+  }
+
+  // Close on ESC key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && overlay && overlay.style.display !== 'none') {
+      closeModal();
+    }
+  });
+}

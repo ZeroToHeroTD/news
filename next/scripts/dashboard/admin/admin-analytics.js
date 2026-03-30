@@ -129,14 +129,16 @@ async function renderAttendanceTrendChart() {
   if (!canvas) return;
 
   const t = getChartTheme();
-  const { data: att } = await supabase
-    .from('attendance')
-    .select('status, date')
-    .order('date', { ascending: true });
+  const { data: att } = await supabase.from('attendance').select('status, date');
 
-  // Group by month
+  // Handle Empty State gracefully
+  if (!att || att.length === 0) {
+    canvas.parentElement.innerHTML = '<div class="admin-empty-state">No attendance data yet</div>';
+    return;
+  }
+
   const monthly = {};
-  (att || []).forEach(r => {
+  att.forEach(r => {
     const month = r.date ? r.date.substring(0, 7) : 'Unknown';
     if (!monthly[month]) monthly[month] = { present: 0, absent: 0, total: 0 };
     monthly[month].total++;
@@ -144,10 +146,11 @@ async function renderAttendanceTrendChart() {
     if (r.status === 'absent') monthly[month].absent++;
   });
 
-  const labels = Object.keys(monthly).slice(-6);
-  const presentRates = labels.map(m => monthly[m].total > 0 ? Math.round((monthly[m].present / monthly[m].total) * 100) : 0);
-  const absentRates = labels.map(m => monthly[m].total > 0 ? Math.round((monthly[m].absent / monthly[m].total) * 100) : 0);
-
+  // CRITICAL FIX: Sort chronologically before slicing
+  const labels = Object.keys(monthly).sort().slice(-6); 
+  
+  const presentRates = labels.map(m => Math.round((monthly[m].present / monthly[m].total) * 100));
+  const absentRates = labels.map(m => Math.round((monthly[m].absent / monthly[m].total) * 100));
   const displayLabels = labels.map(l => {
     const [y, m] = l.split('-');
     return new Date(parseInt(y), parseInt(m) - 1).toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
@@ -280,4 +283,4 @@ function renderRecentActivity() {
   `).join('');
 }
 
-export { renderGradeDistChart, renderRecentActivity };
+export { renderRecentActivity };

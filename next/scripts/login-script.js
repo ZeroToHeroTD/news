@@ -32,6 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Login Logic
+// Login Logic
   loginForm.addEventListener('submit', async (e) => {
     e.preventDefault(); 
     
@@ -58,13 +59,26 @@ document.addEventListener('DOMContentLoaded', () => {
         loginBtn.textContent = originalText;
         loginBtn.disabled = false;
       } else {
-        // Success!
-        showAlert('Login successful! Redirecting...', 'success');
+        showAlert('Login successful! Verifying permissions...', 'success');
         loginBtn.textContent = 'Success!';
         loginBtn.style.backgroundColor = '#10b981';
         
+        // 👉 NEW: Fetch the user's role from the profiles table
+        const userId = data.user.id;
+        const { data: profile } = await supabaseClient
+            .from('profiles')
+            .select('role')
+            .eq('id', userId)
+            .single();
+
+        // Redirect based on the role
         setTimeout(() => {
-          window.location.href = 'dashboard.html'; 
+          const userRole = profile?.role || 'student';
+          if (userRole === 'admin' || userRole === 'teacher') {
+             window.location.href = 'admin-dashboard.html'; // Send to Admin/Teacher UI
+          } else {
+             window.location.href = 'dashboard.html'; // Send to Student UI
+          }
         }, 1000);
       }
     }
