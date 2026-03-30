@@ -304,3 +304,29 @@ export function getChartTheme() {
     purple: '#a855f7',
   };
 }
+
+export function getPHNumericalGrade(avg) {
+  if (avg >= 97) return 1.00;
+  if (avg >= 94) return 1.25;
+  if (avg >= 91) return 1.50;
+  if (avg >= 88) return 1.75;
+  if (avg >= 85) return 2.00;
+  if (avg >= 82) return 2.25;
+  if (avg >= 79) return 2.50;
+  if (avg >= 76) return 2.75;
+  if (avg >= 75) return 3.00;
+  return 5.00;
+}
+
+export function updateGwaComparison(currentGwa) {
+  const el = document.getElementById('gwaComparison');
+  if (!el) return;
+  const target = parseFloat(document.getElementById('targetGwaInput')?.value);
+  if (!target || isNaN(target)) { el.textContent = ''; return; }
+  const diff = parseFloat((currentGwa - target).toFixed(2));
+  const improved = diff < 0;
+  const same = diff === 0;
+  const color = same ? 'var(--text-muted)' : improved ? 'var(--accent-green)' : 'var(--accent-red)';
+  const label = same ? 'On target' : improved ? `${Math.abs(diff)} above target` : `${diff} below target`;
+  el.innerHTML = `<span style="color:${color}; font-weight:700;">${label}</span>`;
+}

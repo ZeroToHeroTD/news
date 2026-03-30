@@ -2,7 +2,7 @@
 // schedule.js — Class Schedule & Live Tracker Engine (Premium SaaS Edition)
 // =============================================================================
 
-import { supabaseClient } from './config.js';
+import { supabase as supabaseClient } from './config.js';
 
 // ==========================================
 // 1. UI HELPERS & TIME LOGIC

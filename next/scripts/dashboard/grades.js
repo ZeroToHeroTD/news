@@ -2,7 +2,7 @@
 // grades.js — Academic Records & Performance Analytics (LIVE SYNC UPGRADE)
 // =============================================================================
 
-import { supabaseClient } from './config.js';
+import { supabase as supabaseClient } from './config.js';
 import { getPHNumericalGrade, updateGwaComparison } from './utils.js';
 
 export let myChart = null;

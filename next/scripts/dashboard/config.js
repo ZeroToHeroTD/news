@@ -7,6 +7,7 @@ export const SUPABASE_URL = "https://ekayczuyxmhbiyvyjwad.supabase.co";
 export const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVrYXljenV5eG1oYml5dnlqd2FkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyNzYzMDEsImV4cCI6MjA4OTg1MjMwMX0.dRz-nU9dAsYiOV-xKRKwfXrsX9DdLdHGYuwXsm063wQ";
 
 export const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+export const supabaseClient = supabase;
 
 // =============================================================================
 // ROLE CONSTANTS

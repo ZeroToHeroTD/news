@@ -3,7 +3,7 @@
 // Fixes: sidebar search, emoji picker positioning, attachment button, more menu
 // =============================================================================
 
-import { supabaseClient } from './config.js';
+import { supabase as supabaseClient } from './config.js';
 import { getTimeAgo } from './utils.js';
 
 // ---------------------------------------------------------------------------

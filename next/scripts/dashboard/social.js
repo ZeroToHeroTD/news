@@ -2,7 +2,7 @@
 // social.js — Social Directory & Realtime Presence Engine (Premium SaaS)
 // =============================================================================
 
-import { supabaseClient } from './config.js';
+import { supabase as supabaseClient } from './config.js';
 import { escapeAttr } from './utils.js';
 
 // Global state to track online users across renders

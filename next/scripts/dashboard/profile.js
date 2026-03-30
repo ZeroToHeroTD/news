@@ -2,7 +2,7 @@
 // profile.js — Identity & Settings Engine (Premium SaaS Edition)
 // =============================================================================
 
-import { supabaseClient } from './config.js';
+import { supabase as supabaseClient } from './config.js';
 import { updateAllAvatars, checkUserPermissions } from './ui.js';
 
 // ==========================================

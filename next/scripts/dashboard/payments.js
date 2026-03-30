@@ -2,7 +2,7 @@
 // payments.js — Premium Finance & Tuition Ledger
 // =============================================================================
 
-import { supabaseClient } from './config.js';
+import { supabase as supabaseClient } from './config.js';
 
 // --- Safe Toast Wrapper (Fixes the double pop-up issue!) ---
 const notify = (msg, type = 'info') => {

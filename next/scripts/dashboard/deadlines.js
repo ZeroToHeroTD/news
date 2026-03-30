@@ -2,8 +2,7 @@
 // deadlines.js — Deadlines Engine & Task Management (UPGRADED DYNAMIC EDITION)
 // =============================================================================
 
-import { supabaseClient } from './config.js';
-
+import { supabase as supabaseClient } from './config.js';
 // ---------------------------------------------------------------------------
 // 1. UI HELPER & FORMATTING
 // ---------------------------------------------------------------------------

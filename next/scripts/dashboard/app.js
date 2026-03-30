@@ -2,21 +2,20 @@
 // app.js — The Master Dashboard Orchestrator
 // =============================================================================
 
-import { supabaseClient } from '../dashboard/config.js';
-import { showToast } from '../dashboard/utils.js';
-import { updateAllAvatars, switchView } from '../dashboard/ui.js';
+import { supabaseClient } from './config.js';
+import { toast as showToast } from './utils.js';
+import { updateAllAvatars, switchView } from './ui.js';
 
 // Modular Loaders
-import { initProfile } from '../dashboard/profile.js';
-import { loadAttendance } from '../dashboard/attendance.js';
-import { loadCoursesData, loadResources } from '../dashboard/courses-resource.js';
-import { loadDeadlines } from '../dashboard/deadlines.js';
-import { loadGradesData, loadPerformanceChart, initializeChartListener } from '../dashboard/grades.js';
-import { loadNotices, loadSmartDashboardData } from '../dashboard/notices-dashboard.js';
-import { loadPaymentData } from '../dashboard/payments.js';
-import { loadTodaysSchedule, loadWeeklySchedule } from '../dashboard/schedule.js';
-import { loadSocialDirectory, initializePresence } from '../dashboard/social.js';
-
+import { initProfile } from './profile.js';
+import { loadAttendance } from './attendance.js';
+import { loadCoursesData, loadResources } from './courses-resource.js';
+import { loadDeadlines } from './deadlines.js';
+import { loadGradesData, loadPerformanceChart, initializeChartListener } from './grades.js';
+import { loadNotices, loadSmartDashboardData } from './notices-dashboard.js';
+import { loadPaymentData } from './payments.js';
+import { loadTodaysSchedule, loadWeeklySchedule } from './schedule.js';
+import { loadSocialDirectory, initializePresence } from './social.js';
 // Message Module Imports
 import { loadMessages } from './message-modules/index.js';
 import { 

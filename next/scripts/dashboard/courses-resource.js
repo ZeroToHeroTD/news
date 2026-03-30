@@ -3,7 +3,7 @@
 // Combined Module: Core Grid Loaders + Premium UI Enhancements
 // =============================================================================
 
-import { supabaseClient } from './config.js';
+import { supabase as supabaseClient } from './config.js';
 import { escapeAttr } from './utils.js';
 
 // Premium cycling icon set for course cards

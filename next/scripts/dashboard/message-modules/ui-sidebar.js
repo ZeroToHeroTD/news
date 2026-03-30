@@ -1,4 +1,4 @@
-import { supabaseClient } from '../config.js';
+
 import { state } from './store.js';
 import { getTimeAgo } from '../utils.js';
 import { escapeAttr, truncate } from './helpers.js';

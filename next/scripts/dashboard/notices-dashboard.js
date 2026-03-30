@@ -2,7 +2,7 @@
 // notices-dashboard.js — Dashboard Summary & Notices Engine (Premium)
 // =============================================================================
 
-import { supabaseClient } from './config.js';
+import { supabase as supabaseClient } from './config.js';
 import { updateUnreadCount } from './messages.js';
 
 // ==========================================

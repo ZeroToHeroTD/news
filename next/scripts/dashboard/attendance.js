@@ -2,8 +2,7 @@
 // attendance.js — Attendance Widget Loader (Premium SaaS Edition)
 // =============================================================================
 
-import { supabaseClient } from './config.js';
-
+import { supabase as supabaseClient } from './config.js';
 /**
  * Animates a number counting up from 0 to the target value.
  * @param {HTMLElement} element - The DOM element to update.
