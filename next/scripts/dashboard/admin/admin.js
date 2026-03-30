@@ -3,15 +3,23 @@
 // Orchestrates all modules, enforces auth, applies RBAC.
 // =============================================================================
 
+// FROM:
 import { supabase, can, ROLES } from './config.js';
 import { toast, applyRoleUI, logActivity, avatarUrl } from './utils.js';
-
-// Module imports
 import { initUsers, loadUsers, getUserStats } from './modules/adminUsers.js';
 import { initCourses, loadCourses, getCourseStats } from './modules/adminCourses.js';
 import { initAnalytics } from './modules/adminAnalytics.js';
 import { initAnnouncements, loadAnnouncements } from './modules/adminAnnouncements.js';
 import { initSettings } from './modules/adminSettings.js';
+
+// TO:
+import { supabase, can, ROLES } from '../config.js';
+import { toast, applyRoleUI, logActivity, avatarUrl } from '../utils.js';
+import { initUsers, loadUsers, getUserStats } from './admin-users.js';
+import { initCourses, loadCourses, getCourseStats } from './admin-courses.js';
+import { initAnalytics } from './admin-analytics.js';
+import { initAnnouncements, loadAnnouncements } from './admin-announcements.js';
+import { initSettings } from './admin-settings.js';
 
 // ─── Module-level state ───────────────────────────────────────────────────────
 let adminUser = null;

@@ -271,6 +271,10 @@ export function escapeHtml(str) {
     .replace(/"/g, '&quot;');
 }
 
+export function escapeAttr(str) {
+  return (str || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+}
+
 /**
  * Log an admin action to localStorage activity log.
  * In production, this should write to a Supabase audit table.

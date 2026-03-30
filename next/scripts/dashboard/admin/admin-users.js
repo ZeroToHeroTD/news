@@ -4,12 +4,10 @@
 // =============================================================================
 
 import { supabase, can, ROLES } from '../config.js';
-import {
-  toast, openModal, closeModal, setupModalClose,
+import { toast, openModal, closeModal, setupModalClose,
   confirmDelete, paginate, renderPagination,
   filterBySearch, applyRoleUI, formatDate,
-  avatarUrl, escapeHtml, logActivity
-} from '../utils.js';
+  avatarUrl, escapeHtml, logActivity } from '../utils.js';
 
 // ─── Module State ───────────────────────────────────────────────────────────
 const state = {
