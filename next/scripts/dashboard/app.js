@@ -17,7 +17,7 @@ import { loadPaymentData } from '../dashboard/payments.js';
 import { loadTodaysSchedule, loadWeeklySchedule } from '../dashboard/schedule.js';
 import { loadSocialDirectory, initializePresence } from '../dashboard/social.js';
 
-// Message Module Imports (FIXED: Added missing function imports)
+// Message Module Imports
 import { loadMessages } from './message-modules/index.js';
 import { 
     initializeAutocomplete, 
@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const { data: { session }, error: authError } = await supabaseClient.auth.getSession();
     
     if (authError || !session) {
-        window.location.href = 'index.html'; // Stays in same folder
+        window.location.href = 'index.html'; 
         return;
     }
     const user = session.user;
@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     'view-grades': '#gradesTableBody tr',
                     'view-courses': '.course-card',
                     'view-resources': '.resource-card',
-                    'view-messages': '.conv-item', // Updated to match sidebar items
+                    'view-messages': '.conv-item',
                     'view-social': '.social-card-minimal',
                     'view-deadlines': '.deadline-item'
                 };
@@ -155,7 +155,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     if (themeBtn) {
-        themeBtn.addEventListener('click', () => {
+        themeBtn.addEventListener('click', (e) => {
+            // 👉 THE FIX: Stop the click from triggering global view changers!
+            e.stopPropagation();
+            
             themeBtn.classList.add('rotating');
             setTimeout(() => themeBtn.classList.remove('rotating'), 500);
 

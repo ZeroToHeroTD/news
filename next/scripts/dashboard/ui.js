@@ -83,46 +83,68 @@ export function checkUserPermissions(role = 'student') {
 // ==========================================
 
 /**
+ * Asynchronously loads an HTML component from a specified path into a container element.
+ * @param {string} componentPath - The URL path to the HTML component.
+ * @param {string} containerId - The ID of the DOM element to load the content into.
+ */
+export async function loadComponent(componentPath, containerId) {
+    try {
+        const response = await fetch(componentPath);
+        if (!response.ok) {
+            throw new Error(`Component fetch failed: ${response.status}`);
+        }
+        const content = await response.text();
+        const container = document.getElementById(containerId);
+        if (container) {
+            container.innerHTML = content;
+        } else {
+            console.warn(`[UI Engine]: Container "#${containerId}" not found for component "${componentPath}".`);
+        }
+    } catch (error) {
+        console.error(`[UI Engine]: Failed to load component "${componentPath}".`, error);
+    }
+}
+
+
+/**
  * Manages the transition between dashboard views.
+ * Dynamically loads view content on demand.
  * Triggers the slideInRight keyframes from base.css.
  */
-export function switchView(targetId) {
+export async function switchView(targetId) {
     if (!targetId) return;
 
-    // 1. Update Content Views
-    const views = document.querySelectorAll('.view-content');
-    let targetExists = false;
+    const targetView = document.getElementById(targetId);
 
-    views.forEach(view => {
-        const isActive = view.id === targetId;
-        
-        if (isActive) {
-            view.classList.add(UI_CONFIG.ACTIVE_CLASS);
-            targetExists = true;
-        } else {
-            view.classList.remove(UI_CONFIG.ACTIVE_CLASS);
-        }
-    });
-
-    if (!targetExists) {
+    if (!targetView) {
         console.warn(`[UI Engine]: View "${targetId}" not found in DOM.`);
         return;
     }
 
-    // 2. Update Sidebar Navigation Glow States
+    // 1. Load content if the view is empty
+    if (targetView.innerHTML.trim() === '') {
+        // Assumes component HTML files are named after the view ID.
+        // e.g., view 'view-courses' maps to 'components/view-courses.html'
+        const componentName = targetId.replace('view-', '');
+        await loadComponent(`../html/components/${targetId}.html`, targetId);
+    }
+    
+    // 2. Update Content Views
+    const views = document.querySelectorAll('.view-content');
+    views.forEach(view => {
+        view.classList.toggle(UI_CONFIG.ACTIVE_CLASS, view.id === targetId);
+    });
+
+    // 3. Update Sidebar Navigation Glow States
     document.querySelectorAll('.nav-links li').forEach(li => {
         const link = li.querySelector('a');
         if (link) {
             const isTarget = link.getAttribute('data-target') === targetId;
-            if (isTarget) {
-                li.classList.add(UI_CONFIG.ACTIVE_CLASS);
-            } else {
-                li.classList.remove(UI_CONFIG.ACTIVE_CLASS);
-            }
+            li.classList.toggle(UI_CONFIG.ACTIVE_CLASS, isTarget);
         }
     });
 
-    // 3. Reset Scroll Position smoothly
+    // 4. Reset Scroll Position smoothly
     resetMainScroll();
 }
 

@@ -1,44 +1,53 @@
-import { toggleFAB } from './ui-notifications.js';
-import { updateHeroStats, getGreeting } from './ui-hero.js';
-
-const debounce = (fn, ms) => { 
+/**
+ * Helper to prevent functions from firing too rapidly.
+ */
+function debounce(fn, ms) { 
     let t; 
-    return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); }; 
-};
-
-export function observeViewChanges() {
-    const observer = new MutationObserver(() => {
-        const isActive = document.getElementById('view-resources')?.classList.contains('active');
-        toggleFAB(!!isActive);
-    });
-    
-    document.querySelectorAll('.view-content').forEach(view => 
-        observer.observe(view, { attributes: true, attributeFilter: ['class'] })
-    );
+    return (...args) => { 
+        clearTimeout(t); 
+        t = setTimeout(() => fn(...args), ms); 
+    }; 
 }
 
-export function watchResourcesGrid(tagCardsCallback) {
+/**
+ * Watches the resources grid for changes and updates the Hero stats automatically.
+ */
+export function watchResourcesGrid() {
     const grid = document.getElementById('resourcesGrid');
     if (!grid) return;
-
-    const observer = new MutationObserver(debounce(() => {
-        tagCardsCallback(); // Re-tag metadata on new cards
-        updateHeroStats();
+    
+    // We dynamically import the needed functions so there are no circular dependencies
+    const observer = new MutationObserver(debounce(async () => { 
+        const { tagResourceCards } = await import('./ui-filters.js');
+        const { updateHeroStats } = await import('./ui-hero.js');
+        
+        tagResourceCards(); 
+        updateHeroStats(); 
     }, 200));
-
-    observer.observe(grid, { childList: true });
+    
+    observer.observe(grid, { childList: true, subtree: false });
 }
 
+/**
+ * Watches the sidebar name. When it loads from Supabase, it updates the "Good evening" banner!
+ */
 export function watchUserName() {
     const nameEl = document.getElementById('sidebarUserName');
     if (!nameEl) return;
-
+    
     const observer = new MutationObserver(() => {
-        const greetEl = document.querySelector('.resources-hero-greeting');
+        const section = document.getElementById('view-resources');
+        const greetEl = section?.querySelector('.resources-hero-greeting');
+        
         if (greetEl) {
             const first = nameEl.textContent.replace('Loading...', 'Student').split(' ')[0];
-            greetEl.textContent = `${getGreeting()}, ${first}`;
+            
+            const h = new Date().getHours();
+            const greeting = h < 12 ? 'Good morning' : (h < 17 ? 'Good afternoon' : 'Good evening');
+            
+            greetEl.textContent = `${greeting}, ${first}`;
         }
     });
+    
     observer.observe(nameEl, { characterData: true, childList: true, subtree: true });
 }

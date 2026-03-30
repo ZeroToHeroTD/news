@@ -873,3 +873,94 @@
   /* Hide date column in payments table on small screens */
   .payments-table .col-date { display: none; }
 }
+
+/* ==========================================================================
+       PAYMENT MODAL & INPUT FIXES (Light Mode Compatible)
+       ========================================================================== */
+    .method-option {
+      border: 2px solid var(--border-color);
+      padding: 20px;
+      border-radius: 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: 0.2s;
+      color: var(--text-main); /* 👉 FIX: Adapts GCash/Maya text to theme */
+    }
+    .method-option:hover {
+      border-color: var(--primary);
+      background: rgba(99, 102, 241, 0.05);
+    }
+    .form-group label { 
+      display: block; 
+      margin-bottom: 8px; 
+      font-size: 0.85rem; 
+      font-weight: 600; 
+      color: var(--text-muted); 
+    }
+    .form-group input,
+    .form-group textarea { 
+      width: 100%; 
+      padding: 12px; 
+      border-radius: 8px; 
+      background: var(--input-bg); 
+      border: 1px solid var(--border-color); 
+      color: var(--text-main) !important; /* 👉 FIX: No more invisible white text */
+      font-family: inherit;
+    }
+
+    /* Override inline HTML white text in the QR step */
+    #finalAmountText, 
+    #paymentStep2 p {
+      color: var(--text-main) !important; 
+    }
+
+    /* Custom File Upload Styling */
+    .file-upload-label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 16px;
+      background: rgba(99, 102, 241, 0.05);
+      border: 2px dashed var(--border-color);
+      border-radius: 8px;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+    .file-upload-label:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: rgba(99, 102, 241, 0.1);
+    }
+    .file-upload-label.has-file {
+      background: rgba(34, 197, 94, 0.1);
+      border-color: var(--accent-green);
+      color: var(--accent-green);
+      border-style: solid;
+    }
+
+    /* Force Modals to respect Light/Dark Mode backgrounds */
+.compose-modal-box {
+    background-color: var(--card-bg) !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-main) !important;
+}
+
+.compose-modal-header h3 {
+    color: var(--text-main) !important;
+}
+
+.compose-modal-box p, 
+.compose-modal-box span {
+    color: var(--text-main);
+}
+
+.modal-close-btn {
+    color: var(--text-muted) !important;
+}

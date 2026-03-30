@@ -305,32 +305,7 @@ export async function loadResources() {
   }
 
   /* -----------------------------------------------------------------------
-     4. FLOATING ACTION BUTTON (FAB)
-  ----------------------------------------------------------------------- */
-  function buildFAB() {
-    if (document.querySelector('.resources-fab')) return;
-
-    const fab = document.createElement('div');
-    fab.className = 'resources-fab';
-    fab.innerHTML = `
-      <button class="fab-btn" id="resourcesFabBtn" title="Upload a resource">
-        <span class="material-symbols-outlined">add</span>
-        Upload Resource
-      </button>`;
-    document.body.appendChild(fab);
-
-    fab.querySelector('#resourcesFabBtn').addEventListener('click', () => {
-      showToastPremium('File upload opening...', 'info');
-    });
-  }
-
-  function toggleFAB(visible) {
-    const fab = document.querySelector('.resources-fab');
-    if (fab) fab.classList.toggle('visible', visible);
-  }
-
-  /* -----------------------------------------------------------------------
-     5. COMMAND PALETTE
+     4. COMMAND PALETTE
   ----------------------------------------------------------------------- */
   function buildCommandPalette() {
     if (document.getElementById('cmdOverlay')) return;
@@ -439,7 +414,7 @@ export async function loadResources() {
   }
 
   /* -----------------------------------------------------------------------
-     6. PREMIUM TOAST SYSTEM
+     5. PREMIUM TOAST SYSTEM
   ----------------------------------------------------------------------- */
   function buildToastContainer() {
     if (document.querySelector('.toast-container')) return;
@@ -469,19 +444,8 @@ export async function loadResources() {
   };
 
   /* -----------------------------------------------------------------------
-     7. VIEW STATE OBSERVERS
+     6. VIEW STATE OBSERVERS
   ----------------------------------------------------------------------- */
-  function observeViewChanges() {
-    const main = document.querySelector('.app-main');
-    if (!main) return;
-    const observer = new MutationObserver(() => {
-      const isResourcesActive = document.getElementById('view-resources')?.classList.contains('active');
-      toggleFAB(!!isResourcesActive);
-    });
-    $$('.view-content').forEach(view => observer.observe(view, { attributes: true, attributeFilter: ['class'] }));
-    toggleFAB(!!document.getElementById('view-resources')?.classList.contains('active'));
-  }
-
   function watchResourcesGrid() {
     const grid = document.getElementById('resourcesGrid');
     if (!grid) return;
@@ -505,7 +469,7 @@ export async function loadResources() {
   }
 
 /* -----------------------------------------------------------------------
-     8. MESSAGE INSTRUCTOR BRIDGE
+     7. MESSAGE INSTRUCTOR BRIDGE
   ----------------------------------------------------------------------- */
   window.openComposeToInstructor = function(instructorName, instructorId, defaultSubject) {
     const modal = document.getElementById('composeModalOverlay');
@@ -535,11 +499,9 @@ export async function loadResources() {
   function init() {
     buildToastContainer();
     buildHero();
-    buildFAB();
     buildCommandPalette();
     enhanceFilterPills();
     watchResourcesGrid();
-    observeViewChanges();
     watchUserName();
     window.toggleCommandPalette = toggleCmd;
   }

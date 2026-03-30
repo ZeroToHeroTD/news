@@ -1,5 +1,8 @@
 import { supabaseClient } from '../config.js';
 
+/**
+ * Loads portal resources (files) from the database and renders them into the grid.
+ */
 export async function loadResources() {
     const grid = document.getElementById('resourcesGrid');
     if (!grid) return;

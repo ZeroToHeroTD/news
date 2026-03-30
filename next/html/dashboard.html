@@ -14,26 +14,6 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   
-  <style>
-    /* Payment Modal Specific Styles */
-    .method-option {
-      border: 2px solid var(--border-color);
-      padding: 20px;
-      border-radius: 15px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-    .method-option:hover {
-      border-color: var(--primary);
-      background: rgba(99, 102, 241, 0.05);
-    }
-    .form-group label { display: block; margin-bottom: 8px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); }
-    .form-group input { width: 100%; padding: 12px; border-radius: 8px; background: var(--input-bg); border: 1px solid var(--border-color); color: white; }
-  </style>
 </head>
 
 <body class="app-body">
@@ -692,9 +672,7 @@
         <div style="text-align: center; background: rgba(255,255,255,0.03); padding: 20px; border-radius: 15px; border: 1px solid var(--border-color);">
           <h4 id="methodNameDisplay" style="color: var(--primary); margin-bottom: 10px;">GCash Payment</h4>
           
-<img src="" id="methodQRCode" style="width: 220px; height: auto; max-height: 280px; object-fit: contain; border-radius: 10px; border: 5px solid #fff; margin-bottom: 15px; background: #fff;">          
-          <p style="font-size: 0.85rem; color: var(--text-muted);">1. Scan the QR code and pay exactly <strong id="finalAmountText" style="color:white;"></strong></p>
-          <p style="font-size: 0.85rem; color: var(--text-muted);">2. Take a screenshot of the successful receipt.</p>
+<img src="" id="methodQRCode" style="width: 180px; height: auto; max-height: 180px; object-fit: contain; border-radius: 10px; border: 5px solid #fff; margin-bottom: 15px; background: #fff;">          <p style="font-size: 0.85rem; color: var(--text-muted);">2. Take a screenshot of the successful receipt.</p>
         </div>
 
         <div class="form-group" style="margin-top: 20px;">
@@ -702,11 +680,16 @@
           <input type="text" id="payRefNumber" placeholder="Enter the 13-digit Ref No.">
         </div>
 
-        <div class="form-group" style="margin-top: 15px;">
+<div class="form-group" style="margin-top: 15px;">
           <label>Upload Proof of Payment</label>
-          <input type="file" id="payReceiptFile" accept="image/*" class="custom-file-input">
+          <div class="file-upload-wrapper">
+            <input type="file" id="payReceiptFile" accept="image/*" hidden>
+            <label for="payReceiptFile" class="file-upload-label" id="fileUploadLabel">
+              <span class="material-symbols-outlined" id="fileUploadIcon">upload_file</span>
+              <span id="fileNameText">Click to browse or drag file</span>
+            </label>
+          </div>
         </div>
-
         <div class="compose-modal-actions" style="margin-top: 25px;">
           <button class="btn-cancel" onclick="window.backToStep1()">Back</button>
           <button class="btn-send" id="btnConfirmPayment" onclick="window.handlePaymentSubmission()">

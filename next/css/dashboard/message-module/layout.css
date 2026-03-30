@@ -27,6 +27,29 @@
  * overflowing the page. Tweak the subtracted value to match your
  * topbar + page-padding height.
  */
+
+ /* Status Dot Fixes */
+    .topbar-avatar-wrapper {
+        position: relative;
+        display: inline-block;
+    }
+    .topbar-status-dot {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        border: 2px solid var(--card-bg); /* Creates a nice cutout effect */
+        background-color: #94a3b8; /* Offline Gray */
+        z-index: 10;
+    }
+    .topbar-status-dot.online,
+    .conv-status-dot.online {
+        background-color: #22c55e !important; /* Bright Online Green */
+        box-shadow: 0 0 8px rgba(34, 197, 94, 0.4); /* Nice glowing effect */
+    }
+    
 .messaging-hub-wrapper {
   display: flex;
   flex-direction: column;
@@ -49,7 +72,7 @@
   font-family: 'Sora', sans-serif;
   font-size: 1.40rem;
   font-weight: 800;
-  color: var(--msg-text-main);
+color: var(--text-main);
   letter-spacing: -0.04em;
   line-height: 1;
 }

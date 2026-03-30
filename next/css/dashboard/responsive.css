@@ -262,6 +262,7 @@ html {
     max-height: 85vh;
     margin-bottom: env(safe-area-inset-bottom);
     transform: translateY(100%);
+    overflow-y: auto;
   }
 
   .compose-modal-overlay.active .compose-modal-box {

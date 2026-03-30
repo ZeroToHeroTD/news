@@ -18,7 +18,11 @@ let selectedConversationId = null;
 let selectedConversationName = '';
 let currentTab = 'personal';
 let typingTimers = {};
+
+// 👉 ADDED: Realtime & Presence trackers
 let realtimeChannel = null;
+let presenceChannel = null; 
+let onlineUsers = new Set(); 
 
 // ---------------------------------------------------------------------------
 // 1. BOOT
@@ -65,16 +69,45 @@ async function fetchAllMessages() {
 }
 
 // ---------------------------------------------------------------------------
-// 2. REAL-TIME SUBSCRIPTION
+// 2. REAL-TIME & PRESENCE SUBSCRIPTION
 // ---------------------------------------------------------------------------
 function subscribeToRealtime() {
     if (realtimeChannel) supabaseClient.removeChannel(realtimeChannel);
 
+    // 1. Message Sync
     realtimeChannel = supabaseClient
         .channel('portal_messages_hub')
         .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'portal_messages' }, handleIncomingMessage)
         .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'portal_messages' }, handleMessageUpdate)
         .subscribe();
+
+    // 👉 2. Presence Sync (This fixes the green dots!)
+    if (presenceChannel) supabaseClient.removeChannel(presenceChannel);
+    
+    presenceChannel = supabaseClient.channel('campus_presence', {
+        config: { presence: { key: currentUserId } }
+    });
+
+    presenceChannel
+        .on('presence', { event: 'sync' }, () => {
+            const state = presenceChannel.presenceState();
+            onlineUsers = new Set(Object.keys(state));
+            
+            // Instantly update the sidebar dots
+            renderSidebar();
+            
+            // Update the chat header if you are looking at an active conversation
+            if (selectedConversationId) {
+                const isOnline = onlineUsers.has(selectedConversationId);
+                const role = profilesMap[selectedConversationId]?.role || 'Student';
+                setHeaderStatus(isOnline ? 'online' : 'offline', isOnline ? 'Active now' : role);
+            }
+        })
+        .subscribe(async (status) => {
+            if (status === 'SUBSCRIBED') {
+                await presenceChannel.track({ online_at: new Date().toISOString() });
+            }
+        });
 }
 
 async function handleIncomingMessage(payload) {
@@ -155,7 +188,6 @@ function renderConversationList(filterTerm = '') {
         (a, b) => new Date(b.lastMsg.created_at) - new Date(a.lastMsg.created_at)
     );
 
-    // FIX: Apply search filter after building convMap
     if (filterTerm) {
         convs = convs.filter(c => c.name.toLowerCase().includes(filterTerm.toLowerCase()));
     }
@@ -172,6 +204,11 @@ function renderConversationList(filterTerm = '') {
     list.innerHTML = convs.map(c => {
         const isActive = selectedConversationId === c.id;
         const isTyping = typingTimers[c.id] !== undefined;
+        
+        // 👉 FIX: Check the onlineUsers Set instead of hardcoding 'offline'
+        const isOnline = onlineUsers.has(c.id);
+        const dotClass = isTyping ? 'typing' : (isOnline ? 'online' : 'offline');
+
         const avatarUrl = c.profile.avatar_url ||
             `https://ui-avatars.com/api/?name=${encodeURIComponent(c.name)}&background=6366f1&color=fff&bold=true&rounded=false`;
         const previewText = isTyping ? 'typing...' : truncate(c.lastMsg.content, 28);
@@ -182,7 +219,7 @@ function renderConversationList(filterTerm = '') {
                onclick="window.openConversation('${c.id}')">
             <div class="conv-avatar-wrap">
               <img src="${avatarUrl}" class="conv-avatar" alt="${escapeAttr(c.name)}" onerror="this.style.display='none'">
-              <div class="conv-status-dot ${isTyping ? 'typing' : 'offline'}"></div>
+              <div class="conv-status-dot ${dotClass}"></div>
             </div>
             <div class="conv-details">
               <div class="conv-row">
@@ -258,7 +295,9 @@ window.openConversation = (partnerId) => {
         if (avatarEl) avatarEl.src = avatarUrl;
         if (nameEl) nameEl.textContent = selectedConversationName;
 
-        setHeaderStatus('offline', partnerProfile.role || 'Student');
+        // 👉 FIX: Inject dynamic presence into the chat header
+        const isOnline = onlineUsers.has(partnerId);
+        setHeaderStatus(isOnline ? 'online' : 'offline', isOnline ? 'Active now' : (partnerProfile.role || 'Student'));
     }
 
     if (emptyState) emptyState.classList.add('hidden');
@@ -269,7 +308,6 @@ window.openConversation = (partnerId) => {
     markThreadAsRead(partnerId);
     renderSidebar();
 
-    // FIX: Re-initialize action buttons after conversation panel is visible
     rebindChatActionButtons();
 
     // Focus input
@@ -443,7 +481,9 @@ function removeTypingBubble() {
     document.getElementById('typingBubble')?.remove();
     if (selectedConversationId) {
         const p = profilesMap[selectedConversationId] || {};
-        setHeaderStatus('offline', p.role || 'Student');
+        // 👉 FIX: Check presence when typing finishes
+        const isOnline = onlineUsers.has(selectedConversationId);
+        setHeaderStatus(isOnline ? 'online' : 'offline', isOnline ? 'Active now' : (p.role || 'Student'));
     }
 }
 
@@ -862,7 +902,7 @@ function injectDynamicStyles() {
 }
 
 // ---------------------------------------------------------------------------
-// 13. SETUP CORE EVENT LISTENERS (static elements only)
+// 13. SETUP CORE EVENT LISTENERS
 // ---------------------------------------------------------------------------
 export function setupMessageActions() {
     const chatInput = document.getElementById('chatMainInput');
@@ -876,10 +916,8 @@ export function setupMessageActions() {
         chatInput.addEventListener('input', () => autoResizeInput(chatInput));
     }
 
-    // Close all popovers on outside click
     document.addEventListener('click', closeAllPopovers);
 
-    // Modal buttons
     document.getElementById('composeNewBtn')?.addEventListener('click', window.openComposeModal);
     document.getElementById('composeCloseBtn')?.addEventListener('click', window.closeComposeModal);
     document.getElementById('composeCancelBtn')?.addEventListener('click', window.closeComposeModal);
@@ -894,7 +932,6 @@ export function setupMessageActions() {
         });
     });
 
-    // FIX: Sidebar search — directly calls renderConversationList with filter
     const sidebarSearch = document.querySelector('.sidebar-search-input');
     if (sidebarSearch) {
         sidebarSearch.addEventListener('input', (e) => {
@@ -904,20 +941,18 @@ export function setupMessageActions() {
 }
 
 // ---------------------------------------------------------------------------
-// 14. REBIND CHAT ACTION BUTTONS (called each time a convo is opened)
+// 14. REBIND CHAT ACTION BUTTONS
 // ---------------------------------------------------------------------------
 function rebindChatActionButtons() {
-    // ── Emoji Button ──────────────────────────────────────────────────────────
+    // ── Emoji Button ──
     const emojiBtn = document.querySelector('.input-emoji-btn[title="Emoji"]');
     if (emojiBtn && !emojiBtn._emojiBound) {
         emojiBtn._emojiBound = true;
 
-        // Build portal picker once
         let picker = document.getElementById('emojiPickerPortal');
         if (!picker) {
             picker = document.createElement('div');
             picker.id = 'emojiPickerPortal';
-
             const EMOJIS = [
                 '😀','😂','🥰','😎','😭','🥺','🤔','😅','🤩','🥳',
                 '👍','👎','🙏','💪','🤝','👀','💀','🔥','❤️','💔',
@@ -945,8 +980,7 @@ function rebindChatActionButtons() {
 
         emojiBtn.addEventListener('click', (e) => {
             e.stopPropagation();
-            closeAllPopovers(null, picker); // close others, keep this one
-
+            closeAllPopovers(null, picker);
             const rect = emojiBtn.getBoundingClientRect();
             picker.style.left = `${rect.left}px`;
             picker.style.bottom = `${window.innerHeight - rect.top + 8}px`;
@@ -955,11 +989,10 @@ function rebindChatActionButtons() {
         });
     }
 
-    // ── Attachment Button ─────────────────────────────────────────────────────
+    // ── Attachment Button ──
     const attachBtn = document.querySelector('.input-emoji-btn[title="Attach file"]');
     if (attachBtn && !attachBtn._attachBound) {
         attachBtn._attachBound = true;
-
         attachBtn.addEventListener('click', () => {
             const fileInput = document.createElement('input');
             fileInput.type = 'file';
@@ -967,12 +1000,9 @@ function rebindChatActionButtons() {
             fileInput.onchange = (e) => {
                 const file = e.target.files[0];
                 if (!file) return;
-
                 const chatInput = document.getElementById('chatMainInput');
                 if (chatInput) {
-                    // Insert attachment chip text
-                    chatInput.value = (chatInput.value ? chatInput.value + ' ' : '') +
-                        `[📎 ${file.name}]`;
+                    chatInput.value = (chatInput.value ? chatInput.value + ' ' : '') + `[📎 ${file.name}]`;
                     chatInput.focus();
                     autoResizeInput(chatInput);
                 }
@@ -982,12 +1012,10 @@ function rebindChatActionButtons() {
         });
     }
 
-    // ── Search Button ─────────────────────────────────────────────────────────
+    // ── Search Button ──
     const searchBtn = document.querySelector('.chat-action-btn[title="Search in conversation"]');
     if (searchBtn && !searchBtn._searchBound) {
         searchBtn._searchBound = true;
-
-        // Create search bar inside the chat panel header (as a sibling below it)
         let searchBar = document.getElementById('chatLocalSearchBar');
         if (!searchBar) {
             searchBar = document.createElement('div');
@@ -995,15 +1023,9 @@ function rebindChatActionButtons() {
             searchBar.innerHTML = `
                 <span class="material-symbols-outlined" style="color:var(--text-muted,#94a3b8);font-size:18px;">search</span>
                 <input type="text" id="chatLocalSearchInput" placeholder="Find in this conversation...">
-                <button id="closeLocalSearch" title="Close">
-                    <span class="material-symbols-outlined">close</span>
-                </button>`;
-
-            // Insert it right after chatPanelHeader
+                <button id="closeLocalSearch" title="Close"><span class="material-symbols-outlined">close</span></button>`;
             const header = document.getElementById('chatPanelHeader');
-            if (header && header.parentNode) {
-                header.parentNode.insertBefore(searchBar, header.nextSibling);
-            }
+            if (header && header.parentNode) header.parentNode.insertBefore(searchBar, header.nextSibling);
 
             document.getElementById('closeLocalSearch').onclick = () => {
                 searchBar.classList.remove('active');
@@ -1028,36 +1050,24 @@ function rebindChatActionButtons() {
         searchBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             searchBar.classList.toggle('active');
-            if (searchBar.classList.contains('active')) {
-                document.getElementById('chatLocalSearchInput')?.focus();
-            } else {
-                clearSearchHighlights();
-            }
+            if (searchBar.classList.contains('active')) document.getElementById('chatLocalSearchInput')?.focus();
+            else clearSearchHighlights();
         });
     }
 
-    // ── More Options Button ───────────────────────────────────────────────────
+    // ── More Options Button ──
     const moreBtn = document.querySelector('.chat-action-btn[title="More options"]');
     if (moreBtn && !moreBtn._moreBound) {
         moreBtn._moreBound = true;
-
         let menu = document.getElementById('chatOptionsMenuPortal');
         if (!menu) {
             menu = document.createElement('div');
             menu.id = 'chatOptionsMenuPortal';
             menu.innerHTML = `
-                <div class="chat-menu-item" id="optViewProfile">
-                    <span class="material-symbols-outlined">person</span> View Profile
-                </div>
-                <div class="chat-menu-item" id="optMute">
-                    <span class="material-symbols-outlined">notifications_off</span> Mute Notifications
-                </div>
-                <div class="chat-menu-item" id="optMarkRead">
-                    <span class="material-symbols-outlined">mark_email_read</span> Mark All Read
-                </div>
-                <div class="chat-menu-item danger" id="optClearChat">
-                    <span class="material-symbols-outlined">delete_sweep</span> Clear Chat
-                </div>`;
+                <div class="chat-menu-item" id="optViewProfile"><span class="material-symbols-outlined">person</span> View Profile</div>
+                <div class="chat-menu-item" id="optMute"><span class="material-symbols-outlined">notifications_off</span> Mute Notifications</div>
+                <div class="chat-menu-item" id="optMarkRead"><span class="material-symbols-outlined">mark_email_read</span> Mark All Read</div>
+                <div class="chat-menu-item danger" id="optClearChat"><span class="material-symbols-outlined">delete_sweep</span> Clear Chat</div>`;
             document.body.appendChild(menu);
 
             document.getElementById('optViewProfile').onclick = () => {
@@ -1079,11 +1089,7 @@ function rebindChatActionButtons() {
             document.getElementById('optClearChat').onclick = () => {
                 const area = document.getElementById('chatThreadArea');
                 if (area) {
-                    area.innerHTML = `
-                        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:10px;color:rgba(241,245,249,0.3);">
-                            <span class="material-symbols-outlined" style="font-size:32px;">cleaning_services</span>
-                            <span style="font-size:0.85rem;">Chat cleared locally.</span>
-                        </div>`;
+                    area.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:10px;color:rgba(241,245,249,0.3);"><span class="material-symbols-outlined" style="font-size:32px;">cleaning_services</span><span style="font-size:0.85rem;">Chat cleared locally.</span></div>`;
                 }
                 showToast('Chat cleared (local view only).', 'info');
                 menu.classList.remove('show');
@@ -1093,7 +1099,6 @@ function rebindChatActionButtons() {
         moreBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             closeAllPopovers(null, menu);
-
             const rect = moreBtn.getBoundingClientRect();
             menu.style.top = `${rect.bottom + 8}px`;
             menu.style.right = `${window.innerWidth - rect.right}px`;
@@ -1140,7 +1145,6 @@ function escapeHtml(str) {
 
 function showToast(msg, type = 'info') {
     document.querySelector('.msg-toast')?.remove();
-
     const icons = { success: 'check_circle', error: 'error', info: 'info', warning: 'warning' };
     const colors = { success: '#22c55e', error: '#ef4444', info: '#6366f1', warning: '#f59e0b' };
 

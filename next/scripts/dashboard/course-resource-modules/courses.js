@@ -1,8 +1,12 @@
 import { supabaseClient } from '../config.js';
 import { escapeAttr } from '../utils.js';
 
+// Premium cycling icon set for course cards
 const COURSE_ICONS = ['📘', '🧪', '📐', '💻', '📊', '🎨', '🌐', '📝'];
 
+/**
+ * Loads the student's enrolled courses.
+ */
 export async function loadCoursesData(userId) {
     const container = document.getElementById('db-courses-container');
     const countDisplay = document.getElementById('courseCount');
@@ -28,6 +32,7 @@ export async function loadCoursesData(userId) {
             const icon = COURSE_ICONS[idx % COURSE_ICONS.length];
             const instructorName = course.instructor_name || 'Instructor TBA';
             const instructorId = course.instructor_id;
+            
             const canMessage = !!instructorId;
 
             return `
@@ -52,6 +57,7 @@ export async function loadCoursesData(userId) {
                 </div>
                 <div class="course-card-footer">
                     <span class="course-units-label">${course.units || 0} Units</span>
+                    
                     ${canMessage ? `
                         <button class="msg-instructor-btn" 
                                 onclick="window.openComposeToInstructor('${escapeAttr(instructorName)}', '${instructorId}', 'Query: ${escapeAttr(course.course_name)}')">
