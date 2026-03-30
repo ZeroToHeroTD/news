@@ -5,19 +5,23 @@
 import { supabaseClient } from './config.js';
 import { escapeAttr } from './utils.js';
 
+// Global state to track online users across renders
+let onlineUsers = new Set();
+
 // ==========================================
 // 1. COMPONENT RENDERERS
 // ==========================================
 
 /**
  * Renders an individual member card with identity and presence indicators.
- * Mapped strictly to the .social-card-minimal CSS architecture.
  */
 const renderMemberCard = (profile, currentUserId, delay) => {
     const isMe = profile.id === currentUserId;
-    const isStaff = ['teacher', 'admin'].includes(profile.role?.toLowerCase());
+    const isStaff = ['teacher', 'admin', 'instructor'].includes(profile.role?.toLowerCase());
     
-    // Premium fallback avatar
+    // 👉 Check the real-time Set to see if they are online
+    const isOnline = onlineUsers.has(profile.id) || isMe;
+    
     const avatar = profile.avatar_url || 
         `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.full_name || 'U')}&background=0062ff&color=fff&bold=true`;
     
@@ -29,7 +33,7 @@ const renderMemberCard = (profile, currentUserId, delay) => {
             <div style="display: flex; gap: 16px; align-items: center;">
                 <div class="social-avatar-wrapper" style="position: relative;">
                     <img src="${avatar}" alt="${escapeAttr(profile.full_name)}" />
-                    <div id="status-dot-${profile.id}" class="status-dot ${isMe ? 'online' : 'offline'}" style="position: absolute; bottom: -2px; right: -2px; border: 2px solid var(--card-bg);"></div>
+                    <div id="status-dot-${profile.id}" class="status-dot ${isOnline ? 'online' : 'offline'}" style="position: absolute; bottom: -2px; right: -2px; border: 2px solid var(--card-bg);"></div>
                 </div>
 
                 <div class="member-info-column">
@@ -39,8 +43,8 @@ const renderMemberCard = (profile, currentUserId, delay) => {
                     <span class="member-name">${profile.full_name || 'Anonymous'}</span>
                     
                     <div class="status-container">
-                        <span id="status-text-${profile.id}" class="online-status-text ${isMe ? 'active' : 'offline'}">
-                            ${isMe ? 'Active Now' : 'Offline'}
+                        <span id="status-text-${profile.id}" class="online-status-text ${isOnline ? 'active' : 'offline'}">
+                            ${isOnline ? 'Active Now' : 'Offline'}
                         </span>
                     </div>
                 </div>
@@ -72,23 +76,20 @@ export async function loadSocialDirectory(currentUserId) {
         const { data: profiles, error } = await supabaseClient.from('profiles').select('*');
         if (error) throw error;
 
-        // Grouping Logic
         const sections = {};
         profiles.forEach(p => {
             const sec = (p.section || 'General').toUpperCase().trim();
             if (!sections[sec]) sections[sec] = { staff: [], students: [], count: 0 };
             
-            const isStaff = ['teacher', 'admin'].includes(p.role?.toLowerCase());
+            const isStaff = ['teacher', 'admin', 'instructor'].includes(p.role?.toLowerCase());
             isStaff ? sections[sec].staff.push(p) : sections[sec].students.push(p);
             sections[sec].count++;
         });
 
-        // Rendering Logic
         let html = '';
         let globalDelay = 0;
 
         Object.entries(sections).sort().forEach(([secName, group]) => {
-            // Container mapped to social.css .social-section-block
             html += `
                 <div class="social-section-block directory-section">
                     <h3 data-count="${group.count}">
@@ -96,8 +97,6 @@ export async function loadSocialDirectory(currentUserId) {
                         ${secName}
                     </h3>`;
             
-            globalDelay += 0.05;
-
             if (group.staff.length > 0) {
                 html += `<h4>Faculty</h4>
                          <div class="social-grid">${group.staff.map(p => {
@@ -117,22 +116,11 @@ export async function loadSocialDirectory(currentUserId) {
             html += `</div>`;
         });
 
-        if (!html) {
-            container.innerHTML = `
-                <div style="text-align: center; padding: 80px 20px; background: var(--card-bg); border: 1px dashed var(--border-color); border-radius: 24px;">
-                    <span class="material-symbols-outlined" style="font-size: 2.5rem; color: var(--text-muted); opacity: 0.5;">group_off</span>
-                    <h3 style="color: var(--text-main); font-weight: 800; font-size: 1.2rem; margin-top: 16px;">No Members Found</h3>
-                    <p style="color: var(--text-muted); font-size: 0.9rem;">Your campus directory is currently empty.</p>
-                </div>`;
-        } else {
-            container.innerHTML = html;
-        }
-        
+        container.innerHTML = html || '<p>No members found.</p>';
         setupDirectorySearch();
 
     } catch (err) {
         console.error("Directory Error:", err.message);
-        container.innerHTML = `<p style="color:var(--accent-red); text-align:center; padding:40px; background:var(--card-bg); border-radius:16px;">Failed to load campus directory.</p>`;
     }
 }
 
@@ -146,7 +134,6 @@ function setupDirectorySearch() {
 
     searchInput.addEventListener('input', e => {
         const term = e.target.value.toLowerCase().trim();
-        
         document.querySelectorAll('.social-card-minimal').forEach(card => {
             const name = card.querySelector('.member-name')?.textContent.toLowerCase() || '';
             const uid = card.getAttribute('data-uid')?.toLowerCase() || '';
@@ -154,32 +141,31 @@ function setupDirectorySearch() {
             card.style.display = matches ? 'flex' : 'none';
         });
 
-        // Toggle section visibility based on visible cards
         document.querySelectorAll('.directory-section').forEach(section => {
-            const visibleCards = section.querySelectorAll('.social-card-minimal:not([style*="display: none"])');
-            section.style.display = visibleCards.length > 0 ? 'block' : 'none';
+            const visible = section.querySelectorAll('.social-card-minimal:not([style*="display: none"])');
+            section.style.display = visible.length > 0 ? 'block' : 'none';
         });
     });
 }
 
+/**
+ * Initializes real-time presence and updates the UI markers.
+ */
 export function initializePresence(currentUserId) {
     const room = supabaseClient.channel('campus_presence');
 
     room.on('presence', { event: 'sync' }, () => {
         const state = room.presenceState();
-        const onlineIds = new Set();
         
-        // Flatten presence state into a Set of IDs
-        Object.values(state).forEach(presences => {
-            presences.forEach(p => onlineIds.add(p.user_id));
-        });
+        // 👉 Update the global Set of IDs
+        onlineUsers = new Set(Object.keys(state));
 
-        // Efficient DOM Update aligned with CSS classes
+        // 👉 Loop through every visible card and flip the switch
         document.querySelectorAll('.social-card-minimal').forEach(card => {
             const uid = card.getAttribute('data-uid');
             const dot = document.getElementById(`status-dot-${uid}`);
             const text = document.getElementById(`status-text-${uid}`);
-            const isOnline = onlineIds.has(uid);
+            const isOnline = onlineUsers.has(uid);
 
             if (dot) {
                 dot.className = `status-dot ${isOnline ? 'online' : 'offline'}`;
@@ -189,17 +175,11 @@ export function initializePresence(currentUserId) {
                 text.className = `online-status-text ${isOnline ? 'active' : 'offline'}`;
             }
 
-            // Sync topbar if it's the current user
+            // Sync your own topbar avatar dot if this card is "YOU"
             if (uid === currentUserId) {
-                const topbarDot = document.getElementById('myCurrentStatusDot') || document.querySelector('.topbar-status-dot');
+                const topbarDot = document.getElementById('myCurrentStatusDot');
                 if (topbarDot) {
-                    if (isOnline) {
-                        topbarDot.classList.add('online');
-                        topbarDot.classList.remove('offline');
-                    } else {
-                        topbarDot.classList.remove('online');
-                        topbarDot.classList.add('offline');
-                    }
+                    topbarDot.classList.toggle('online', isOnline);
                 }
             }
         });
@@ -222,43 +202,26 @@ window.copyUserId = async function (id, btn) {
     try {
         await navigator.clipboard.writeText(id);
         const original = btn.innerHTML;
-        
-        // Use the .copied class we mapped in social.css
         btn.classList.add('copied');
         btn.innerHTML = `<span class="material-symbols-outlined" style="font-size: 1.1rem;">check_circle</span> Copied!`;
-        
         setTimeout(() => {
             btn.classList.remove('copied');
             btn.innerHTML = original;
         }, 2000);
-
-        if (window.showToast) window.showToast('ID Copied to clipboard', 'success');
-    } catch (err) { 
-        console.error('Copy failed', err); 
-    }
+    } catch (err) { console.error('Copy failed', err); }
 };
 
-/**
- * Opens the compose modal from anywhere in the app and pre-fills the recipient.
- */
 window.openDirectMessage = function(partnerId, partnerName) {
-    // 1. Check if the compose modal function exists
     if (typeof window.openComposeModal === 'function') {
-        
-        // 2. Open the modal overlay
         window.openComposeModal();
-        
-        // 3. Wait a tiny fraction of a second for the modal to be visible, then fill it out
         setTimeout(() => {
             const recipientInput = document.getElementById('composeRecipientId');
             if (recipientInput) {
-                recipientInput.value = partnerName; // Show their name in the input box
-                window.secretReceiverId = partnerId; // Set the hidden ID for the database
+                recipientInput.value = partnerName;
+                window.secretReceiverId = partnerId;
             }
         }, 50);
-
     } else {
-        console.error("openComposeModal function is not globally available.");
-        if (window.showToast) window.showToast('Messaging module is still loading.', 'error');
+        if (window.showToast) window.showToast('Messaging module is offline.', 'error');
     }
 };

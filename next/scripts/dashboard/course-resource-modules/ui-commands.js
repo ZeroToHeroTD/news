@@ -1,4 +1,4 @@
-/**
+/** ui-commands.js
  * Helper to prevent search functions from firing too rapidly.
  */
 function debounce(fn, ms) { 
