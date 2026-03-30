@@ -66,15 +66,7 @@ export function closeModal(overlayId) {
   }
 }
 
-export function setupModalClose(overlayId, ...closeBtnIds) {
-  const overlay = document.getElementById(overlayId);
-  if (overlay) {
-    overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(overlayId); });
-  }
-  closeBtnIds.forEach(id => {
-    document.getElementById(id)?.addEventListener('click', () => closeModal(overlayId));
-  });
-}
+
 
 // =============================================================================
 // 3. CONFIRM DELETE DIALOG
@@ -172,15 +164,21 @@ export function renderPagination(containerId, paginationData, onPageChange) {
 // 5. TABLE SEARCH FILTER
 // =============================================================================
 
-export function filterBySearch(items, term, fields) {
+// Keep this one!
+export function filterBySearch(items, term, keys) {
   if (!term) return items;
-  const lower = term.toLowerCase();
-  return items.filter(item =>
-    fields.some(f => {
-      const val = getNestedValue(item, f);
-      return val && String(val).toLowerCase().includes(lower);
-    })
-  );
+  const lowerTerm = term.toLowerCase().trim();
+  
+  return items.filter(item => {
+    // Always check the strict ID first
+    if (item.id && String(item.id).toLowerCase().includes(lowerTerm)) return true;
+    
+    // Check the dynamic keys (name, email, course, etc.)
+    return keys.some(key => {
+      const val = item[key];
+      return val && String(val).toLowerCase().includes(lowerTerm);
+    });
+  });
 }
 
 function getNestedValue(obj, path) {
@@ -350,22 +348,7 @@ export function debounce(func, wait = 300) {
   };
 }
 
-// 2. Upgraded Search Logic (Case-insensitive, trims, includes ID)
-export function filterBySearch(items, term, keys) {
-  if (!term) return items;
-  const lowerTerm = term.toLowerCase().trim();
-  
-  return items.filter(item => {
-    // Always check the strict ID first
-    if (item.id && String(item.id).toLowerCase().includes(lowerTerm)) return true;
-    
-    // Check the dynamic keys (name, email, course, etc.)
-    return keys.some(key => {
-      const val = item[key];
-      return val && String(val).toLowerCase().includes(lowerTerm);
-    });
-  });
-}
+
 
 // 3. Upgraded Modal Behavior (ESC Key + Outside Click)
 export function setupModalClose(overlayId, closeBtnId, cancelBtnId) {

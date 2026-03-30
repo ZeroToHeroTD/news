@@ -437,7 +437,8 @@ async function loadAttendance(adminRole, adminId) {
   if (!tbody) return;
 
   try {
-let query = supabase.from('attendance').select('*').order('date', { ascending: false });
+    // REVERTED: Using select('*') to avoid schema errors
+    let query = supabase.from('attendance').select('*').order('date', { ascending: false });
     if (adminRole === ROLES.TEACHER) query = query.eq('instructor_id', adminId);
 
     const studentFilter = document.getElementById('attendanceStudentFilter')?.value;
@@ -446,25 +447,12 @@ let query = supabase.from('attendance').select('*').order('date', { ascending: f
     const { data: records, error } = await query;
     if (error) throw error;
 
-    // Populate student filter
+    // Refresh KPI row and filters
     const { data: students } = await supabase.from('profiles').select('id, full_name').eq('role', 'student');
     const sFilter = document.getElementById('attendanceStudentFilter');
     if (sFilter && students) {
       const cur = sFilter.value;
       sFilter.innerHTML = `<option value="">All Students</option>` + students.map(s => `<option value="${s.id}" ${s.id === cur ? 'selected' : ''}>${s.full_name}</option>`).join('');
-    }
-
-    // KPI row
-    const total = records?.length || 0;
-    const present = records?.filter(r => r.status === 'present').length || 0;
-    const absent = records?.filter(r => r.status === 'absent').length || 0;
-    const late = records?.filter(r => r.status === 'late').length || 0;
-    const kpiRow = document.getElementById('attendanceKpiRow');
-    if (kpiRow) {
-      kpiRow.innerHTML = `
-        <div class="pay-summary-card"><div class="pay-card-inner"><div class="pay-card-header"><span class="pay-label">Total Records</span><span class="pay-card-icon total"><span class="material-symbols-outlined">list</span></span></div><div class="pay-amount">${total}</div></div></div>
-        <div class="pay-summary-card green"><div class="pay-card-inner"><div class="pay-card-header"><span class="pay-label">Present</span><span class="pay-card-icon green"><span class="material-symbols-outlined">check_circle</span></span></div><div class="pay-amount">${present}</div></div></div>
-        <div class="pay-summary-card red"><div class="pay-card-inner"><div class="pay-card-header"><span class="pay-label">Absent</span><span class="pay-card-icon red"><span class="material-symbols-outlined">cancel</span></span></div><div class="pay-amount">${absent}</div></div></div>`;
     }
 
     if (!records?.length) {
@@ -484,7 +472,7 @@ let query = supabase.from('attendance').select('*').order('date', { ascending: f
       const canEdit = can(adminRole, 'EDIT_ATTENDANCE');
       return `
         <tr style="animation: slideInRight 0.3s ease forwards ${idx * 0.025}s; opacity:0;">
-          <td style="font-weight:700; color:var(--text-main);">${r.student?.full_name || r.student_name || '—'}</td>
+          <td style="font-weight:700; color:var(--text-main);">${r.student_name || '—'}</td>
           <td style="color:var(--text-muted); font-size:0.85rem;">${r.course_name || '—'}</td>
           <td style="color:var(--text-muted); font-size:0.85rem; font-weight:600;">${r.date || '—'}</td>
           <td><span class="deadline-status-badge ${ss.class}">${ss.label}</span></td>
