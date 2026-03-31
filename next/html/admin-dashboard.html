@@ -18,7 +18,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
-<body class="app-body admin-dashboard-page">
+<body class="app-body">
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
   <div class="app-container">
@@ -29,12 +29,12 @@
     <aside class="app-sidebar">
       <div class="sidebar-top-section">
         <div class="sidebar-brand">
-          <div class="logo-icon admin-sidebar-logo">
+          <div class="logo-icon" style="background: linear-gradient(135deg, #ef4444, #f97316);">
             <span class="material-symbols-outlined">admin_panel_settings</span>
           </div>
-          <div class="admin-settings-heading">
-            <h2 class="admin-sidebar-title">Admin Portal</h2>
-            <span class="admin-sidebar-kicker">Control Center</span>
+          <div>
+            <h2 style="font-size:1.1rem;">Admin Portal</h2>
+            <span style="font-size:0.65rem; color:#94a3b8; text-transform:uppercase; letter-spacing:0.1em; font-weight:700;">Control Center</span>
           </div>
         </div>
 
@@ -58,7 +58,7 @@
           <li>
             <a href="#" data-target="view-users">
               <span class="material-symbols-outlined nav-icon">manage_accounts</span>Users
-              <span class="dot-count admin-hidden-badge" id="pendingUsersBadge">0</span>
+              <span class="dot-count" id="pendingUsersBadge" style="display:none;">0</span>
             </a>
           </li>
           <li>
@@ -93,7 +93,7 @@
           </li>
         </ul>
 
-        <span class="sidebar-section-label admin-sidebar-section-spaced">Quick Links</span>
+        <span class="sidebar-section-label" style="margin-top: 20px;">Quick Links</span>
         <ul class="nav-links">
           <li>
             <a href="../../next/html/dashboard.html" target="_blank">
@@ -104,9 +104,12 @@
       </nav>
 
       <div class="sidebar-bottom-section">
-        <div class="admin-role-badge admin-role-chip-shell" id="adminRoleBadge">
-          <span class="material-symbols-outlined admin-role-chip-icon">verified_user</span>
-          <span class="admin-role-chip-text" id="roleDisplayBadge">Administrator</span>
+        <div class="admin-role-badge" id="adminRoleBadge" style="
+          display: flex; align-items: center; gap: 8px; padding: 10px 14px;
+          border-radius: 12px; background: rgba(239,68,68,0.1);
+          border: 1px solid rgba(239,68,68,0.2); margin-bottom: 10px;">
+          <span class="material-symbols-outlined" style="font-size:1rem; color:#ef4444;">verified_user</span>
+          <span style="font-size:0.75rem; font-weight:800; color:#ef4444; text-transform:uppercase; letter-spacing:0.06em;" id="roleDisplayBadge">Administrator</span>
         </div>
         <button type="button" class="logout-btn" id="adminLogoutBtn">
           <span class="material-symbols-outlined">logout</span>Log Out
@@ -125,9 +128,9 @@
           <span class="material-symbols-outlined">menu</span>
         </button>
         <div class="search-bar">
-          <input type="text" id="adminGlobalSearch" placeholder="Search names, IDs, courses, payments...">
+          <input type="text" id="adminGlobalSearch" placeholder="Search users, courses, announcements...">
         </div>
-        <div class="topbar-right-group admin-topbar-actions">
+        <div class="topbar-right-group" style="display:flex; align-items:center; gap:12px;">
           <button type="button" class="theme-toggle-btn" id="themeToggle" title="Switch Theme">
             <span class="material-symbols-outlined" id="themeIcon">dark_mode</span>
           </button>
@@ -143,22 +146,22 @@
 
       <!-- ═══ VIEW: OVERVIEW ═══ -->
       <section class="view-content active" id="view-overview">
-        <div class="dashboard-hero admin-overview-hero">
+        <div class="dashboard-hero" style="background: linear-gradient(135deg, rgba(239,68,68,0.06), rgba(249,115,22,0.04));">
           <div class="welcome-mini">
             <h1 id="adminWelcomeMsg">Welcome, Admin</h1>
             <p id="adminCurrentDate">-- --, ----</p>
           </div>
           <div class="today-focus-container">
-            <div class="focus-card warning admin-focus-card-static">
-              <span class="material-symbols-outlined admin-focus-icon admin-focus-icon-amber">group</span>
+            <div class="focus-card warning" style="cursor:default;">
+              <span class="material-symbols-outlined" style="color:var(--accent-amber);">group</span>
               <div class="focus-info">
                 <small>Total Students</small>
                 <h4 id="overviewTotalStudents">—</h4>
                 <p id="overviewActiveStudents">Active users</p>
               </div>
             </div>
-            <div class="focus-card urgent admin-focus-card-static">
-              <span class="material-symbols-outlined admin-focus-icon admin-focus-icon-red">school</span>
+            <div class="focus-card urgent" style="cursor:default;">
+              <span class="material-symbols-outlined" style="color:var(--accent-red);">school</span>
               <div class="focus-info">
                 <small>Instructors</small>
                 <h4 id="overviewTotalInstructors">—</h4>
@@ -170,71 +173,71 @@
 
         <!-- Analytics KPI Row -->
         <div class="smart-action-grid" id="kpiGrid">
-          <button type="button" class="action-card" data-target="view-users">
+          <div class="action-card" data-target="view-users">
             <div class="action-icon blue"><span class="material-symbols-outlined">people</span></div>
             <div class="action-content">
               <h4 id="kpiTotalUsers">—</h4>
               <p>Total Users</p>
             </div>
-          </button>
-          <button type="button" class="action-card" data-target="view-courses">
+          </div>
+          <div class="action-card" data-target="view-courses">
             <div class="action-icon purple"><span class="material-symbols-outlined">menu_book</span></div>
             <div class="action-content">
               <h4 id="kpiTotalCourses">—</h4>
               <p>Active Courses</p>
             </div>
-          </button>
-          <button type="button" class="action-card" data-target="view-attendance">
+          </div>
+          <div class="action-card" data-target="view-attendance">
             <div class="action-icon green"><span class="material-symbols-outlined">fact_check</span></div>
             <div class="action-content">
               <h4 id="kpiAvgAttendance">—%</h4>
               <p>Avg Attendance</p>
             </div>
-          </button>
-          <button type="button" class="action-card" data-target="view-payments">
+          </div>
+          <div class="action-card" data-target="view-payments">
             <div class="action-icon orange"><span class="material-symbols-outlined">account_balance_wallet</span></div>
             <div class="action-content">
               <h4 id="kpiTotalRevenue">—</h4>
               <p>Payments Collected</p>
             </div>
-          </button>
+          </div>
         </div>
 
         <!-- Charts + Tables -->
         <div class="dashboard-grid">
           <div class="grid-left">
-            <div class="section-card admin-settings-card">
-              <div class="admin-card-header-split">
+            <div class="section-card">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
                 <h2>Grade Distribution</h2>
                 <select class="chart-select" id="gradeDistFilter">
                   <option value="all">All Courses</option>
                 </select>
               </div>
-              <div class="admin-chart-frame admin-chart-frame-lg">
+              <div style="position:relative; min-height:250px;">
                 <canvas id="gradeDistChart"></canvas>
               </div>
             </div>
-            <div class="section-card admin-settings-card">
+            <div class="section-card">
               <h2>Attendance Trend</h2>
-              <div class="admin-chart-frame admin-chart-frame-md admin-chart-frame-spaced">
+              <div style="position:relative; min-height:220px; margin-top:16px;">
                 <canvas id="attendanceTrendChart"></canvas>
               </div>
             </div>
           </div>
           <div class="grid-right">
-            <div class="section-card admin-settings-card">
+            <div class="section-card">
               <h3>User Breakdown</h3>
-              <div class="admin-chart-frame admin-chart-frame-sm admin-chart-frame-spaced">
+              <div style="position:relative; min-height:200px; margin-top:16px;">
                 <canvas id="userBreakdownChart"></canvas>
               </div>
             </div>
-            <div class="section-card admin-settings-card">
+            <div class="section-card">
               <h3>Recent Activity</h3>
-              <div id="recentActivityLog" class="admin-panel-content-spaced"></div>
+              <div id="recentActivityLog" style="margin-top:12px;"></div>
             </div>
             <div class="section-card">
               <h3>Payment Status</h3>
-              <div class="admin-chart-frame admin-chart-frame-xs admin-chart-frame-spaced">
+              <div style="position:relative; min-height:180px; margin-top:16px;">
                 <canvas id="paymentStatusChart"></canvas>
               </div>
             </div>
@@ -245,21 +248,21 @@
       <!-- ═══ VIEW: USERS ═══ -->
       <section class="view-content" id="view-users">
         <div class="admin-view-header">
-          <div class="admin-users-heading">
+          <div>
             <h2>User Management</h2>
             <p class="admin-view-subtitle">Manage students, instructors, and administrators</p>
           </div>
-          <div class="admin-header-actions admin-users-toolbar">
-            <div class="admin-filter-bar admin-users-filters">
+          <div class="admin-header-actions">
+            <div class="admin-filter-bar">
               <select class="chart-select" id="userRoleFilter">
                 <option value="all">All Roles</option>
                 <option value="student">Students</option>
                 <option value="teacher">Instructors</option>
                 <option value="admin">Admins</option>
               </select>
-              <input type="text" id="userSearchInput" class="admin-search-input" placeholder="Search by name, email, or ID...">
+              <input type="text" id="userSearchInput" class="admin-search-input" placeholder="Search by name or email...">
             </div>
-            <button class="admin-btn admin-btn-primary admin-users-add-btn" id="createUserBtn" data-admin-only>
+            <button class="admin-btn admin-btn-primary" id="createUserBtn" data-admin-only>
               <span class="material-symbols-outlined">person_add</span> Add User
             </button>
           </div>
@@ -267,9 +270,9 @@
 
         <div class="admin-stats-strip" id="userStatsStrip"></div>
 
-        <div class="section-card admin-table-card admin-users-table-card">
-          <div class="table-scroll-wrapper admin-table-shell admin-table-shell-lg admin-users-table-shell">
-            <table class="admin-table" id="usersTable">
+        <div class="section-card" style="padding:0; overflow:hidden;">
+          <div class="table-scroll-wrapper" style="max-height:600px; border:none; border-radius:0;">
+            <table class="grades-table admin-table" id="usersTable">
               <thead>
                 <tr>
                   <th>User</th>
@@ -277,7 +280,7 @@
                   <th>Course / Section</th>
                   <th>Status</th>
                   <th>Joined</th>
-                  <th class="admin-table-actions-col">Actions</th>
+                  <th style="text-align:right; padding-right:24px;">Actions</th>
                 </tr>
               </thead>
               <tbody id="usersTableBody">
@@ -292,18 +295,18 @@
       <!-- ═══ VIEW: COURSES ═══ -->
       <section class="view-content" id="view-courses">
         <div class="admin-view-header">
-          <div class="admin-courses-heading">
+          <div>
             <h2>Course Management</h2>
             <p class="admin-view-subtitle">Create, assign, and manage academic subjects</p>
           </div>
-          <div class="admin-header-actions admin-courses-toolbar">
+          <div class="admin-header-actions">
             <input type="text" id="courseSearchInput" class="admin-search-input" placeholder="Search courses...">
-            <button class="admin-btn admin-btn-primary admin-courses-add-btn" id="createCourseBtn" data-admin-only>
+            <button class="admin-btn admin-btn-primary" id="createCourseBtn" data-admin-only>
               <span class="material-symbols-outlined">add_circle</span> Add Course
             </button>
           </div>
         </div>
-        <div class="courses-grid admin-courses-grid" id="adminCoursesGrid">
+        <div class="courses-grid" id="adminCoursesGrid">
           <div class="admin-loading-state">Loading courses...</div>
         </div>
       </section>
@@ -311,33 +314,28 @@
       <!-- ═══ VIEW: GRADES ═══ -->
       <section class="view-content" id="view-grades">
         <div class="admin-view-header">
-          <div class="admin-grades-heading">
+          <div>
             <h2>Grade Records</h2>
             <p class="admin-view-subtitle">View and manage student academic records</p>
           </div>
-          <div class="admin-header-actions admin-grades-toolbar">
-            <div class="admin-filter-bar admin-grades-filters">
-              <input type="text" id="gradesSearchInput" class="admin-search-input" placeholder="Search student, course, or ID...">
-              <select class="chart-select" id="gradesStudentFilter">
-                <option value="">All Students</option>
-              </select>
-              <select class="chart-select" id="gradesCourseFilter">
-                <option value="">All Courses</option>
-              </select>
-            </div>
-            <div class="admin-toolbar-action-group admin-grades-actions">
-              <button class="admin-btn admin-btn-secondary admin-grades-export-btn" id="exportGradesBtn">
-                <span class="material-symbols-outlined">download</span> Export
-              </button>
-              <button class="admin-btn admin-btn-primary admin-grades-add-btn" id="addGradeBtn">
-                <span class="material-symbols-outlined">add</span> Add Grade
-              </button>
-            </div>
+          <div class="admin-header-actions">
+            <select class="chart-select" id="gradesStudentFilter">
+              <option value="">All Students</option>
+            </select>
+            <select class="chart-select" id="gradesCourseFilter">
+              <option value="">All Courses</option>
+            </select>
+            <button class="admin-btn admin-btn-secondary" id="exportGradesBtn">
+              <span class="material-symbols-outlined">download</span> Export
+            </button>
+            <button class="admin-btn admin-btn-primary" id="addGradeBtn">
+              <span class="material-symbols-outlined">add</span> Add Grade
+            </button>
           </div>
         </div>
-        <div class="section-card admin-table-card admin-grades-table-card">
-          <div class="table-scroll-wrapper admin-table-shell admin-table-shell-lg admin-grades-table-shell">
-            <table class="admin-table" id="gradesTable">
+        <div class="section-card" style="padding:0; overflow:hidden;">
+          <div class="table-scroll-wrapper" style="max-height:600px; border:none; border-radius:0;">
+            <table class="grades-table admin-table" id="gradesTable">
               <thead>
                 <tr>
                   <th>Student</th>
@@ -347,7 +345,7 @@
                   <th>Finals</th>
                   <th>Numerical</th>
                   <th>Status</th>
-                  <th class="admin-table-actions-col">Actions</th>
+                  <th style="text-align:right; padding-right:24px;">Actions</th>
                 </tr>
               </thead>
               <tbody id="gradesTableBody">
@@ -362,33 +360,30 @@
       <!-- ═══ VIEW: ATTENDANCE ═══ -->
       <section class="view-content" id="view-attendance">
         <div class="admin-view-header">
-          <div class="admin-attendance-heading">
+          <div>
             <h2>Attendance Records</h2>
             <p class="admin-view-subtitle">Monitor and manage student attendance data</p>
           </div>
-          <div class="admin-header-actions admin-attendance-toolbar">
-            <div class="admin-filter-bar admin-attendance-filters">
-              <input type="text" id="attendanceSearchInput" class="admin-search-input" placeholder="Search student, course, or ID...">
-              <select class="chart-select" id="attendanceStudentFilter">
-                <option value="">All Students</option>
-              </select>
-            </div>
-            <button class="admin-btn admin-btn-primary admin-attendance-add-btn" id="addAttendanceBtn">
+          <div class="admin-header-actions">
+            <select class="chart-select" id="attendanceStudentFilter">
+              <option value="">All Students</option>
+            </select>
+            <button class="admin-btn admin-btn-primary" id="addAttendanceBtn">
               <span class="material-symbols-outlined">add</span> Log Attendance
             </button>
           </div>
         </div>
-        <div class="payment-summary-row admin-kpi-row admin-attendance-kpis" id="attendanceKpiRow"></div>
-        <div class="section-card admin-table-card admin-attendance-table-card">
-          <div class="table-scroll-wrapper admin-table-shell admin-table-shell-md admin-attendance-table-shell">
-            <table class="admin-table" id="attendanceTable">
+        <div class="payment-summary-row" id="attendanceKpiRow" style="margin-bottom:24px;"></div>
+        <div class="section-card" style="padding:0; overflow:hidden;">
+          <div class="table-scroll-wrapper" style="max-height:560px; border:none; border-radius:0;">
+            <table class="grades-table admin-table" id="attendanceTable">
               <thead>
                 <tr>
                   <th>Student</th>
                   <th>Course</th>
                   <th>Date</th>
                   <th>Status</th>
-                  <th class="admin-table-actions-col">Actions</th>
+                  <th style="text-align:right; padding-right:24px;">Actions</th>
                 </tr>
               </thead>
               <tbody id="attendanceTableBody">
@@ -403,25 +398,22 @@
       <!-- ═══ VIEW: ANNOUNCEMENTS ═══ -->
       <section class="view-content" id="view-announcements">
         <div class="admin-view-header">
-          <div class="admin-announcements-heading">
+          <div>
             <h2>Announcements</h2>
             <p class="admin-view-subtitle">Create and manage system-wide notices</p>
           </div>
-          <div class="admin-header-actions admin-announcements-toolbar">
-            <div class="admin-filter-bar admin-announcements-filters">
-              <input type="text" id="annSearchInput" class="admin-search-input" placeholder="Search title, audience, or ID...">
-              <select class="chart-select" id="annAudienceFilter">
-                <option value="all">All Audiences</option>
-                <option value="students">Students Only</option>
-                <option value="instructors">Instructors Only</option>
-              </select>
-            </div>
-            <button class="admin-btn admin-btn-primary admin-announcements-add-btn" id="createAnnBtn">
+          <div class="admin-header-actions">
+            <select class="chart-select" id="annAudienceFilter">
+              <option value="all">All Audiences</option>
+              <option value="students">Students Only</option>
+              <option value="instructors">Instructors Only</option>
+            </select>
+            <button class="admin-btn admin-btn-primary" id="createAnnBtn">
               <span class="material-symbols-outlined">add</span> New Announcement
             </button>
           </div>
         </div>
-        <div id="announcementsGrid" class="admin-announcements-grid admin-announcements-feed">
+        <div id="announcementsGrid" class="admin-announcements-grid">
           <div class="admin-loading-state">Loading announcements...</div>
         </div>
       </section>
@@ -429,29 +421,26 @@
       <!-- ═══ VIEW: PAYMENTS ═══ -->
       <section class="view-content" id="view-payments">
         <div class="admin-view-header">
-          <div class="admin-payments-heading">
+          <div>
             <h2>Payment Records</h2>
             <p class="admin-view-subtitle">Track and manage student financial data</p>
           </div>
-          <div class="admin-header-actions admin-payments-toolbar">
-            <div class="admin-filter-bar admin-payments-filters">
-              <input type="text" id="paymentSearchInput" class="admin-search-input" placeholder="Search student, status, or ID...">
-              <select class="chart-select" id="paymentStatusFilter">
-                <option value="all">All Status</option>
-                <option value="Paid">Paid</option>
-                <option value="Pending">Pending</option>
-                <option value="Overdue">Overdue</option>
-              </select>
-            </div>
-            <button class="admin-btn admin-btn-primary admin-payments-add-btn" id="addPaymentBtn" data-admin-only>
+          <div class="admin-header-actions">
+            <select class="chart-select" id="paymentStatusFilter">
+              <option value="all">All Status</option>
+              <option value="Paid">Paid</option>
+              <option value="Pending">Pending</option>
+              <option value="Overdue">Overdue</option>
+            </select>
+            <button class="admin-btn admin-btn-primary" id="addPaymentBtn" data-admin-only>
               <span class="material-symbols-outlined">add</span> Add Record
             </button>
           </div>
         </div>
-        <div class="payment-summary-row admin-payments-summary" id="adminPaymentSummaryRow"></div>
-        <div class="section-card admin-table-card admin-table-card-flush admin-payments-table-card">
-          <div class="table-scroll-wrapper admin-table-shell admin-table-shell-md admin-payments-table-shell">
-            <table class="admin-table">
+        <div class="payment-summary-row" id="adminPaymentSummaryRow"></div>
+        <div class="section-card" style="padding:0; overflow:hidden; margin-top:0;">
+          <div class="table-scroll-wrapper" style="max-height:560px; border:none; border-radius:0;">
+            <table class="grades-table admin-table">
               <thead>
                 <tr>
                   <th>Student</th>
@@ -459,7 +448,7 @@
                   <th>Amount</th>
                   <th>Due Date</th>
                   <th>Status</th>
-                  <th class="admin-table-actions-col">Actions</th>
+                  <th style="text-align:right; padding-right:24px;">Actions</th>
                 </tr>
               </thead>
               <tbody id="adminPaymentsBody">
@@ -473,19 +462,19 @@
       <!-- ═══ VIEW: SETTINGS (Admin Only) ═══ -->
       <section class="view-content" id="view-settings" data-admin-only>
         <div class="admin-view-header">
-          <div class="admin-settings-heading">
+          <div>
             <h2>System Settings</h2>
             <p class="admin-view-subtitle">Configure portal preferences and role permissions</p>
           </div>
         </div>
-        <div class="dashboard-grid admin-settings-grid">
+        <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr;">
           <div class="grid-left">
             <div class="section-card">
-              <h3 class="admin-settings-card-title">Role Permissions</h3>
+              <h3 style="margin-bottom:20px;">🔐 Role Permissions</h3>
               <div id="rolePermissionsPanel" class="admin-permissions-panel"></div>
             </div>
             <div class="section-card">
-              <h3 class="admin-settings-card-title">Portal Appearance</h3>
+              <h3 style="margin-bottom:20px;">🎨 Portal Appearance</h3>
               <div class="admin-settings-group">
                 <div class="admin-setting-row">
                   <div>
@@ -518,30 +507,30 @@
                   </label>
                 </div>
               </div>
-              <button class="admin-btn admin-btn-primary admin-settings-save-btn" id="saveSettingsBtn">
+              <button class="admin-btn admin-btn-primary" style="width:100%; margin-top:20px;" id="saveSettingsBtn">
                 <span class="material-symbols-outlined">save</span> Save Settings
               </button>
             </div>
           </div>
           <div class="grid-right">
-            <div class="section-card admin-settings-card">
-              <h3 class="admin-settings-card-title">Activity Log</h3>
-              <div id="adminActivityLog" class="admin-settings-log"></div>
+            <div class="section-card">
+              <h3 style="margin-bottom:20px;">📋 Activity Log</h3>
+              <div id="adminActivityLog" style="max-height:400px; overflow-y:auto;"></div>
             </div>
-            <div class="section-card admin-settings-card">
-              <h3 class="admin-settings-card-title">System Info</h3>
+            <div class="section-card">
+              <h3 style="margin-bottom:20px;">🗄️ System Info</h3>
               <div class="admin-settings-group">
                 <div class="admin-setting-row">
                   <span class="admin-setting-label">Portal Version</span>
-                  <span class="admin-settings-value admin-settings-value--accent">v2.0.0</span>
+                  <span style="color:var(--primary); font-weight:700;">v2.0.0</span>
                 </div>
                 <div class="admin-setting-row">
                   <span class="admin-setting-label">Database</span>
-                  <span class="admin-settings-value admin-settings-value--success">Supabase Connected</span>
+                  <span style="color:var(--accent-green); font-weight:700;">Supabase ✓</span>
                 </div>
                 <div class="admin-setting-row">
                   <span class="admin-setting-label">Admin Since</span>
-                  <span id="adminSinceDate" class="admin-settings-value admin-settings-value--muted">--</span>
+                  <span id="adminSinceDate" style="color:var(--text-muted); font-weight:600;">—</span>
                 </div>
               </div>
             </div>
@@ -557,8 +546,8 @@
   ═══════════════════════════════════════════ -->
 
   <!-- User Create/Edit Modal -->
-  <div class="compose-modal-overlay" id="userModalOverlay" aria-hidden="true">
-    <div class="compose-modal-box admin-modal admin-modal-md">
+  <div class="compose-modal-overlay" id="userModalOverlay">
+    <div class="compose-modal-box admin-modal" style="max-width:520px;">
       <div class="compose-modal-header">
         <h3 id="userModalTitle">Add New User</h3>
         <button type="button" class="modal-close-btn" id="userModalClose">
@@ -575,34 +564,17 @@
           <input type="email" id="umEmail" placeholder="user@school.edu" required>
         </div>
         <div class="compose-field" id="umPasswordGroup">
-          <label>Password <span class="admin-label-hint">(min. 6 chars)</span></label>
+          <label>Password <span style="color:var(--text-muted); font-weight:500;">(min. 6 chars)</span></label>
           <input type="password" id="umPassword" placeholder="••••••••">
         </div>
-        <div class="admin-form-grid-two">
-          <div class="compose-field admin-role-field">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+          <div class="compose-field">
             <label>Role</label>
-            <select id="umRole" class="chart-select admin-role-native-select" data-ui-skip-wrap="true" tabindex="-1" aria-hidden="true">
+            <select id="umRole" class="chart-select" style="width:100%; padding:12px 14px; border-radius:10px;">
               <option value="student">Student</option>
               <option value="teacher">Instructor</option>
               <option value="admin">Admin</option>
             </select>
-            <div class="admin-role-picker" id="umRolePicker" role="radiogroup" aria-label="User role">
-              <button type="button" class="admin-role-option" data-role="student" role="radio" aria-checked="false">
-                <span class="material-symbols-outlined admin-role-option-icon">school</span>
-                <span class="admin-role-option-title">Student</span>
-                <span class="admin-role-option-copy">Learner access</span>
-              </button>
-              <button type="button" class="admin-role-option" data-role="teacher" role="radio" aria-checked="false">
-                <span class="material-symbols-outlined admin-role-option-icon">co_present</span>
-                <span class="admin-role-option-title">Instructor</span>
-                <span class="admin-role-option-copy">Teaching tools</span>
-              </button>
-              <button type="button" class="admin-role-option" data-role="admin" role="radio" aria-checked="false">
-                <span class="material-symbols-outlined admin-role-option-icon">shield_person</span>
-                <span class="admin-role-option-title">Admin</span>
-                <span class="admin-role-option-copy">Full control</span>
-              </button>
-            </div>
           </div>
           <div class="compose-field">
             <label>Section</label>
@@ -628,8 +600,8 @@
   </div>
 
   <!-- Course Create/Edit Modal -->
-<div class="compose-modal-overlay" id="courseModalOverlay" aria-hidden="true">
-    <div class="compose-modal-box admin-modal admin-modal-md admin-course-modal">
+<div class="compose-modal-overlay" id="courseModalOverlay">
+    <div class="compose-modal-box admin-modal" style="max-width:520px;">
       <div class="compose-modal-header">
         <h3 id="courseModalTitle">Add Course</h3>
         <button type="button" class="modal-close-btn" id="courseModalClose">
@@ -637,97 +609,87 @@
         </button>
       </div>
       
-      <form id="courseModalForm" class="admin-form-grid admin-course-form">
-        <div class="admin-course-form-body">
-          <div class="admin-course-form-section">
-            <div class="compose-field admin-full-width">
-              <label>Course Name</label>
-              <input type="text" id="cmCourseName" placeholder="e.g. Introduction to Programming" required>
-            </div>
-
-            <div class="compose-field">
-              <label>Course Code</label>
-              <input type="text" id="cmCourseCode" placeholder="e.g. CS101">
-            </div>
-
-            <div class="compose-field">
-              <label>Units</label>
-              <input type="number" id="cmUnits" placeholder="3" min="1" max="9">
-            </div>
-
-            <div class="compose-field admin-full-width">
-              <label>Assign Instructor</label>
-              <select id="cmInstructor" class="chart-select">
-                <option value="">Select Instructor...</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="compose-field admin-full-width admin-course-enrollment">
-            <div class="admin-course-enroll-title">
-              <label>Enroll Students</label>
-              <p>Choose who should be assigned to this course.</p>
-            </div>
-            <div class="admin-enroll-header">
-              <span>Available Students</span>
-              <button type="button" id="cmSelectAllBtn" class="admin-text-btn">Select All</button>
-            </div>
-
-            <div class="admin-course-student-search">
-              <input type="text" id="cmStudentSearch" class="admin-search-input" placeholder="Search students by name...">
-            </div>
-
-            <div id="cmStudentEnrollList" class="admin-enroll-list">Loading students...</div>
-          </div>
+      <form id="courseModalForm" class="admin-form-grid">
+        <div class="compose-field admin-full-width">
+          <label>Course Name</label>
+          <input type="text" id="cmCourseName" placeholder="e.g. Introduction to Programming" required>
         </div>
-
-        <div class="compose-modal-actions">
-          <button type="button" class="btn-cancel" id="courseModalCancel">Cancel</button>
-          <button type="button" class="btn-send" id="courseModalSave">
-            <span class="material-symbols-outlined">save</span> Save Course
-          </button>
+        
+        <div class="compose-field">
+          <label>Course Code</label>
+          <input type="text" id="cmCourseCode" placeholder="e.g. CS101">
         </div>
-      </form>
+        
+        <div class="compose-field">
+          <label>Units</label>
+          <input type="number" id="cmUnits" placeholder="3" min="1" max="9">
+        </div>
+        
+        <div class="compose-field admin-full-width">
+          <label>Assign Instructor</label>
+          <select id="cmInstructor" class="chart-select">
+            <option value="">Select Instructor...</option>
+          </select>
+        </div>
+        
+<div class="compose-field admin-full-width">
+          <label>Enroll Students</label>
+          <div class="admin-enroll-header">
+            <span>Available Students</span>
+            <button type="button" id="cmSelectAllBtn" class="admin-text-btn">Select All</button>
+          </div>
+          
+          <div style="margin-bottom: 8px;">
+            <input type="text" id="cmStudentSearch" placeholder="Search students by name..." style="width: 100%; border-radius: 8px; padding: 8px 12px;">
+          </div>
+          
+          <div id="cmStudentEnrollList" class="admin-enroll-list">Loading students...</div>
+        </div>
+      
+      <div class="compose-modal-actions">
+        <button type="button" class="btn-cancel" id="courseModalCancel">Cancel</button>
+        <button type="button" class="btn-send" id="courseModalSave">
+          <span class="material-symbols-outlined">save</span> Save Course
+        </button>
+      </div>
     </div>
   </div>
 
   <!-- Grade Edit Modal -->
-  <div class="compose-modal-overlay" id="gradeModalOverlay" aria-hidden="true">
-    <div class="compose-modal-box admin-modal admin-modal-sm admin-grade-modal">
+  <div class="compose-modal-overlay" id="gradeModalOverlay">
+    <div class="compose-modal-box admin-modal" style="max-width:420px;">
       <div class="compose-modal-header">
         <h3 id="gradeModalTitle">Edit Grade</h3>
         <button type="button" class="modal-close-btn" id="gradeModalClose">
           <span class="material-symbols-outlined">close</span>
         </button>
       </div>
-      <div class="modal-scroll-area">
+      <div class="compose-field">
+        <label>Student</label>
+        <select id="gmStudent" class="chart-select" style="width:100%; padding:12px 14px; border-radius:10px;"></select>
+      </div>
+      <div class="compose-field">
+        <label>Course</label>
+        <select id="gmCourse" class="chart-select" style="width:100%; padding:12px 14px; border-radius:10px;"></select>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
         <div class="compose-field">
-          <label>Student</label>
-          <select id="gmStudent" class="chart-select"></select>
-        </div>
-        <div class="compose-field">
-          <label>Course</label>
-          <select id="gmCourse" class="chart-select"></select>
-        </div>
-        <div class="admin-form-grid-two">
-          <div class="compose-field">
-            <label>Midterm (%)</label>
-            <input type="number" id="gmMidterm" min="0" max="100" placeholder="0-100">
-          </div>
-          <div class="compose-field">
-            <label>Finals (%)</label>
-            <input type="number" id="gmFinals" min="0" max="100" placeholder="0-100">
-          </div>
+          <label>Midterm (%)</label>
+          <input type="number" id="gmMidterm" min="0" max="100" placeholder="0-100">
         </div>
         <div class="compose-field">
-          <label>Status</label>
-          <select id="gmStatus" class="chart-select">
-            <option value="In Progress">In Progress</option>
-            <option value="Passed">Passed</option>
-            <option value="Failed">Failed</option>
-            <option value="Incomplete">Incomplete</option>
-          </select>
+          <label>Finals (%)</label>
+          <input type="number" id="gmFinals" min="0" max="100" placeholder="0-100">
         </div>
+      </div>
+      <div class="compose-field">
+        <label>Status</label>
+        <select id="gmStatus" class="chart-select" style="width:100%; padding:12px 14px; border-radius:10px;">
+          <option value="In Progress">In Progress</option>
+          <option value="Passed">Passed</option>
+          <option value="Failed">Failed</option>
+          <option value="Incomplete">Incomplete</option>
+        </select>
       </div>
       <div class="compose-modal-actions">
         <button type="button" class="btn-cancel" id="gradeModalCancel">Cancel</button>
@@ -739,31 +701,29 @@
   </div>
 
   <!-- Announcement Modal -->
-  <div class="compose-modal-overlay" id="annModalOverlay" aria-hidden="true">
-    <div class="compose-modal-box admin-modal admin-modal-announcement">
+  <div class="compose-modal-overlay" id="annModalOverlay">
+    <div class="compose-modal-box admin-modal" style="max-width:500px;">
       <div class="compose-modal-header">
         <h3 id="annModalTitle">New Announcement</h3>
         <button type="button" class="modal-close-btn" id="annModalClose">
           <span class="material-symbols-outlined">close</span>
         </button>
       </div>
-      <div class="modal-scroll-area">
-        <div class="compose-field">
-          <label>Subject / Title</label>
-          <input type="text" id="annSubject" placeholder="e.g. Enrollment Schedule Update" required>
-        </div>
-        <div class="compose-field">
-          <label>Message</label>
-          <textarea id="annContent" rows="5" placeholder="Write your announcement..."></textarea>
-        </div>
-        <div class="compose-field" id="annAudienceGroup">
-          <label>Target Audience</label>
-          <select id="annAudience" class="chart-select">
-            <option value="all">Everyone</option>
-            <option value="students">Students Only</option>
-            <option value="instructors">Instructors Only</option>
-          </select>
-        </div>
+      <div class="compose-field">
+        <label>Subject / Title</label>
+        <input type="text" id="annSubject" placeholder="e.g. Enrollment Schedule Update" required>
+      </div>
+      <div class="compose-field">
+        <label>Message</label>
+        <textarea id="annContent" rows="5" placeholder="Write your announcement..."></textarea>
+      </div>
+      <div class="compose-field" id="annAudienceGroup">
+        <label>Target Audience</label>
+        <select id="annAudience" class="chart-select" style="width:100%; padding:12px 14px; border-radius:10px;">
+          <option value="all">Everyone</option>
+          <option value="students">Students Only</option>
+          <option value="instructors">Instructors Only</option>
+        </select>
       </div>
       <div class="compose-modal-actions">
         <button type="button" class="btn-cancel" id="annModalCancel">Cancel</button>
@@ -775,36 +735,34 @@
   </div>
 
   <!-- Attendance Log Modal -->
-  <div class="compose-modal-overlay" id="attendanceModalOverlay" aria-hidden="true">
-    <div class="compose-modal-box admin-modal admin-modal-sm admin-attendance-modal">
+  <div class="compose-modal-overlay" id="attendanceModalOverlay">
+    <div class="compose-modal-box admin-modal" style="max-width:420px;">
       <div class="compose-modal-header">
         <h3 id="attModalTitle">Log Attendance</h3>
         <button type="button" class="modal-close-btn" id="attModalClose">
           <span class="material-symbols-outlined">close</span>
         </button>
       </div>
-      <div class="modal-scroll-area">
-        <div class="compose-field">
-          <label>Student</label>
-          <select id="attStudent" class="chart-select"></select>
-        </div>
-        <div class="compose-field">
-          <label>Course</label>
-          <select id="attCourse" class="chart-select"></select>
-        </div>
-        <div class="compose-field">
-          <label>Date</label>
-          <input type="date" id="attDate">
-        </div>
-        <div class="compose-field">
-          <label>Status</label>
-          <select id="attStatus" class="chart-select">
-            <option value="present">Present</option>
-            <option value="absent">Absent</option>
-            <option value="late">Late</option>
-            <option value="excused">Excused</option>
-          </select>
-        </div>
+      <div class="compose-field">
+        <label>Student</label>
+        <select id="attStudent" class="chart-select" style="width:100%; padding:12px 14px; border-radius:10px;"></select>
+      </div>
+      <div class="compose-field">
+        <label>Course</label>
+        <select id="attCourse" class="chart-select" style="width:100%; padding:12px 14px; border-radius:10px;"></select>
+      </div>
+      <div class="compose-field">
+        <label>Date</label>
+        <input type="date" id="attDate">
+      </div>
+      <div class="compose-field">
+        <label>Status</label>
+        <select id="attStatus" class="chart-select" style="width:100%; padding:12px 14px; border-radius:10px;">
+          <option value="present">Present</option>
+          <option value="absent">Absent</option>
+          <option value="late">Late</option>
+          <option value="excused">Excused</option>
+        </select>
       </div>
       <div class="compose-modal-actions">
         <button type="button" class="btn-cancel" id="attModalCancel">Cancel</button>
@@ -816,24 +774,23 @@
   </div>
 
   <!-- Payment Modal -->
-  <div class="compose-modal-overlay" id="paymentAdminModalOverlay" aria-hidden="true">
-    <div class="compose-modal-box admin-modal admin-modal-sm">
+  <div class="compose-modal-overlay" id="paymentAdminModalOverlay">
+    <div class="compose-modal-box admin-modal" style="max-width:420px;">
       <div class="compose-modal-header">
         <h3 id="payModalTitle">Add Payment Record</h3>
         <button type="button" class="modal-close-btn" id="payModalClose">
           <span class="material-symbols-outlined">close</span>
         </button>
       </div>
-      <div class="modal-scroll-area">
       <div class="compose-field">
         <label>Student</label>
-        <select id="pmStudent" class="chart-select"></select>
+        <select id="pmStudent" class="chart-select" style="width:100%; padding:12px 14px; border-radius:10px;"></select>
       </div>
       <div class="compose-field">
         <label>Description</label>
         <input type="text" id="pmDescription" placeholder="e.g. Tuition Fee - 1st Semester">
       </div>
-        <div class="admin-form-grid-two">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
         <div class="compose-field">
           <label>Amount (₱)</label>
           <input type="number" id="pmAmount" placeholder="0.00" min="0">
@@ -845,11 +802,10 @@
       </div>
       <div class="compose-field">
         <label>Status</label>
-        <select id="pmStatus" class="chart-select">
+        <select id="pmStatus" class="chart-select" style="width:100%; padding:12px 14px; border-radius:10px;">
           <option value="Pending">Pending</option>
           <option value="Paid">Paid</option>
         </select>
-      </div>
       </div>
       <div class="compose-modal-actions">
         <button type="button" class="btn-cancel" id="payModalCancel">Cancel</button>
@@ -861,21 +817,23 @@
   </div>
 
   <!-- Confirm Delete Modal -->
-  <div class="compose-modal-overlay" id="confirmDeleteOverlay" aria-hidden="true">
-    <div class="compose-modal-box admin-modal admin-modal-confirm">
-      <div class="modal-scroll-area">
-        <div class="admin-confirm-content">
-          <div class="admin-confirm-icon-shell">
-            <span class="material-symbols-outlined admin-confirm-icon">delete_forever</span>
-          </div>
-          <h3 id="deleteConfirmTitle">Delete Record?</h3>
-          <p id="deleteConfirmMsg" class="admin-confirm-message"></p>
+  <div class="compose-modal-overlay" id="confirmDeleteOverlay">
+    <div class="compose-modal-box admin-modal" style="max-width:380px; text-align:center;">
+      <div style="margin-bottom:16px;">
+        <div style="width:56px; height:56px; border-radius:16px; background:rgba(239,68,68,0.12); display:flex; align-items:center; justify-content:center; margin:0 auto 12px;">
+          <span class="material-symbols-outlined" style="color:#ef4444; font-size:1.8rem;">delete_forever</span>
         </div>
+        <h3 id="deleteConfirmTitle">Delete Record?</h3>
+        <p id="deleteConfirmMsg" style="color:var(--text-muted); margin-top:8px; font-size:0.88rem; line-height:1.6;"></p>
       </div>
-      <div class="admin-confirm-actions">
+      <div style="display:flex; gap:10px; justify-content:center;">
         <button type="button" class="btn-cancel" id="deleteConfirmCancel">Cancel</button>
-        <button type="button" id="deleteConfirmOk" class="admin-confirm-delete-btn">
-          <span class="material-symbols-outlined admin-confirm-delete-icon">delete</span> Delete
+        <button type="button" id="deleteConfirmOk" style="
+          display:inline-flex; align-items:center; gap:6px; padding:10px 22px;
+          border-radius:10px; border:none; background:linear-gradient(135deg,#ef4444,#dc2626);
+          color:#fff; font-weight:700; cursor:pointer; font-size:0.85rem;
+          box-shadow: 0 4px 14px rgba(239,68,68,0.35);">
+          <span class="material-symbols-outlined" style="font-size:1rem;">delete</span> Delete
         </button>
       </div>
     </div>

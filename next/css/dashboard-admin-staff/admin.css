@@ -1,2 +1,1091 @@
-/* Canonical admin dashboard entrypoint */
-@import url("./admin-canonical.css");
+/* ==========================================================================
+   admin.css — Admin Dashboard Additive Styles
+   RULE: Only add new classes. Never override existing student dashboard styles.
+   All new classes are prefixed with .admin- to prevent conflicts.
+   ========================================================================== */
+
+/* ==========================================================================
+   ADMIN UI/UX OVERHAUL (SaaS Standard)
+   ========================================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  /* SaaS Design System */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-modal: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+body.app-body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+.chart-select, .admin-modal select, .admin-search-input, .admin-modal input, .admin-modal textarea {
+  appearance: none; /* Hide native styling */
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 10px 36px 10px 14px;
+  font-family: var(--font-sans);
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--text-main);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.chart-select, .admin-modal select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 14px;
+  padding: 10px 36px 10px 14px;
+}
+
+.chart-select:hover, .admin-modal select:hover, .admin-search-input:hover {
+  border-color: #94a3b8;
+}
+
+.chart-select:focus, .admin-modal select:focus, .admin-search-input:focus, .admin-modal input:focus {
+  outline: none;
+  border-color: var(--admin-primary);
+  box-shadow: 0 0 0 3px var(--admin-primary-soft);
+  background-color: var(--card-bg);
+}
+
+/* --------------------------------------------------------------------------
+   2. ADMIN LAYOUT HELPERS
+   -------------------------------------------------------------------------- */
+.admin-view-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.admin-view-header h2 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin: 0 0 4px;
+  letter-spacing: -0.03em;
+}
+
+.admin-view-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 0;
+  font-weight: 500;
+}
+
+.admin-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* --------------------------------------------------------------------------
+   3. ADMIN BUTTONS
+   -------------------------------------------------------------------------- */
+.admin-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 18px;
+  border-radius: 12px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  letter-spacing: 0.01em;
+}
+
+.admin-btn .material-symbols-outlined { font-size: 1.05rem; }
+
+.admin-btn-primary {
+  background: var(--admin-primary);
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(239, 68, 68, 0.30);
+}
+
+.admin-btn-primary:hover {
+  background: var(--admin-primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.40);
+}
+
+.admin-btn-secondary {
+  background: var(--card-bg);
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+}
+
+.admin-btn-secondary:hover {
+  background: var(--input-bg);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.admin-btn-danger {
+  background: rgba(239, 68, 68, 0.10);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.20);
+}
+
+.admin-btn-danger:hover {
+  background: #ef4444;
+  color: #fff;
+}
+
+/* --------------------------------------------------------------------------
+   4. ADMIN SEARCH INPUT
+   -------------------------------------------------------------------------- */
+.admin-search-input {
+  padding: 10px 16px;
+  border: 1.5px solid var(--border-color);
+  border-radius: 12px;
+  background: var(--card-bg);
+  color: var(--text-main);
+  font-size: 0.85rem;
+  outline: none;
+  transition: all 0.2s ease;
+  min-width: 220px;
+  font-family: 'Inter', sans-serif;
+}
+
+.admin-search-input:focus {
+  border-color: var(--admin-primary);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.08);
+  background: var(--card-bg);
+}
+
+.admin-search-input::placeholder { color: var(--text-muted); }
+
+/* --------------------------------------------------------------------------
+   5. ADMIN TABLE HELPERS
+   -------------------------------------------------------------------------- */
+.table-scroll-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  background: var(--card-bg);
+}
+
+.admin-table {
+  width: 100%;
+  min-width: 800px;
+  border-collapse: collapse; /* Cleaner than separate */
+  text-align: left;
+}
+
+.admin-table th {
+  background: var(--input-bg);
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  white-space: nowrap;
+}
+
+.admin-table td {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.88rem;
+  color: var(--text-main);
+  vertical-align: middle;
+}
+
+.admin-table tbody tr {
+  transition: background 0.15s ease;
+}
+
+.admin-table tbody tr:hover {
+  background: rgba(0, 0, 0, 0.02); /* Subtle hover row effect */
+}
+
+
+.admin-loading-cell {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.admin-loading-state {
+  grid-column: 1/-1;
+  text-align: center;
+  padding: 80px 20px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.admin-table-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 24px;
+  border-top: 1px solid var(--border-color);
+  background: var(--input-bg);
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.admin-pagination-info {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.admin-pagination-btns {
+  display: flex;
+  gap: 6px;
+}
+
+.admin-page-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  border: 1px solid var(--border-color);
+  background: var(--card-bg);
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.admin-page-btn:hover {
+  border-color: var(--admin-primary);
+  color: var(--admin-primary);
+}
+
+.admin-page-btn.active {
+  background: var(--admin-primary);
+  border-color: var(--admin-primary);
+  color: #fff;
+}
+
+.admin-page-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* --------------------------------------------------------------------------
+   6. USER TABLE ROW COMPONENTS
+   -------------------------------------------------------------------------- */
+.admin-user-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-user-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  object-fit: cover;
+  background: var(--input-bg);
+  border: 1px solid var(--border-color);
+  flex-shrink: 0;
+}
+
+.admin-user-name {
+  font-weight: 700;
+  color: var(--text-main);
+  font-size: 0.9rem;
+  margin-bottom: 2px;
+}
+
+.admin-user-email {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* Role Badges */
+.admin-role-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.admin-role-chip.student  { background: rgba(59,130,246,0.10);  color: #3b82f6; border: 1px solid rgba(59,130,246,0.20);  }
+.admin-role-chip.teacher  { background: rgba(168,85,247,0.10); color: #a855f7; border: 1px solid rgba(168,85,247,0.20); }
+.admin-role-chip.admin    { background: rgba(239,68,68,0.10);   color: #ef4444; border: 1px solid rgba(239,68,68,0.20);   }
+
+/* Row Action Buttons */
+.admin-row-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.admin-icon-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  border: 1px solid var(--border-color);
+  background: var(--card-bg);
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.18s ease;
+  padding: 0;
+}
+
+.admin-icon-btn .material-symbols-outlined { font-size: 1rem; }
+
+.admin-icon-btn:hover { background: var(--input-bg); color: var(--primary); border-color: var(--primary); transform: translateY(-1px); }
+.admin-icon-btn.edit:hover  { color: #3b82f6; border-color: #3b82f6; }
+.admin-icon-btn.delete:hover { color: #ef4444; border-color: #ef4444; background: rgba(239,68,68,0.08); }
+
+/* --------------------------------------------------------------------------
+   7. STATS STRIP (below header)
+   -------------------------------------------------------------------------- */
+.admin-stats-strip {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.admin-stat-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.admin-stat-pill:hover { border-color: var(--primary); color: var(--primary); }
+.admin-stat-pill.active { background: var(--primary-soft); border-color: var(--primary); color: var(--primary); }
+
+.admin-stat-pill-num {
+  font-weight: 900;
+  font-size: 0.95rem;
+  color: var(--text-main);
+}
+
+/* --------------------------------------------------------------------------
+   8. ADMIN MODAL OVERRIDES
+   -------------------------------------------------------------------------- */
+/* ==========================================================================
+   ADMIN UI/UX OVERHAUL (SaaS Standard)
+   ========================================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  /* SaaS Design System */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-modal: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+body.app-body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* --------------------------------------------------------------------------
+   A. MODERN DROPDOWNS & INPUTS (Stripe/Linear style)
+   -------------------------------------------------------------------------- */
+.chart-select, .admin-modal select, .admin-search-input, .admin-modal input, .admin-modal textarea {
+  appearance: none; /* Hide native styling */
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 10px 36px 10px 14px;
+  font-family: var(--font-sans);
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--text-main);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Custom Dropdown Arrow */
+.chart-select, .admin-modal select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 14px;
+}
+
+.chart-select:hover, .admin-modal select:hover, .admin-search-input:hover {
+  border-color: #94a3b8;
+}
+
+.chart-select:focus, .admin-modal select:focus, .admin-search-input:focus, .admin-modal input:focus {
+  outline: none;
+  border-color: var(--admin-primary);
+  box-shadow: 0 0 0 3px var(--admin-primary-soft);
+  background-color: var(--card-bg);
+}
+
+/* --------------------------------------------------------------------------
+   B. TABLE UI REDESIGN (No overlapping, sticky headers, row hover)
+   -------------------------------------------------------------------------- */
+.table-scroll-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  background: var(--card-bg);
+}
+
+.admin-table {
+  width: 100%;
+  min-width: 800px;
+  border-collapse: collapse; /* Cleaner than separate */
+  text-align: left;
+}
+
+.admin-table th {
+  background: var(--input-bg);
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  white-space: nowrap;
+}
+
+.admin-table td {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.88rem;
+  color: var(--text-main);
+  vertical-align: middle;
+}
+
+.admin-table tbody tr {
+  transition: background 0.15s ease;
+}
+
+.admin-table tbody tr:hover {
+  background: rgba(0, 0, 0, 0.02); /* Subtle hover row effect */
+}
+
+/* --------------------------------------------------------------------------
+   C. RESPONSIVE MODALS (No 100vh, smooth animations)
+   -------------------------------------------------------------------------- */
+.compose-modal-overlay {
+  display: none; /* CRITICAL FIX: Keeps them hidden until clicked! */
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(4px); 
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+/* Ensure it only uses flexbox when JS adds the 'active' class */
+.compose-modal-overlay.active {
+  display: flex;
+  animation: overlayFadeIn 0.2s ease;
+}
+
+.admin-modal {
+  background: var(--card-bg) !important;
+  border-radius: var(--radius-xl) !important;
+  box-shadow: var(--shadow-modal) !important;
+  width: 100% !important;
+  max-width: 520px;
+  max-height: 90vh !important; /* CRITICAL: Prevents stretching off screen */
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important; /* Contain inner scrolling */
+  transform: scale(0.98);
+  animation: modalPopIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Scrollable Form Body inside Modal */
+.admin-modal form, .admin-modal .modal-scroll-area {
+  overflow-y: auto !important;
+  padding: 24px !important;
+  scrollbar-width: thin;
+}
+
+.compose-modal-header { padding: 20px 24px; border-bottom: 1px solid var(--border-color); z-index: 2;}
+.compose-modal-actions { padding: 20px 24px; border-top: 1px solid var(--border-color); z-index: 2; background: var(--input-bg);}
+
+@keyframes overlayFadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes modalPopIn {
+  from { opacity: 0; transform: scale(0.96) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.admin-modal h3, .admin-modal .compose-modal-header h3 {
+  color: var(--text-main) !important;
+}
+
+.admin-modal .compose-field label {
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* Hide native number input spinners */
+.admin-modal input[type="number"]::-webkit-inner-spin-button,
+.admin-modal input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.admin-modal select,
+.admin-modal textarea {
+  background: var(--input-bg) !important;
+  border: 1.5px solid var(--border-color) !important;
+  color: var(--text-main) !important;
+  border-radius: 10px !important;
+  padding: 10px 14px !important;
+  width: 100% !important;
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.88rem;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.admin-modal input:focus,
+.admin-modal select:focus,
+.admin-modal textarea:focus {
+  border-color: var(--admin-primary) !important;
+  box-shadow: 0 0 0 3px rgba(239,68,68,0.08) !important;
+  background: var(--card-bg) !important;
+}
+
+/* --------------------------------------------------------------------------
+   9. ANNOUNCEMENTS GRID
+   -------------------------------------------------------------------------- */
+.admin-announcements-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.admin-ann-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-left: 4px solid var(--primary);
+  border-radius: 20px;
+  padding: 22px 24px;
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.admin-ann-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-left-color: var(--admin-primary);
+}
+
+.admin-ann-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.admin-ann-title {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--text-main);
+  line-height: 1.3;
+  flex: 1;
+}
+
+.admin-ann-body {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-bottom: 16px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.admin-ann-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-color);
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.admin-ann-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.admin-ann-audience {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: var(--primary-soft);
+  color: var(--primary);
+  border: 1px solid rgba(0,98,255,0.15);
+}
+
+/* --------------------------------------------------------------------------
+   10. ENROLL LIST (course modal)
+   -------------------------------------------------------------------------- */
+.admin-enroll-list {
+  max-height: 180px;
+  overflow-y: auto;
+  border: 1.5px solid var(--border-color);
+  border-radius: 10px;
+  background: var(--input-bg);
+  padding: 8px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-color) transparent;
+}
+
+.admin-enroll-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.admin-enroll-item:hover { background: var(--card-bg); }
+
+.admin-enroll-item input[type="checkbox"] { accent-color: var(--primary); width: 16px; height: 16px; }
+
+.admin-enroll-item label {
+  font-size: 0.85rem;
+  color: var(--text-main);
+  font-weight: 600;
+  cursor: pointer;
+  flex: 1;
+}
+
+/* --------------------------------------------------------------------------
+   11. SETTINGS PANEL
+   -------------------------------------------------------------------------- */
+.admin-settings-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--input-bg);
+}
+
+.admin-setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-color);
+  gap: 16px;
+  transition: background 0.15s ease;
+}
+
+.admin-setting-row:last-child { border-bottom: none; }
+.admin-setting-row:hover { background: rgba(255,255,255,0.03); }
+
+.admin-setting-label { font-size: 0.9rem; font-weight: 700; color: var(--text-main); }
+.admin-setting-desc  { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
+
+/* Toggle Switch */
+.admin-toggle { position: relative; display: inline-block; cursor: pointer; }
+.admin-toggle input { display: none; }
+.admin-toggle-track {
+  display: block; width: 46px; height: 26px; border-radius: 999px;
+  background: var(--border-color); transition: background 0.2s ease; position: relative;
+}
+.admin-toggle-track::after {
+  content: ''; position: absolute; width: 20px; height: 20px; border-radius: 50%;
+  background: #fff; top: 3px; left: 3px;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+.admin-toggle input:checked + .admin-toggle-track { background: var(--admin-primary); }
+.admin-toggle input:checked + .admin-toggle-track::after { transform: translateX(20px); }
+
+/* Permissions Panel */
+.admin-permissions-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.admin-perm-group {
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.admin-perm-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: var(--input-bg);
+  border-bottom: 1px solid var(--border-color);
+  font-weight: 800;
+  font-size: 0.82rem;
+  color: var(--text-main);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.admin-perm-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px dashed var(--border-color);
+  gap: 10px;
+}
+
+.admin-perm-row:last-child { border-bottom: none; }
+.admin-perm-name { font-size: 0.85rem; color: var(--text-main); font-weight: 600; }
+.admin-perm-roles { display: flex; gap: 6px; }
+
+.admin-perm-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.62rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.admin-perm-chip.admin   { background: rgba(239,68,68,0.10); color:#ef4444; }
+.admin-perm-chip.teacher { background: rgba(168,85,247,0.10); color:#a855f7; }
+.admin-perm-chip.student { background: rgba(59,130,246,0.10); color:#3b82f6; }
+
+/* --------------------------------------------------------------------------
+   12. ACTIVITY LOG
+   -------------------------------------------------------------------------- */
+.admin-activity-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px dashed var(--border-color);
+}
+
+.admin-activity-item:last-child { border-bottom: none; }
+
+.admin-activity-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--primary);
+  margin-top: 6px;
+  flex-shrink: 0;
+}
+
+.admin-activity-text {
+  font-size: 0.82rem;
+  color: var(--text-main);
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.admin-activity-time {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+  font-weight: 500;
+}
+
+/* --------------------------------------------------------------------------
+   13. EMPTY STATES
+   -------------------------------------------------------------------------- */
+.admin-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  text-align: center;
+  gap: 12px;
+  color: var(--text-muted);
+}
+
+.admin-empty-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
+  background: var(--input-bg);
+  border: 1px dashed var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  margin-bottom: 4px;
+}
+
+.admin-empty-state h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0;
+}
+
+.admin-empty-state p {
+  font-size: 0.83rem;
+  max-width: 260px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   14. ACCESS DENIED (Instructor view of admin-only sections)
+   -------------------------------------------------------------------------- */
+.admin-access-denied {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  gap: 16px;
+  text-align: center;
+  padding: 40px;
+  background: var(--card-bg);
+  border: 1px dashed rgba(239,68,68,0.3);
+  border-radius: 20px;
+  margin-top: 20px;
+}
+
+.admin-access-denied .material-symbols-outlined {
+  font-size: 3rem;
+  color: rgba(239,68,68,0.5);
+}
+
+.admin-access-denied h3 {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin: 0;
+}
+
+.admin-access-denied p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  max-width: 280px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   16. MODAL FORM GRID IMPROVEMENTS
+   -------------------------------------------------------------------------- */
+.admin-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 10px;
+}
+
+.admin-full-width {
+  grid-column: 1 / -1;
+}
+
+.admin-enroll-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+/* Sleek Select All Badge */
+.admin-text-btn {
+  background: rgba(0, 98, 255, 0.08);
+  color: #0062ff;
+  border: 1px solid rgba(0, 98, 255, 0.15);
+  padding: 5px 14px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.admin-text-btn:hover {
+  background: #0062ff;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 98, 255, 0.2);
+  cursor: pointer;
+}
+
+/* Make the enroll list look like a clean selection box */
+.admin-enroll-list {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1.5px solid var(--border-color);
+  border-radius: 12px;
+  background: var(--card-bg); /* Matches the modal background */
+  padding: 6px;
+}
+
+/* Custom Modern Checkboxes */
+.admin-enroll-item input[type="checkbox"] {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border-color);
+  border-radius: 6px;
+  background: var(--input-bg);
+  cursor: pointer;
+  position: relative;
+  margin: 0;
+  flex-shrink: 0;
+  outline: none;
+}
+
+/* Custom Checkmark Icon */
+.admin-enroll-item input[type="checkbox"]:checked {
+  background: var(--admin-primary) !important;
+  border-color: var(--admin-primary) !important;
+}
+
+.admin-enroll-item input[type="checkbox"]:checked::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 45%; /* Slightly above true center looks best */
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.admin-enroll-item:has(input[type="checkbox"]:checked) {
+  background: var(--admin-primary-soft);
+  border-color: rgba(239, 68, 68, 0.2);
+}
+
+/* Highlight the entire row when selected */
+
+
+.admin-enroll-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border: 1px solid transparent;
+  margin-bottom: 4px;
+}
+
+.admin-enroll-item:hover {
+  background: var(--input-bg);
+  border-color: var(--border-color);
+}
+
+.admin-enroll-item label {
+  flex: 1; /* Stretches the clickable area across the whole row */
+  cursor: pointer;
+  font-size: 0.88rem !important;
+  font-weight: 600 !important;
+  color: var(--text-main) !important;
+  margin: 0 !important;
+  
+  /* Overrides the ugly global modal label styles */
+  text-transform: none !important;
+  letter-spacing: normal !important;
+}
+/* Responsive modal grid */
+
+
+/* --------------------------------------------------------------------------
+   15. RESPONSIVE
+   -------------------------------------------------------------------------- */
+@media (max-width: 900px) {
+  .admin-view-header { flex-direction: column; align-items: flex-start; }
+  .admin-header-actions { width: 100%; }
+  .admin-search-input { min-width: 100%; }
+  .admin-btn { flex: 1; justify-content: center; }
+  .admin-announcements-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 600px) {
+  .admin-user-cell { gap: 8px; }
+  .admin-user-avatar { width: 32px; height: 32px; }
+  .admin-user-email { display: none; }
+}

@@ -25,7 +25,7 @@ html {
 }
 
 @media (min-width: 1024px) {
-  body.app-body:not(.admin-dashboard-page) .app-container {
+  .app-container {
     width: 125vw !important;
     min-height: 125vh !important;
     max-width: 2000px !important;
@@ -37,7 +37,7 @@ html {
 /* Firefox Fallback */
 @-moz-document url-prefix() {
   @media (min-width: 1024px) {
-    body.app-body:not(.admin-dashboard-page) .app-container {
+    .app-container {
       width: 125vw !important;
       min-height: 125vh !important;
       transform: scale(0.80) !important;
