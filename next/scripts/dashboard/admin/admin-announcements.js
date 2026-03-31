@@ -100,7 +100,7 @@ function renderAnnouncementsGrid(announcements) {
 
   if (!announcements.length) {
     grid.innerHTML = `
-      <div class="admin-empty-state" style="grid-column:1/-1; background:var(--card-bg); border-radius:20px; border:1px dashed var(--border-color);">
+      <div class="admin-empty-state admin-empty-announcements">
         <div class="admin-empty-icon">📢</div>
         <h3>No announcements yet</h3>
         <p>Create your first announcement to notify students and instructors</p>
@@ -115,7 +115,8 @@ function renderAnnouncementsGrid(announcements) {
   };
 
   grid.innerHTML = announcements.map((ann, idx) => {
-    const aud = audienceColors[ann.audience || 'all'] || audienceColors.all;
+    const audKey = ann.audience || 'all';
+    const aud = audienceColors[audKey] || audienceColors.all;
     const isOwn = ann.sender_id === state.currentUserId;
     const canEdit = can(state.currentRole, 'EDIT_ANY_ANN') || (can(state.currentRole, 'EDIT_OWN_ANN') && isOwn);
     const canDel = can(state.currentRole, 'DELETE_ANY_ANN') || (can(state.currentRole, 'DELETE_OWN_ANN') && isOwn);
@@ -124,23 +125,23 @@ function renderAnnouncementsGrid(announcements) {
       <div class="admin-ann-card admin-ann-feed-card" data-search="${escapeHtml([ann.subject, ann.content, ann.sender_name, ann.audience].filter(Boolean).join(' '))}" style="animation: slideInRight 0.35s ease forwards ${idx * 0.04}s; opacity:0;">
         <div class="admin-ann-card-top">
           <h4 class="admin-ann-title">${escapeHtml(ann.subject || 'Untitled')}</h4>
-          <span class="admin-ann-audience" style="background:${aud.bg}; color:${aud.color}; border-color:${aud.color}33;">
+          <span class="admin-ann-audience admin-ann-audience-${escapeHtml(audKey)}">
             ${aud.label}
           </span>
         </div>
         <p class="admin-ann-body">${escapeHtml(ann.content || '')}</p>
         <div class="admin-ann-footer">
-          <div>
+          <div class="admin-ann-meta-stack">
             <div class="admin-ann-meta">
-              <span class="material-symbols-outlined" style="font-size:14px;">person</span>
+              <span class="material-symbols-outlined">person</span>
               ${escapeHtml(ann.sender_name || 'Admin')}
             </div>
-            <div class="admin-ann-meta" style="margin-top:4px;">
-              <span class="material-symbols-outlined" style="font-size:14px;">schedule</span>
+            <div class="admin-ann-meta">
+              <span class="material-symbols-outlined">schedule</span>
               ${getTimeAgo(ann.created_at)}
             </div>
           </div>
-          <div style="display:flex; gap:6px;">
+          <div class="admin-ann-actions">
             ${canEdit ? `<button class="admin-icon-btn edit" title="Edit" onclick="window._adminEditAnn('${ann.id}')">
               <span class="material-symbols-outlined">edit</span>
             </button>` : ''}

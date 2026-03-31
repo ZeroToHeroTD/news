@@ -26,8 +26,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // 🚨 THE FIX: Replace 'https://your-live-website.com' with your actual hosted domain 
         // (e.g., https://studentportal.vercel.app or whatever hosting you use).
         // This forces the email button to point to the live site, NEVER localhost.
-        const LIVE_SITE_URL = 'https://jawiportal.vercel.app/'; 
-        const redirectPath = LIVE_SITE_URL + '/next/html/reset-password.html';
+        const LIVE_SITE_URL = 'https://jawiportal.vercel.app';
+        const redirectPath = `${LIVE_SITE_URL}/html/reset-password.html`;
 
         const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
             redirectTo: redirectPath,

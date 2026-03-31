@@ -19,7 +19,7 @@ function destroyChart(id) {
 }
 
 function getChartContainer(canvas) {
-  return canvas?.closest('[style*="min-height"]') || canvas?.parentElement;
+  return canvas?.closest('.chart-canvas-wrap') || canvas?.parentElement;
 }
 
 function setChartEmptyState(canvas, emptyClass, message) {

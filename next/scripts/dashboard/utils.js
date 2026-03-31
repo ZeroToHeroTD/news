@@ -51,6 +51,39 @@ export function toast(message, type = 'info') {
 // =============================================================================
 
 const modalCloseTimers = new WeakMap();
+const modalFocusReturn = new WeakMap();
+let modalHistoryDepth = 0;
+
+function getVisibleModalOverlays() {
+  return [...document.querySelectorAll('.compose-modal-overlay')].filter(overlay =>
+    overlay.classList.contains('active') || overlay.style.display === 'flex'
+  );
+}
+
+function getTopVisibleModal() {
+  const visible = getVisibleModalOverlays();
+  return visible[visible.length - 1] || null;
+}
+
+function getFocusableElements(container) {
+  if (!container) return [];
+  return [...container.querySelectorAll(
+    'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+  )].filter(el => !el.hasAttribute('hidden') && el.offsetParent !== null);
+}
+
+function syncModalHistoryState() {
+  const hasOpenModal = getVisibleModalOverlays().length > 0;
+  const currentState = window.history.state || {};
+
+  if (hasOpenModal && !currentState.__adminModalOpen) {
+    window.history.pushState({ ...currentState, __adminModalOpen: true }, '');
+    modalHistoryDepth += 1;
+  } else if (!hasOpenModal && currentState.__adminModalOpen && modalHistoryDepth > 0) {
+    modalHistoryDepth -= 1;
+    window.history.back();
+  }
+}
 
 function clearModalCloseTimer(overlay) {
   const timer = modalCloseTimers.get(overlay);
@@ -63,11 +96,17 @@ function clearModalCloseTimer(overlay) {
 export function openModal(overlayId) {
   const overlay = document.getElementById(overlayId);
   if (overlay) {
+    modalFocusReturn.set(overlay, document.activeElement);
     clearModalCloseTimer(overlay);
     overlay.style.display = 'flex';
     overlay.style.pointerEvents = 'auto';
     overlay.setAttribute('aria-hidden', 'false');
-    requestAnimationFrame(() => overlay.classList.add('active'));
+    requestAnimationFrame(() => {
+      overlay.classList.add('active');
+      syncModalHistoryState();
+      const focusables = getFocusableElements(overlay);
+      focusables[0]?.focus();
+    });
   }
 }
 
@@ -83,6 +122,12 @@ export function closeModal(overlayId) {
         overlay.style.display = 'none';
         overlay.style.pointerEvents = '';
       }
+      syncModalHistoryState();
+      const returnTarget = modalFocusReturn.get(overlay);
+      if (returnTarget && typeof returnTarget.focus === 'function') {
+        returnTarget.focus();
+      }
+      modalFocusReturn.delete(overlay);
       modalCloseTimers.delete(overlay);
     }, 220);
     modalCloseTimers.set(overlay, closeTimer);
@@ -486,6 +531,40 @@ export function setupModalClose(overlayId, closeBtnId, cancelBtnId) {
     const isVisible = overlay.classList.contains('active') || overlay.style.display === 'flex';
     if (e.key === 'Escape' && isVisible) {
       closeHandler();
+      return;
+    }
+
+    if (e.key === 'Tab' && isVisible && getTopVisibleModal() === overlay) {
+      const focusables = getFocusableElements(overlay);
+      if (!focusables.length) return;
+
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      const active = document.activeElement;
+
+      if (e.shiftKey && active === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && active === last) {
+        e.preventDefault();
+        first.focus();
+      }
     }
   });
 }
+
+window.addEventListener('popstate', () => {
+  const topModal = getTopVisibleModal();
+  if (topModal) {
+    topModal.classList.remove('active');
+    topModal.style.pointerEvents = 'none';
+    topModal.setAttribute('aria-hidden', 'true');
+    topModal.style.display = 'none';
+    const returnTarget = modalFocusReturn.get(topModal);
+    if (returnTarget && typeof returnTarget.focus === 'function') {
+      returnTarget.focus();
+    }
+    modalFocusReturn.delete(topModal);
+    return;
+  }
+});

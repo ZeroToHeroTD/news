@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -13,7 +13,7 @@
   <!-- Original CSS (kept for JS/backend compatibility) -->
   <link rel="stylesheet" href="../css/dashboard/dashboard-master.css">
   <link rel="stylesheet" href="../css/dashboard/message-module/messenger-hub.css">
-  <link rel="stylesheet" href="../css/dashboard-admin-staff/admin.css">
+  <link rel="stylesheet" href="../css/dashboard-admin-staff/admin.phase2.css">
 
   <!-- External libs -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -28,7 +28,7 @@
 
   <div class="app-container">
 
-    <!-- ═══ SIDEBAR ═══ -->
+    <!-- â•â•â• SIDEBAR â•â•â• -->
     <aside class="app-sidebar" id="appSidebar">
       <div class="sidebar-top-section">
         <div class="sidebar-brand">
@@ -61,7 +61,7 @@
           <li>
             <a href="#" data-target="view-users">
               <span class="material-symbols-outlined nav-icon">manage_accounts</span>Users
-              <span class="dot-count" id="pendingUsersBadge" style="display:none;">0</span>
+              <span class="dot-count" id="pendingUsersBadge">0</span>
             </a>
           </li>
           <li>
@@ -96,10 +96,10 @@
           </li>
         </ul>
 
-        <span class="sidebar-section-label" style="margin-top:10px;">Quick Links</span>
+        <span class="sidebar-section-label sidebar-quick-links-label">Quick Links</span>
         <ul class="nav-links">
           <li>
-            <a href="../../next/html/dashboard.html" target="_blank">
+            <a href="dashboard.html" target="_blank">
               <span class="material-symbols-outlined nav-icon">open_in_new</span>Student Portal
             </a>
           </li>
@@ -117,7 +117,7 @@
       </div>
     </aside>
 
-    <!-- ═══ MAIN ═══ -->
+    <!-- â•â•â• MAIN â•â•â• -->
     <main class="app-main">
 
       <!-- TOPBAR -->
@@ -145,7 +145,7 @@
       <!-- CONTENT AREA -->
       <div class="admin-content-area">
 
-        <!-- ══ VIEW: OVERVIEW ══ -->
+        <!-- â•â• VIEW: OVERVIEW â•â• -->
         <section class="view-content active" id="view-overview">
           <div class="dashboard-hero">
             <div class="welcome-mini">
@@ -154,18 +154,18 @@
             </div>
             <div class="today-focus-container">
               <div class="focus-card warning">
-                <span class="material-symbols-outlined" style="color:var(--accent-amber);">group</span>
+                <span class="material-symbols-outlined focus-card-icon focus-card-icon-amber">group</span>
                 <div class="focus-info">
                   <small>Total Students</small>
-                  <h4 id="overviewTotalStudents">—</h4>
+                  <h4 id="overviewTotalStudents">â€”</h4>
                   <p id="overviewActiveStudents">Active users</p>
                 </div>
               </div>
               <div class="focus-card urgent">
-                <span class="material-symbols-outlined" style="color:var(--accent-red);">school</span>
+                <span class="material-symbols-outlined focus-card-icon focus-card-icon-red">school</span>
                 <div class="focus-info">
                   <small>Instructors</small>
-                  <h4 id="overviewTotalInstructors">—</h4>
+                  <h4 id="overviewTotalInstructors">â€”</h4>
                   <p>Faculty members</p>
                 </div>
               </div>
@@ -176,19 +176,19 @@
           <div class="smart-action-grid" id="kpiGrid">
             <div class="action-card" data-target="view-users">
               <div class="action-icon blue"><span class="material-symbols-outlined">people</span></div>
-              <div class="action-content"><h4 id="kpiTotalUsers">—</h4><p>Total Users</p></div>
+              <div class="action-content"><h4 id="kpiTotalUsers">â€”</h4><p>Total Users</p></div>
             </div>
             <div class="action-card" data-target="view-courses">
               <div class="action-icon purple"><span class="material-symbols-outlined">menu_book</span></div>
-              <div class="action-content"><h4 id="kpiTotalCourses">—</h4><p>Active Courses</p></div>
+              <div class="action-content"><h4 id="kpiTotalCourses">â€”</h4><p>Active Courses</p></div>
             </div>
             <div class="action-card" data-target="view-attendance">
               <div class="action-icon green"><span class="material-symbols-outlined">fact_check</span></div>
-              <div class="action-content"><h4 id="kpiAvgAttendance">—%</h4><p>Avg Attendance</p></div>
+              <div class="action-content"><h4 id="kpiAvgAttendance">â€”%</h4><p>Avg Attendance</p></div>
             </div>
             <div class="action-card" data-target="view-payments">
               <div class="action-icon orange"><span class="material-symbols-outlined">account_balance_wallet</span></div>
-              <div class="action-content"><h4 id="kpiTotalRevenue">—</h4><p>Payments Collected</p></div>
+              <div class="action-content"><h4 id="kpiTotalRevenue">â€”</h4><p>Payments Collected</p></div>
             </div>
           </div>
 
@@ -196,49 +196,49 @@
           <div class="dashboard-grid">
             <div class="grid-left">
               <div class="section-card">
-                <div style="display:flex;justify-content:space-between;align-items:center;padding:18px 24px;border-bottom:1px solid var(--border-subtle);">
-                  <div>
-                    <h2 style="font-size:0.9rem;font-weight:700;">Grade Distribution</h2>
-                    <p style="font-size:0.72rem;color:var(--text-secondary);margin-top:2px;">Academic performance overview</p>
+                <div class="admin-card-header admin-card-header-split">
+                  <div class="admin-card-title-wrap">
+                    <h2 class="admin-card-title">Grade Distribution</h2>
+                    <p class="admin-card-subtitle">Academic performance overview</p>
                   </div>
                   <select class="chart-select" id="gradeDistFilter">
                     <option value="all">All Courses</option>
                   </select>
                 </div>
-                <div style="padding:20px;min-height:260px;position:relative;">
+                <div class="chart-canvas-wrap chart-canvas-wrap-lg">
                   <canvas id="gradeDistChart"></canvas>
                 </div>
               </div>
               <div class="section-card">
-                <div style="padding:18px 24px;border-bottom:1px solid var(--border-subtle);">
-                  <h2 style="font-size:0.9rem;font-weight:700;">Attendance Trend</h2>
-                  <p style="font-size:0.72px;color:var(--text-secondary);margin-top:2px;">Monthly present vs absent rates</p>
+                <div class="admin-card-header">
+                  <h2 class="admin-card-title">Attendance Trend</h2>
+                  <p class="admin-card-subtitle">Monthly present vs absent rates</p>
                 </div>
-                <div style="padding:20px;min-height:220px;position:relative;">
+                <div class="chart-canvas-wrap chart-canvas-wrap-md">
                   <canvas id="attendanceTrendChart"></canvas>
                 </div>
               </div>
             </div>
             <div class="grid-right">
               <div class="section-card">
-                <div style="padding:16px 20px;border-bottom:1px solid var(--border-subtle);">
-                  <h3 style="font-size:0.86rem;font-weight:700;">User Breakdown</h3>
+                <div class="admin-card-header admin-card-header-sm">
+                  <h3 class="admin-card-title-sm">User Breakdown</h3>
                 </div>
-                <div style="padding:16px;min-height:180px;position:relative;">
+                <div class="chart-canvas-wrap chart-canvas-wrap-sm">
                   <canvas id="userBreakdownChart"></canvas>
                 </div>
               </div>
               <div class="section-card">
-                <div style="padding:16px 20px;border-bottom:1px solid var(--border-subtle);">
-                  <h3 style="font-size:0.86rem;font-weight:700;">Recent Activity</h3>
+                <div class="admin-card-header admin-card-header-sm">
+                  <h3 class="admin-card-title-sm">Recent Activity</h3>
                 </div>
-                <div style="padding:16px 20px;max-height:220px;overflow-y:auto;" id="recentActivityLog"></div>
+                <div class="admin-scroll-panel admin-scroll-panel-activity" id="recentActivityLog"></div>
               </div>
               <div class="section-card">
-                <div style="padding:16px 20px;border-bottom:1px solid var(--border-subtle);">
-                  <h3 style="font-size:0.86rem;font-weight:700;">Payment Status</h3>
+                <div class="admin-card-header admin-card-header-sm">
+                  <h3 class="admin-card-title-sm">Payment Status</h3>
                 </div>
-                <div style="padding:16px;min-height:160px;position:relative;">
+                <div class="chart-canvas-wrap chart-canvas-wrap-xs">
                   <canvas id="paymentStatusChart"></canvas>
                 </div>
               </div>
@@ -246,7 +246,7 @@
           </div>
         </section>
 
-        <!-- ══ VIEW: USERS ══ -->
+        <!-- â•â• VIEW: USERS â•â• -->
         <section class="view-content" id="view-users">
           <div class="admin-view-header">
             <div>
@@ -272,8 +272,8 @@
           <div class="admin-stats-strip" id="userStatsStrip"></div>
 
           <div class="section-card">
-            <div class="table-scroll-wrapper" style="max-height:580px;overflow-y:auto;">
-              <table class="admin-table" id="usersTable">
+            <div class="table-scroll-wrapper table-scroll-wrapper-users">
+              <table class="admin-table admin-table-users" id="usersTable">
                 <thead>
                   <tr>
                     <th>User</th>
@@ -293,7 +293,7 @@
           </div>
         </section>
 
-        <!-- ══ VIEW: COURSES ══ -->
+        <!-- â•â• VIEW: COURSES â•â• -->
         <section class="view-content" id="view-courses">
           <div class="admin-view-header">
             <div>
@@ -312,7 +312,7 @@
           </div>
         </section>
 
-        <!-- ══ VIEW: GRADES ══ -->
+        <!-- â•â• VIEW: GRADES â•â• -->
         <section class="view-content" id="view-grades">
           <div class="admin-view-header">
             <div>
@@ -322,6 +322,7 @@
             <div class="admin-header-actions">
               <select class="chart-select" id="gradesStudentFilter"><option value="">All Students</option></select>
               <select class="chart-select" id="gradesCourseFilter"><option value="">All Courses</option></select>
+              <input type="text" id="gradesSearchInput" class="admin-search-input admin-search-input-sm" placeholder="Search grade records...">
               <button class="admin-btn admin-btn-secondary" id="exportGradesBtn">
                 <span class="material-symbols-outlined">download</span>Export
               </button>
@@ -330,9 +331,10 @@
               </button>
             </div>
           </div>
-          <div class="section-card">
-            <div class="table-scroll-wrapper" style="max-height:560px;overflow-y:auto;">
-              <table class="admin-table grades-table" id="gradesTable">
+          <div class="admin-grades-insights" id="gradesStatsStrip"></div>
+          <div class="section-card admin-grades-panel">
+            <div class="table-scroll-wrapper table-scroll-wrapper-grades">
+              <table class="admin-table admin-table-grades grades-table" id="gradesTable">
                 <thead>
                   <tr>
                     <th>Student</th>
@@ -354,7 +356,7 @@
           </div>
         </section>
 
-        <!-- ══ VIEW: ATTENDANCE ══ -->
+        <!-- â•â• VIEW: ATTENDANCE â•â• -->
         <section class="view-content" id="view-attendance">
           <div class="admin-view-header">
             <div>
@@ -363,15 +365,16 @@
             </div>
             <div class="admin-header-actions">
               <select class="chart-select" id="attendanceStudentFilter"><option value="">All Students</option></select>
+              <input type="text" id="attendanceSearchInput" class="admin-search-input admin-search-input-sm" placeholder="Search attendance...">
               <button class="admin-btn admin-btn-primary" id="addAttendanceBtn">
                 <span class="material-symbols-outlined">add</span>Log Attendance
               </button>
             </div>
           </div>
-          <div class="payment-summary-row" id="attendanceKpiRow" style="margin-bottom:20px;"></div>
+          <div class="payment-summary-row payment-summary-row-attendance" id="attendanceKpiRow"></div>
           <div class="section-card">
-            <div class="table-scroll-wrapper" style="max-height:520px;overflow-y:auto;">
-              <table class="admin-table" id="attendanceTable">
+            <div class="table-scroll-wrapper table-scroll-wrapper-attendance">
+              <table class="admin-table admin-table-attendance" id="attendanceTable">
                 <thead>
                   <tr>
                     <th>Student</th>
@@ -390,7 +393,7 @@
           </div>
         </section>
 
-        <!-- ══ VIEW: ANNOUNCEMENTS ══ -->
+        <!-- â•â• VIEW: ANNOUNCEMENTS â•â• -->
         <section class="view-content" id="view-announcements">
           <div class="admin-view-header">
             <div>
@@ -413,7 +416,7 @@
           </div>
         </section>
 
-        <!-- ══ VIEW: PAYMENTS ══ -->
+        <!-- â•â• VIEW: PAYMENTS â•â• -->
         <section class="view-content" id="view-payments">
           <div class="admin-view-header">
             <div>
@@ -426,7 +429,9 @@
                 <option value="Paid">Paid</option>
                 <option value="Pending">Pending</option>
                 <option value="Overdue">Overdue</option>
+                <option value="Declined">Declined</option>
               </select>
+              <input type="text" id="paymentSearchInput" class="admin-search-input admin-search-input-sm" placeholder="Search payments...">
               <button class="admin-btn admin-btn-primary" id="addPaymentBtn" data-admin-only>
                 <span class="material-symbols-outlined">add</span>Add Record
               </button>
@@ -434,8 +439,8 @@
           </div>
           <div class="payment-summary-row" id="adminPaymentSummaryRow"></div>
           <div class="section-card">
-            <div class="table-scroll-wrapper" style="max-height:520px;overflow-y:auto;">
-              <table class="admin-table">
+            <div class="table-scroll-wrapper table-scroll-wrapper-payments">
+              <table class="admin-table admin-table-payments">
                 <thead>
                   <tr>
                     <th>Student</th>
@@ -454,7 +459,7 @@
           </div>
         </section>
 
-        <!-- ══ VIEW: SETTINGS ══ -->
+        <!-- â•â• VIEW: SETTINGS â•â• -->
         <section class="view-content" id="view-settings" data-admin-only>
           <div class="admin-view-header">
             <div>
@@ -462,15 +467,19 @@
               <p class="admin-view-subtitle">Configure portal preferences and role permissions</p>
             </div>
           </div>
-          <div class="dashboard-grid" style="grid-template-columns:1fr 1fr;">
+          <div class="dashboard-grid admin-settings-grid">
             <div class="grid-left">
               <div class="section-card">
-                <div style="padding:16px 20px;border-bottom:1px solid var(--border-subtle);font-size:0.86rem;font-weight:700;">🔐 Role Permissions</div>
-                <div style="padding:16px 20px;" id="rolePermissionsPanel" class="admin-permissions-panel"></div>
+                <div class="admin-card-header admin-card-header-sm">
+                  <h3 class="admin-card-title-sm">Role Permissions</h3>
+                </div>
+                <div id="rolePermissionsPanel" class="admin-permissions-panel admin-section-body"></div>
               </div>
               <div class="section-card">
-                <div style="padding:16px 20px;border-bottom:1px solid var(--border-subtle);font-size:0.86rem;font-weight:700;">🎨 Portal Appearance</div>
-                <div class="admin-settings-group" style="border:none;border-radius:0;">
+                <div class="admin-card-header admin-card-header-sm">
+                  <h3 class="admin-card-title-sm">Portal Appearance</h3>
+                </div>
+                <div class="admin-settings-group admin-settings-group-flat">
                   <div class="admin-setting-row">
                     <div>
                       <div class="admin-setting-label">Dark Mode Default</div>
@@ -502,8 +511,8 @@
                     </label>
                   </div>
                 </div>
-                <div style="padding:16px 20px;border-top:1px solid var(--border-subtle);">
-                  <button class="admin-btn admin-btn-primary" style="width:100%;justify-content:center;" id="saveSettingsBtn">
+                <div class="admin-section-footer">
+                  <button class="admin-btn admin-btn-primary admin-btn-block" id="saveSettingsBtn">
                     <span class="material-symbols-outlined">save</span>Save Settings
                   </button>
                 </div>
@@ -511,23 +520,27 @@
             </div>
             <div class="grid-right">
               <div class="section-card">
-                <div style="padding:16px 20px;border-bottom:1px solid var(--border-subtle);font-size:0.86rem;font-weight:700;">📋 Activity Log</div>
-                <div style="padding:16px 20px;max-height:360px;overflow-y:auto;" id="adminActivityLog"></div>
+                <div class="admin-card-header admin-card-header-sm">
+                  <h3 class="admin-card-title-sm">Activity Log</h3>
+                </div>
+                <div class="admin-scroll-panel admin-scroll-panel-log" id="adminActivityLog"></div>
               </div>
               <div class="section-card">
-                <div style="padding:16px 20px;border-bottom:1px solid var(--border-subtle);font-size:0.86rem;font-weight:700;">🗄️ System Info</div>
-                <div class="admin-settings-group" style="border:none;border-radius:0;">
-                  <div class="admin-setting-row" style="cursor:default;">
+                <div class="admin-card-header admin-card-header-sm">
+                  <h3 class="admin-card-title-sm">System Info</h3>
+                </div>
+                <div class="admin-settings-group admin-settings-group-flat">
+                  <div class="admin-setting-row admin-setting-row-static">
                     <span class="admin-setting-label">Portal Version</span>
-                    <span style="color:var(--accent-blue);font-weight:700;font-size:0.82rem;">v2.0.0</span>
+                    <span class="admin-system-value admin-system-value-blue">v2.0.0</span>
                   </div>
-                  <div class="admin-setting-row" style="cursor:default;">
+                  <div class="admin-setting-row admin-setting-row-static">
                     <span class="admin-setting-label">Database</span>
-                    <span style="color:var(--accent-green);font-weight:700;font-size:0.82rem;">Supabase ✓</span>
+                    <span class="admin-system-value admin-system-value-green">Supabase âœ“</span>
                   </div>
-                  <div class="admin-setting-row" style="cursor:default;">
+                  <div class="admin-setting-row admin-setting-row-static">
                     <span class="admin-setting-label">Admin Since</span>
-                    <span id="adminSinceDate" style="color:var(--text-secondary);font-weight:600;font-size:0.82rem;">—</span>
+                    <span id="adminSinceDate" class="admin-system-value admin-system-value-muted">â€”</span>
                   </div>
                 </div>
               </div>
@@ -539,16 +552,18 @@
     </main>
   </div><!-- /app-container -->
 
-  <!-- ═══ DRAWERS (replaces blocking modals) ═══ -->
+  <!-- â•â•â• DRAWERS (replaces blocking modals) â•â•â• -->
 
   <!-- User Drawer -->
   <div class="compose-modal-overlay" id="userModalOverlay">
     <div class="compose-modal-box admin-modal">
       <div class="compose-modal-header">
         <h3 id="userModalTitle">Add New User</h3>
-        <button type="button" class="modal-close-btn" id="userModalClose">close</button>
+        <button type="button" class="modal-close-btn" id="userModalClose" aria-label="Close user modal">
+          <span class="material-symbols-outlined">close</span>
+        </button>
       </div>
-      <form id="userModalForm" style="flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:0;">
+      <form id="userModalForm" class="admin-modal-body admin-modal-form">
         <div class="admin-form-grid">
           <div class="compose-field admin-full-width">
             <label>Full Name</label>
@@ -559,18 +574,29 @@
             <input type="email" id="umEmail" placeholder="user@school.edu" required>
           </div>
           <div class="compose-field admin-full-width" id="umPasswordGroup">
-            <label>Password <span style="color:var(--text-muted);font-weight:400;text-transform:none;letter-spacing:0;">(min. 6 chars)</span></label>
-            <input type="password" id="umPassword" placeholder="••••••••">
+            <label>Password <span class="admin-label-hint">(min. 6 chars)</span></label>
+            <input type="password" id="umPassword" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢">
           </div>
-          <div class="compose-field">
+          <div class="compose-field admin-full-width">
             <label>Role</label>
-            <select id="umRole">
+            <select id="umRole" class="admin-visually-hidden-select" aria-label="User role">
               <option value="student">Student</option>
               <option value="teacher">Instructor</option>
               <option value="admin">Admin</option>
             </select>
+            <div class="admin-role-picker" id="umRolePicker" role="radiogroup" aria-label="User role picker">
+              <button type="button" class="admin-role-option" data-role="student" role="radio" aria-checked="false">
+                Student
+              </button>
+              <button type="button" class="admin-role-option" data-role="teacher" role="radio" aria-checked="false">
+                Instructor
+              </button>
+              <button type="button" class="admin-role-option" data-role="admin" role="radio" aria-checked="false">
+                Admin
+              </button>
+            </div>
           </div>
-          <div class="compose-field">
+          <div class="compose-field admin-full-width">
             <label>Section</label>
             <input type="text" id="umSection" placeholder="e.g. BSIT-2A">
           </div>
@@ -598,9 +624,11 @@
     <div class="compose-modal-box admin-modal">
       <div class="compose-modal-header">
         <h3 id="courseModalTitle">Add Course</h3>
-        <button type="button" class="modal-close-btn" id="courseModalClose">close</button>
+        <button type="button" class="modal-close-btn" id="courseModalClose" aria-label="Close course modal">
+          <span class="material-symbols-outlined">close</span>
+        </button>
       </div>
-      <form id="courseModalForm" style="flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:0;">
+      <form id="courseModalForm" class="admin-modal-body admin-modal-form">
         <div class="admin-form-grid">
           <div class="compose-field admin-full-width">
             <label>Course Name</label>
@@ -610,9 +638,17 @@
             <label>Course Code</label>
             <input type="text" id="cmCourseCode" placeholder="e.g. CS101">
           </div>
-          <div class="compose-field">
+          <div class="compose-field admin-course-units-field">
             <label>Units</label>
-            <input type="number" id="cmUnits" placeholder="3" min="1" max="9">
+            <div class="admin-number-stepper">
+              <button type="button" class="admin-stepper-btn" id="cmUnitsDecrement" aria-label="Decrease units">
+                <span class="material-symbols-outlined">remove</span>
+              </button>
+              <input type="number" id="cmUnits" class="admin-stepper-input" placeholder="3" min="1" max="9">
+              <button type="button" class="admin-stepper-btn" id="cmUnitsIncrement" aria-label="Increase units">
+                <span class="material-symbols-outlined">add</span>
+              </button>
+            </div>
           </div>
           <div class="compose-field admin-full-width">
             <label>Assign Instructor</label>
@@ -622,14 +658,16 @@
           </div>
           <div class="compose-field admin-full-width">
             <label>Enroll Students</label>
-            <div class="admin-enroll-header">
-              <span>Available Students</span>
-              <button type="button" id="cmSelectAllBtn" class="admin-text-btn">Select All</button>
+            <div class="admin-student-picker">
+              <div class="admin-student-picker-toolbar">
+                <span class="admin-student-picker-title">Available Students</span>
+                <button type="button" id="cmSelectAllBtn" class="admin-text-btn admin-student-actions">Select All</button>
+              </div>
+              <div class="admin-student-search">
+                <input type="text" id="cmStudentSearch" class="admin-search-input admin-search-input-sm" placeholder="Search students...">
+              </div>
+              <div id="cmStudentEnrollList" class="admin-student-list admin-enroll-list">Loading students...</div>
             </div>
-            <div style="margin-bottom:8px;">
-              <input type="text" id="cmStudentSearch" placeholder="Search students..." style="width:100%;height:32px;padding:0 12px;background:var(--bg-elevated);border:1px solid var(--border-subtle);border-radius:var(--radius-md);color:var(--text-primary);font-family:'Inter',sans-serif;font-size:0.78rem;outline:none;">
-            </div>
-            <div id="cmStudentEnrollList" class="admin-enroll-list">Loading students...</div>
           </div>
         </div>
       </form>
@@ -647,9 +685,11 @@
     <div class="compose-modal-box admin-modal">
       <div class="compose-modal-header">
         <h3 id="gradeModalTitle">Edit Grade</h3>
-        <button type="button" class="modal-close-btn" id="gradeModalClose">close</button>
+        <button type="button" class="modal-close-btn" id="gradeModalClose" aria-label="Close grade modal">
+          <span class="material-symbols-outlined">close</span>
+        </button>
       </div>
-      <div style="flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:0;">
+      <div class="admin-modal-body admin-modal-form">
         <div class="admin-form-grid">
           <div class="compose-field admin-full-width">
             <label>Student</label>
@@ -661,11 +701,27 @@
           </div>
           <div class="compose-field">
             <label>Midterm (%)</label>
-            <input type="number" id="gmMidterm" min="0" max="100" placeholder="0–100">
+            <div class="admin-number-stepper admin-number-stepper-grade">
+              <button type="button" class="admin-stepper-btn" id="gmMidtermDecrement" aria-label="Decrease midterm score">
+                <span class="material-symbols-outlined">remove</span>
+              </button>
+              <input type="number" id="gmMidterm" class="admin-stepper-input admin-stepper-input-grade" min="0" max="100" placeholder="0-100">
+              <button type="button" class="admin-stepper-btn" id="gmMidtermIncrement" aria-label="Increase midterm score">
+                <span class="material-symbols-outlined">add</span>
+              </button>
+            </div>
           </div>
           <div class="compose-field">
             <label>Finals (%)</label>
-            <input type="number" id="gmFinals" min="0" max="100" placeholder="0–100">
+            <div class="admin-number-stepper admin-number-stepper-grade">
+              <button type="button" class="admin-stepper-btn" id="gmFinalsDecrement" aria-label="Decrease finals score">
+                <span class="material-symbols-outlined">remove</span>
+              </button>
+              <input type="number" id="gmFinals" class="admin-stepper-input admin-stepper-input-grade" min="0" max="100" placeholder="0-100">
+              <button type="button" class="admin-stepper-btn" id="gmFinalsIncrement" aria-label="Increase finals score">
+                <span class="material-symbols-outlined">add</span>
+              </button>
+            </div>
           </div>
           <div class="compose-field admin-full-width">
             <label>Status</label>
@@ -692,9 +748,11 @@
     <div class="compose-modal-box admin-modal">
       <div class="compose-modal-header">
         <h3 id="annModalTitle">New Announcement</h3>
-        <button type="button" class="modal-close-btn" id="annModalClose">close</button>
+        <button type="button" class="modal-close-btn" id="annModalClose" aria-label="Close announcement modal">
+          <span class="material-symbols-outlined">close</span>
+        </button>
       </div>
-      <div style="flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:0;">
+      <div class="admin-modal-body admin-modal-form">
         <div class="compose-field">
           <label>Subject / Title</label>
           <input type="text" id="annSubject" placeholder="e.g. Enrollment Schedule Update" required>
@@ -726,9 +784,11 @@
     <div class="compose-modal-box admin-modal">
       <div class="compose-modal-header">
         <h3 id="attModalTitle">Log Attendance</h3>
-        <button type="button" class="modal-close-btn" id="attModalClose">close</button>
+        <button type="button" class="modal-close-btn" id="attModalClose" aria-label="Close attendance modal">
+          <span class="material-symbols-outlined">close</span>
+        </button>
       </div>
-      <div style="flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:0;">
+      <div class="admin-modal-body admin-modal-form">
         <div class="admin-form-grid">
           <div class="compose-field admin-full-width">
             <label>Student</label>
@@ -740,7 +800,10 @@
           </div>
           <div class="compose-field">
             <label>Date</label>
-            <input type="date" id="attDate">
+            <div class="admin-date-field">
+              <input type="date" id="attDate">
+              <span class="admin-date-icon material-symbols-outlined" aria-hidden="true">calendar_month</span>
+            </div>
           </div>
           <div class="compose-field">
             <label>Status</label>
@@ -767,20 +830,28 @@
     <div class="compose-modal-box admin-modal">
       <div class="compose-modal-header">
         <h3 id="payModalTitle">Add Payment Record</h3>
-        <button type="button" class="modal-close-btn" id="payModalClose">close</button>
+        <button type="button" class="modal-close-btn" id="payModalClose" aria-label="Close payment modal">
+          <span class="material-symbols-outlined">close</span>
+        </button>
       </div>
-      <div style="flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:0;">
+      <div class="admin-modal-body admin-modal-form">
         <div class="admin-form-grid">
           <div class="compose-field admin-full-width">
             <label>Student</label>
-            <select id="pmStudent"></select>
+            <select id="pmStudent" class="admin-visually-hidden-select"></select>
+            <div class="admin-student-picker admin-payment-student-picker" id="pmStudentPicker">
+              <div class="admin-student-search">
+                <input type="text" id="pmStudentSearch" class="admin-search-input admin-search-input-sm" placeholder="Search student name or email...">
+              </div>
+              <div id="pmStudentList" class="admin-student-list admin-payment-student-list">Loading students...</div>
+            </div>
           </div>
           <div class="compose-field admin-full-width">
             <label>Description</label>
             <input type="text" id="pmDescription" placeholder="e.g. Tuition Fee - 1st Semester">
           </div>
           <div class="compose-field">
-            <label>Amount (₱)</label>
+            <label>Amount (PHP)</label>
             <input type="number" id="pmAmount" placeholder="0.00" min="0">
           </div>
           <div class="compose-field">
@@ -805,166 +876,76 @@
     </div>
   </div>
 
-  <!-- Confirm Delete (stays centered — exception) -->
-  <div class="compose-modal-overlay" id="confirmDeleteOverlay" style="align-items:center;justify-content:center;">
-    <div class="compose-modal-box admin-modal" style="width:360px!important;max-width:90vw!important;height:auto!important;max-height:none!important;border-radius:20px!important;border:1px solid var(--border-medium)!important;padding:32px!important;text-align:center;animation:scaleIn 0.22s ease both!important;">
-      <div style="width:52px;height:52px;border-radius:14px;background:var(--accent-red-dim);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
-        <span class="material-symbols-outlined" style="font-size:1.6rem;color:var(--accent-red);">delete_forever</span>
+  <!-- Confirm Delete (stays centered â€” exception) -->
+    <div class="compose-modal-overlay" id="paymentProofModalOverlay">
+    <div class="compose-modal-box admin-modal">
+      <div class="compose-modal-header">
+        <h3>Payment Proof Review</h3>
+        <button type="button" class="modal-close-btn" id="paymentProofModalClose" aria-label="Close payment proof modal">
+          <span class="material-symbols-outlined">close</span>
+        </button>
       </div>
-      <h3 id="deleteConfirmTitle" style="font-size:1rem;font-weight:700;margin-bottom:8px;color:var(--text-primary);">Delete Record?</h3>
-      <p id="deleteConfirmMsg" style="color:var(--text-secondary);font-size:0.84rem;line-height:1.6;margin-bottom:24px;"></p>
-      <div style="display:flex;gap:10px;justify-content:center;">
-        <button type="button" class="btn-cancel" id="deleteConfirmCancel">Cancel</button>
-        <button type="button" id="deleteConfirmOk" style="display:inline-flex;align-items:center;gap:6px;padding:0 18px;height:34px;border-radius:var(--radius-md);border:none;background:var(--accent-red);color:#fff;font-weight:700;font-size:0.80rem;cursor:pointer;font-family:'Inter',sans-serif;box-shadow:0 4px 14px rgba(239,68,68,0.30);transition:all var(--transition);">
-          <span class="material-symbols-outlined" style="font-size:0.9rem;">delete</span>Delete
+      <div class="admin-modal-body admin-modal-form">
+        <div class="admin-payment-proof-shell">
+          <div class="admin-payment-proof-meta-grid">
+            <div class="admin-payment-proof-meta-card">
+              <span class="admin-payment-proof-label">Student</span>
+              <span class="admin-payment-proof-value" id="paymentProofStudent">-</span>
+            </div>
+            <div class="admin-payment-proof-meta-card">
+              <span class="admin-payment-proof-label">Reference ID</span>
+              <span class="admin-payment-proof-value" id="paymentProofReference">-</span>
+            </div>
+            <div class="admin-payment-proof-meta-card">
+              <span class="admin-payment-proof-label">Method</span>
+              <span class="admin-payment-proof-value" id="paymentProofMethod">-</span>
+            </div>
+            <div class="admin-payment-proof-meta-card">
+              <span class="admin-payment-proof-label">Submitted</span>
+              <span class="admin-payment-proof-value" id="paymentProofSubmitted">-</span>
+            </div>
+          </div>
+          <div class="admin-payment-proof-preview" id="paymentProofPreview">
+            <div class="admin-payment-proof-empty">
+              <span class="material-symbols-outlined">image_not_supported</span>
+              <span>No proof image available for this submission.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="compose-modal-actions">
+        <button type="button" class="btn-cancel" id="paymentProofModalCancel">Close</button>
+        <button type="button" class="admin-btn admin-btn-danger" id="paymentProofDeclineBtn">
+          <span class="material-symbols-outlined">close</span>Decline
+        </button>
+        <button type="button" class="btn-send" id="paymentProofApproveBtn">
+          <span class="material-symbols-outlined">check_circle</span>Approve
         </button>
       </div>
     </div>
   </div>
 
-  <!-- ═══ JS ═══ -->
+  <!-- Confirm Delete (stays centered ??? exception) -->
+  <div class="compose-modal-overlay compose-modal-overlay-centered" id="confirmDeleteOverlay">
+    <div class="compose-modal-box admin-modal admin-modal-confirm">
+      <div class="admin-confirm-icon-wrap">
+        <span class="material-symbols-outlined admin-confirm-icon">delete_forever</span>
+      </div>
+      <h3 id="deleteConfirmTitle" class="admin-confirm-title">Delete Record?</h3>
+      <p id="deleteConfirmMsg" class="admin-confirm-message"></p>
+      <div class="admin-confirm-actions">
+        <button type="button" class="btn-cancel" id="deleteConfirmCancel">Cancel</button>
+        <button type="button" id="deleteConfirmOk" class="admin-btn-danger-solid">
+          <span class="material-symbols-outlined">delete</span>Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- â•â•â• JS â•â•â• -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script type="module" src="../scripts/dashboard/admin/admin.js"></script>
 
-  <script>
-  // ── Premium UI Enhancements (layout fixes, micro-interactions) ──
-  (function() {
-    'use strict';
-
-    // Sidebar mobile toggle
-    const hamburger = document.getElementById('hamburgerBtn');
-    const sidebar   = document.getElementById('appSidebar') || document.querySelector('.app-sidebar');
-    const overlay   = document.getElementById('sidebarOverlay');
-
-    function openSidebar()  { sidebar?.classList.add('open');    overlay?.classList.add('active'); }
-    function closeSidebar() { sidebar?.classList.remove('open'); overlay?.classList.remove('active'); }
-
-    hamburger?.addEventListener('click', openSidebar);
-    overlay?.addEventListener('click', closeSidebar);
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSidebar(); });
-
-    window.addEventListener('resize', () => {
-      if (window.innerWidth > 900) closeSidebar();
-    });
-
-    // ── Drawer close on overlay click ──
-    document.querySelectorAll('.compose-modal-overlay').forEach(ov => {
-      ov.addEventListener('mousedown', function(e) {
-        // Only close if clicking the overlay itself, not confirm modal
-        if (e.target === ov && !ov.id.includes('confirmDelete')) {
-          ov.classList.remove('active');
-        }
-      });
-    });
-
-    // ── ESC closes any open drawer ──
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Escape') {
-        document.querySelectorAll('.compose-modal-overlay.active').forEach(ov => {
-          if (!ov.id.includes('confirmDelete')) ov.classList.remove('active');
-        });
-      }
-    });
-
-    // ── Row click → open context panel behavior ──
-    // The actual JS is in admin.js; we just ensure rows are styled correctly
-    // via CSS .admin-table tbody tr:hover (already handled above)
-
-    // ── Toggle row — make entire row clickable ──
-    document.querySelectorAll('.admin-setting-row').forEach(row => {
-      const toggle = row.querySelector('.admin-toggle input');
-      if (!toggle) return;
-      row.addEventListener('click', function(e) {
-        if (e.target !== toggle && !e.target.closest('.admin-toggle')) {
-          toggle.checked = !toggle.checked;
-          toggle.dispatchEvent(new Event('change', { bubbles: true }));
-        }
-      });
-    });
-
-    // ── KPI count-up on view switch ──
-    function countUp(el, target, duration = 800) {
-      if (!el || isNaN(target)) return;
-      const start = performance.now();
-      const from = 0;
-      function tick(now) {
-        const elapsed = now - start;
-        const progress = Math.min(elapsed / duration, 1);
-        const ease = 1 - Math.pow(2, -10 * progress);
-        el.textContent = Math.round(from + ease * (target - from)).toLocaleString();
-        if (progress < 1) requestAnimationFrame(tick);
-        else el.textContent = target.toLocaleString();
-      }
-      requestAnimationFrame(tick);
-    }
-
-    // Watch for KPI value changes and animate them
-    const kpiObserver = new MutationObserver(mutations => {
-      mutations.forEach(m => {
-        const el = m.target;
-        const val = parseFloat(el.textContent.replace(/[^0-9.]/g, ''));
-        if (!isNaN(val) && val > 0 && el.classList.contains('action-content')) {
-          const h4 = el.querySelector('h4');
-          if (h4) {
-            const num = parseFloat(h4.textContent.replace(/[^0-9.]/g, ''));
-            if (!isNaN(num)) countUp(h4, num);
-          }
-        }
-      });
-    });
-
-    document.querySelectorAll('.action-content').forEach(el => {
-      kpiObserver.observe(el, { childList: true, subtree: true, characterData: true });
-    });
-
-    // ── Stagger card animations on view switch ──
-    const viewObserver = new MutationObserver(mutations => {
-      mutations.forEach(m => {
-        if (m.target.classList.contains('active') && m.attributeName === 'class') {
-          const cards = m.target.querySelectorAll('.action-card, .admin-ann-card, .course-card, .pay-summary-card');
-          cards.forEach((card, i) => {
-            card.style.opacity = '0';
-            card.style.transform = 'translateY(8px)';
-            setTimeout(() => {
-              card.style.transition = `opacity 0.25s ease ${i * 0.05}s, transform 0.25s ease ${i * 0.05}s`;
-              card.style.opacity = '1';
-              card.style.transform = 'translateY(0)';
-            }, 10);
-          });
-        }
-      });
-    });
-
-    document.querySelectorAll('.view-content').forEach(v => {
-      viewObserver.observe(v, { attributes: true });
-    });
-
-    // ── Button press feedback ──
-    document.addEventListener('mousedown', e => {
-      const btn = e.target.closest('.admin-btn, .btn-send, .btn-cancel, .admin-icon-btn, .action-card');
-      if (btn) {
-        btn.style.transform = 'scale(0.96)';
-        const reset = () => { btn.style.transform = ''; document.removeEventListener('mouseup', reset); };
-        document.addEventListener('mouseup', reset);
-      }
-    });
-
-    // ── Search bar icon already handled by CSS ::before ──
-    // Just ensure the input has the right left padding applied
-    const searchInput = document.getElementById('adminGlobalSearch');
-    if (searchInput) {
-      const bar = searchInput.parentElement;
-      if (bar) bar.style.position = 'relative';
-    }
-
-    // ── Theme toggle icon sync ──
-    const themeBtn = document.getElementById('themeToggle');
-    const themeIcon = document.getElementById('themeIcon');
-    // The actual theme logic is in admin.js; this just ensures icon matches
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'light' && themeIcon) themeIcon.textContent = 'light_mode';
-
-  })();
-  </script>
 </body>
 </html>
+

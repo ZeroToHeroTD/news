@@ -19,12 +19,35 @@ const state = {
   editingId: null,
 };
 
+function setupUnitsStepper() {
+  const input = document.getElementById('cmUnits');
+  const decrementBtn = document.getElementById('cmUnitsDecrement');
+  const incrementBtn = document.getElementById('cmUnitsIncrement');
+
+  if (!input || !decrementBtn || !incrementBtn || input.dataset.stepperBound === 'true') return;
+
+  const applyDelta = (delta) => {
+    const min = parseInt(input.min || '1', 10);
+    const max = parseInt(input.max || '99', 10);
+    const current = parseInt(input.value || input.placeholder || String(min), 10);
+    const nextValue = Math.min(max, Math.max(min, (Number.isNaN(current) ? min : current) + delta));
+    input.value = String(nextValue);
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+  };
+
+  decrementBtn.addEventListener('click', () => applyDelta(-1));
+  incrementBtn.addEventListener('click', () => applyDelta(1));
+  input.dataset.stepperBound = 'true';
+}
+
 // ─── Init ─────────────────────────────────────────────────────────────────────
 export async function initCourses(adminRole, adminId) {
   state.currentRole = adminRole;
   state.currentUserId = adminId;
 
   setupModalClose('courseModalOverlay', 'courseModalClose', 'courseModalCancel');
+  setupUnitsStepper();
 
   document.getElementById('createCourseBtn')?.addEventListener('click', () => {
     if (!can(adminRole, 'CREATE_COURSE')) {
@@ -71,12 +94,12 @@ export async function loadCourses() {
     renderCoursesGrid(state.allCourses);
   } catch (err) {
     console.error('Courses load error:', err.message);
-    if (grid) grid.innerHTML = `<div class="admin-empty-state"><p style="color:var(--accent-red);">Failed to load courses.</p></div>`;
+    if (grid) grid.innerHTML = `<div class="admin-empty-state"><p class="admin-inline-error">Failed to load courses.</p></div>`;
   }
 }
 
 async function loadPeople() {
-  const { data: profiles } = await supabase.from('profiles').select('id, full_name, role, email');
+  const { data: profiles } = await supabase.from('profiles').select('id, full_name, role, email, avatar_url');
   if (profiles) {
     state.allStudents = profiles.filter(p => p.role === ROLES.STUDENT);
     state.allInstructors = profiles.filter(p => p.role === ROLES.TEACHER || p.role === ROLES.ADMIN);
@@ -90,7 +113,7 @@ function renderCoursesGrid(courses) {
 
   if (!courses?.length) {
     grid.innerHTML = `
-      <div class="admin-empty-state" style="grid-column:1/-1; background:var(--card-bg); border-radius:20px; border:1px dashed var(--border-color);">
+      <div class="admin-empty-state admin-empty-courses">
         <div class="admin-empty-icon">📚</div>
         <h3>No courses found</h3>
         <p>Create your first course to get started</p>
@@ -119,7 +142,7 @@ function renderCoursesGrid(courses) {
           </div>
           <h3>${escapeHtml(course.course_name)}</h3>
           <p class="instructor-name">
-            <span class="material-symbols-outlined" style="font-size:1rem; color:var(--primary);">person</span>
+            <span class="material-symbols-outlined">person</span>
             ${escapeHtml(course.instructor_name || 'Unassigned')}
           </p>
           <div class="course-progress-label">
@@ -131,7 +154,7 @@ function renderCoursesGrid(courses) {
         </div>
         <div class="course-card-footer">
           <span class="course-units-label">${course.units || 0} Units</span>
-          <div style="display:flex; gap:6px;">
+          <div class="admin-course-actions">
             ${canEdit ? `<button class="admin-icon-btn edit" title="Edit course" onclick="window._adminEditCourse('${course.id}')">
               <span class="material-symbols-outlined">edit</span>
             </button>` : ''}
@@ -148,9 +171,15 @@ function renderCoursesGrid(courses) {
 function openCreateModal() {
   state.editingId = null;
   document.getElementById('courseModalTitle').textContent = 'Add New Course';
-  document.getElementById('courseModalForm').reset();
+  const form = document.getElementById('courseModalForm');
+  form.reset();
+  form.scrollTop = 0;
   populateInstructorDropdown();
   populateStudentEnrollList([]);
+  const studentSearch = document.getElementById('cmStudentSearch');
+  if (studentSearch) studentSearch.value = '';
+  const unitsInput = document.getElementById('cmUnits');
+  if (unitsInput && !unitsInput.value) unitsInput.value = unitsInput.placeholder || '3';
   openModal('courseModalOverlay');
 }
 
@@ -167,6 +196,9 @@ window._adminEditCourse = function (courseId) {
   document.getElementById('cmCourseName').value = course.course_name || '';
   document.getElementById('cmCourseCode').value = course.course_code || '';
   document.getElementById('cmUnits').value = course.units || '';
+  document.getElementById('courseModalForm').scrollTop = 0;
+  const studentSearch = document.getElementById('cmStudentSearch');
+  if (studentSearch) studentSearch.value = '';
 
   populateInstructorDropdown(course.instructor_id);
   populateStudentEnrollList([], course);
@@ -194,16 +226,34 @@ function populateStudentEnrollList(enrolledIds = [], course = null) {
   if (!container) return;
 
   if (!state.allStudents.length) {
-    container.innerHTML = '<p style="color:var(--text-muted); font-size:0.82rem; padding:8px;">No students available.</p>';
+    container.innerHTML = '<p class="admin-empty-picker-text">No students available.</p>';
     return;
   }
 
   container.innerHTML = state.allStudents.map(s => `
-    <div class="admin-enroll-item" data-student-name="${escapeHtml(s.full_name).toLowerCase()}">
-      <input type="checkbox" id="enroll_${s.id}" value="${s.id}" ${enrolledIds.includes(s.id) ? 'checked' : ''}>
-      <label for="enroll_${s.id}">${escapeHtml(s.full_name)}</label>
-    </div>
+    <label class="admin-enroll-item admin-student-row" for="enroll_${s.id}" data-student-name="${escapeHtml(s.full_name).toLowerCase()}">
+      <input class="admin-student-check" type="checkbox" id="enroll_${s.id}" value="${s.id}" ${enrolledIds.includes(s.id) ? 'checked' : ''}>
+      <img src="${avatarUrl(s.full_name, s.avatar_url)}" class="admin-student-avatar" alt="${escapeHtml(s.full_name)}" onerror="this.src='https://ui-avatars.com/api/?name=S&background=2563eb&color=fff'">
+      <span class="admin-student-meta">
+        <span class="admin-student-name">${escapeHtml(s.full_name)}</span>
+        <span class="admin-student-subtitle">${escapeHtml(s.email || 'Student')}</span>
+      </span>
+      <span class="admin-student-check-ui" aria-hidden="true">
+        <span class="material-symbols-outlined">check</span>
+      </span>
+    </label>
   `).join('');
+
+  updateSelectAllButtonLabel();
+}
+
+function updateSelectAllButtonLabel() {
+  const selectAllBtn = document.getElementById('cmSelectAllBtn');
+  const checkboxes = Array.from(document.querySelectorAll('#cmStudentEnrollList input[type="checkbox"]'));
+  if (!selectAllBtn || checkboxes.length === 0) return;
+
+  const allChecked = checkboxes.every(cb => cb.checked);
+  selectAllBtn.textContent = allChecked ? 'Clear All' : 'Select All';
 }
 
 // ─── Save Course ──────────────────────────────────────────────────────────────
@@ -301,10 +351,17 @@ export function getCourseStats() {
 document.getElementById('cmSelectAllBtn')?.addEventListener('click', () => {
   const checkboxes = document.querySelectorAll('#cmStudentEnrollList input[type="checkbox"]');
   const allChecked = Array.from(checkboxes).every(cb => cb.checked);
-  
+
   checkboxes.forEach(cb => {
-    cb.checked = !allChecked; // Toggle all on or all off
+    cb.checked = !allChecked;
   });
+
+  updateSelectAllButtonLabel();
+});
+
+document.getElementById('cmStudentEnrollList')?.addEventListener('change', (event) => {
+  if (!event.target.matches('input[type="checkbox"]')) return;
+  updateSelectAllButtonLabel();
 });
 
 // Live Search for Student Enrollment

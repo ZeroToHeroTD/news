@@ -30,11 +30,32 @@ const notify = (msg, type = 'info') => {
 // ---------------------------------------------------------------------------
 
 const formatCurrency = (num) => {
-    return `₱${num.toLocaleString('en-PH', {
+    const amount = Number(num || 0);
+    return new Intl.NumberFormat('en-PH', {
+        style: 'currency',
+        currency: 'PHP',
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
-    })}`;
+    }).format(amount);
 };
+
+const paymentSubmissionContext = {
+    paymentId: null,
+};
+
+window.currentSelectedMethod = null;
+
+function resolveSelectedPaymentMethod() {
+    if (window.currentSelectedMethod && ['GCash', 'Maya'].includes(window.currentSelectedMethod)) {
+        return window.currentSelectedMethod;
+    }
+
+    const methodLabel = document.getElementById('methodNameDisplay')?.textContent || '';
+    if (methodLabel.toLowerCase().includes('gcash')) return 'GCash';
+    if (methodLabel.toLowerCase().includes('maya')) return 'Maya';
+
+    return null;
+}
 
 const getStatusConfig = (status, dueDate) => {
     const today = new Date();
@@ -97,6 +118,11 @@ function getSmartInsight(stats, paidPct, payments) {
 // ---------------------------------------------------------------------------
 
 export async function loadPaymentData(userId) {
+    if (!userId) {
+        const { data: authData } = await supabaseClient.auth.getUser();
+        userId = authData?.user?.id || null;
+    }
+
     const containers = {
         table:       document.getElementById('paymentsTableBody'),
         total:       document.getElementById('payTotalBalance'),
@@ -313,7 +339,7 @@ function updatePaymentsTable(container, payments) {
                         ? `<button class="pay-action-btn" title="Download Official Receipt" onclick="window.downloadDocument('Official Receipt', '${realRef}', '${descSafe}', ${amtRaw}, '${dateStr}', '${p.status}')">
                                 <span class="material-symbols-outlined" style="font-size:1rem;">download</span>
                             </button>`
-                        : `<button class="pay-action-btn" title="Pay this item" onclick="window.openPaymentGateway('${formatCurrency(amtRaw)}')">
+                        : `<button class="pay-action-btn" title="Pay this item" onclick="window.openPaymentGateway('${formatCurrency(amtRaw)}', '${p.id}')">
                                 <span class="material-symbols-outlined" style="font-size:1rem;">payment</span>
                             </button>`
                     }
@@ -368,14 +394,116 @@ window.scrollToHistory = () => {
     }
 };
 
-window.openPaymentGateway = (amountStr = null) => {
+function resolvePendingPaymentRecord() {
+    const payments = Array.isArray(window.cachedPaymentsData) ? window.cachedPaymentsData : [];
+
+    if (paymentSubmissionContext.paymentId) {
+        const matched = payments.find(payment => String(payment.id) === String(paymentSubmissionContext.paymentId));
+        if (matched) return matched;
+    }
+
+    const modalAmount = document.getElementById('payAmountDisplay')?.textContent || '';
+    const parsedAmount = Number(String(modalAmount).replace(/[^\d.]/g, ''));
+    const unpaidPayments = payments.filter(payment => String(payment.status || '').trim() !== 'Paid');
+    const amountMatched = unpaidPayments.find(payment => Math.abs((parseFloat(payment.amount || 0)) - parsedAmount) < 0.01);
+
+    return amountMatched || unpaidPayments[0] || null;
+}
+
+async function uploadPaymentProof(userId, paymentId, file) {
+    const safeName = String(file?.name || 'proof.png').replace(/[^a-zA-Z0-9._-]/g, '-');
+    const filePath = `${userId}/${paymentId || 'manual'}/${Date.now()}-${safeName}`;
+    const bucket = 'payment-proofs';
+
+    const { error: uploadError } = await supabaseClient.storage.from(bucket).upload(filePath, file, {
+        upsert: false,
+        cacheControl: '3600',
+    });
+    if (uploadError) {
+        throw new Error('Payment proof upload failed. Check that the payment-proofs storage bucket exists and accepts uploads.');
+    }
+
+    const { data } = supabaseClient.storage.from(bucket).getPublicUrl(filePath);
+    return {
+        bucket,
+        filePath,
+        publicUrl: data?.publicUrl || '',
+    };
+}
+
+async function createPaymentSubmissionRecord(submission) {
+    const submittedAt = new Date().toISOString();
+    const attempts = [
+        {
+            payment_id: submission.payment_id,
+            student_id: submission.student_id,
+            reference_number: submission.reference_number,
+            proof_url: submission.proof_url,
+            payment_method: submission.payment_method,
+            method: submission.payment_method,
+            amount: submission.amount,
+            description: submission.description,
+            status: 'Pending',
+            submitted_at: submittedAt,
+        },
+        {
+            payment_id: submission.payment_id,
+            student_id: submission.student_id,
+            reference_number: submission.reference_number,
+            receipt_url: submission.proof_url,
+            payment_method: submission.payment_method,
+            method: submission.payment_method,
+            amount: submission.amount,
+            description: submission.description,
+            status: 'Pending',
+            submitted_at: submittedAt,
+        },
+        {
+            payment_id: submission.payment_id,
+            student_id: submission.student_id,
+            reference_number: submission.reference_number,
+            proof_url: submission.proof_url,
+            payment_method: submission.payment_method,
+            method: submission.payment_method,
+            amount: submission.amount,
+            description: submission.description,
+            review_status: 'Pending',
+            created_at: submittedAt,
+        },
+        {
+            payment_id: submission.payment_id,
+            student_id: submission.student_id,
+            reference_number: submission.reference_number,
+            receipt_url: submission.proof_url,
+            payment_method: submission.payment_method,
+            method: submission.payment_method,
+            amount: submission.amount,
+            description: submission.description,
+            review_status: 'Pending',
+            created_at: submittedAt,
+        },
+    ];
+
+    let lastError = null;
+    for (const payload of attempts) {
+        const { error } = await supabaseClient.from('payment_submissions').insert([payload]);
+        if (!error) return payload;
+        lastError = error;
+    }
+
+    throw new Error(lastError?.message || 'Payment submission could not be saved for admin review.');
+}
+
+window.openPaymentGateway = (amountStr = null, paymentId = null) => {
     const modal = document.getElementById('paymentModalOverlay');
     const amtDisplay = document.getElementById('payAmountDisplay');
     
     if(modal && amtDisplay) {
+        paymentSubmissionContext.paymentId = paymentId || null;
+        window.currentSelectedMethod = null;
         if(!amountStr || typeof amountStr !== 'string') {
            const remainingEl = document.getElementById('payRemainingBalance');
-           amountStr = remainingEl ? remainingEl.textContent : '₱0.00';
+           amountStr = remainingEl ? remainingEl.textContent : formatCurrency(0);
         }
         
         amtDisplay.textContent = amountStr;
@@ -385,7 +513,6 @@ window.openPaymentGateway = (amountStr = null) => {
         document.getElementById('payRefNumber').value = '';
         document.getElementById('payReceiptFile').value = '';
 
-        // Reset the beautiful file label UI when opening
         document.getElementById('fileNameText').textContent = 'Click to browse or drag file';
         document.getElementById('fileUploadLabel').classList.remove('has-file');
         document.getElementById('fileUploadIcon').textContent = 'upload_file';
@@ -396,6 +523,8 @@ window.openPaymentGateway = (amountStr = null) => {
 
 window.closePaymentModal = () => {
     const modal = document.getElementById('paymentModalOverlay');
+    paymentSubmissionContext.paymentId = null;
+    window.currentSelectedMethod = null;
     if(modal) modal.classList.remove('active');
 };
 
@@ -421,10 +550,11 @@ window.selectPaymentMethod = (methodKey) => {
 window.backToStep1 = () => {
     document.getElementById('paymentStep1').style.display = 'block';
     document.getElementById('paymentStep2').style.display = 'none';
+    window.currentSelectedMethod = null;
 };
 
 window.handlePaymentSubmission = async () => {
-    const refNo = document.getElementById('payRefNumber').value;
+    const refNo = document.getElementById('payRefNumber').value.trim();
     const fileInput = document.getElementById('payReceiptFile');
     const file = fileInput.files ? fileInput.files[0] : null;
     const btn = document.getElementById('btnConfirmPayment');
@@ -434,14 +564,49 @@ window.handlePaymentSubmission = async () => {
         return;
     }
 
+    if (!String(file.type || '').startsWith('image/')) {
+        notify("Please upload a valid image file.", "error");
+        return;
+    }
+
+    const selectedMethod = resolveSelectedPaymentMethod();
+    if (!selectedMethod) {
+        notify("Please choose GCash or Maya before submitting proof.", "error");
+        return;
+    }
+
     btn.disabled = true; 
     btn.innerHTML = `<span class="material-symbols-outlined spinning">sync</span> Uploading...`;
 
     try {
-        // Simulated server upload delay
-        await new Promise(resolve => setTimeout(resolve, 1500)); 
+        const { data: authData, error: authError } = await supabaseClient.auth.getUser();
+        if (authError) throw authError;
+
+        const currentUser = authData?.user;
+        if (!currentUser?.id) throw new Error('Your session expired. Please sign in again.');
+
+        const paymentRecord = resolvePendingPaymentRecord();
+        if (!paymentRecord?.id) throw new Error('No pending payment record is linked to this submission yet.');
+
+        const upload = await uploadPaymentProof(currentUser.id, paymentRecord.id, file);
+        await createPaymentSubmissionRecord({
+            payment_id: paymentRecord.id,
+            student_id: currentUser.id,
+            reference_number: refNo,
+            proof_url: upload.publicUrl,
+            payment_method: selectedMethod,
+            amount: parseFloat(paymentRecord.amount || 0),
+            description: paymentRecord.description || 'Payment proof submission',
+        });
+
+        const { error: updateError } = await supabaseClient
+            .from('student_payments')
+            .update({ reference_number: refNo })
+            .eq('id', paymentRecord.id);
+        if (updateError) throw updateError;
 
         notify("Proof submitted! Finance will verify within 24 hours.", "success");
+        await loadPaymentData();
         window.closePaymentModal();
     } catch (err) {
         console.error(err);

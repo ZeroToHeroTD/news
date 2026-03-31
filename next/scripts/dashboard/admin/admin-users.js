@@ -20,6 +20,9 @@ const state = {
   currentUserId: null,
 };
 
+let presenceChannel = null;
+let onlineUsers = new Set();
+
 function getRolePickerParts() {
   const select = document.getElementById('umRole');
   const picker = document.getElementById('umRolePicker');
@@ -139,7 +142,35 @@ export async function initUsers(adminRole, adminId) {
   document.getElementById('userRoleFilter')?.addEventListener('change', applyFilters);
   document.getElementById('userSearchInput')?.addEventListener('input', debouncedApplyFilters);
 
+  initializePresence();
   await loadUsers();
+}
+
+function initializePresence() {
+  if (!state.currentUserId) return;
+
+  if (presenceChannel) {
+    supabase.removeChannel(presenceChannel);
+    presenceChannel = null;
+  }
+
+  presenceChannel = supabase.channel('campus_presence', {
+    config: { presence: { key: state.currentUserId } }
+  });
+
+  presenceChannel
+    .on('presence', { event: 'sync' }, () => {
+      const presenceState = presenceChannel.presenceState();
+      onlineUsers = new Set(Object.keys(presenceState));
+      renderUsersTable();
+    })
+    .subscribe(async (status) => {
+      if (status === 'SUBSCRIBED') {
+        await presenceChannel.track({
+          online_at: new Date().toISOString(),
+        });
+      }
+    });
 }
 
 // ─── Data Loading ─────────────────────────────────────────────────────────────
@@ -211,6 +242,8 @@ function renderUsersTable() {
     const joinDate = formatDate(user.created_at);
     const courseName = escapeHtml(user.course_name || user.course || 'Unassigned');
     const sectionName = escapeHtml(user.section || 'No section assigned');
+    const isOnline = onlineUsers.has(user.id) || user.id === state.currentUserId;
+    const userStatus = isOnline ? 'Active' : 'Offline';
     const canEdit = can(state.currentRole, 'EDIT_ANY_USER') ||
       (state.currentRole === ROLES.TEACHER && user.role === ROLES.STUDENT);
     const canDel = can(state.currentRole, 'DELETE_USER');
@@ -233,7 +266,7 @@ function renderUsersTable() {
             <span class="admin-users-section">${sectionName}</span>
           </div>
         </td>
-        <td><span class="admin-users-status">Active</span></td>
+        <td><span class="admin-users-status ${isOnline ? 'online' : 'offline'}">${userStatus}</span></td>
         <td><span class="admin-users-joined">${joinDate}</span></td>
         <td>
           <div class="admin-row-actions">
@@ -271,13 +304,13 @@ function renderUserStats() {
     <button type="button" class="admin-stat-pill${activeRole === 'all' ? ' active' : ''}" data-role-filter="all" aria-pressed="${activeRole === 'all'}">
       <span class="admin-stat-pill-num">${state.allUsers.length}</span> Total Users
     </button>
-    <button type="button" class="admin-stat-pill${activeRole === 'student' ? ' active' : ''}" data-role-filter="student" aria-pressed="${activeRole === 'student'}">
+    <button type="button" class="admin-stat-pill admin-stat-pill-student${activeRole === 'student' ? ' active' : ''}" data-role-filter="student" aria-pressed="${activeRole === 'student'}">
       <span class="admin-stat-pill-num admin-stat-pill-num-student">${counts.student || 0}</span> Students
     </button>
-    <button type="button" class="admin-stat-pill${activeRole === 'teacher' ? ' active' : ''}" data-role-filter="teacher" aria-pressed="${activeRole === 'teacher'}">
+    <button type="button" class="admin-stat-pill admin-stat-pill-teacher${activeRole === 'teacher' ? ' active' : ''}" data-role-filter="teacher" aria-pressed="${activeRole === 'teacher'}">
       <span class="admin-stat-pill-num admin-stat-pill-num-teacher">${counts.teacher || 0}</span> Instructors
     </button>
-    <button type="button" class="admin-stat-pill${activeRole === 'admin' ? ' active' : ''}" data-role-filter="admin" aria-pressed="${activeRole === 'admin'}">
+    <button type="button" class="admin-stat-pill admin-stat-pill-admin${activeRole === 'admin' ? ' active' : ''}" data-role-filter="admin" aria-pressed="${activeRole === 'admin'}">
       <span class="admin-stat-pill-num admin-stat-pill-num-admin">${counts.admin || 0}</span> Admins
     </button>
   `;
@@ -286,8 +319,10 @@ function renderUserStats() {
 // ─── Create Modal ─────────────────────────────────────────────────────────────
 function openCreateModal() {
   state.editingId = null;
+  const userForm = document.getElementById('userModalForm');
   document.getElementById('userModalTitle').textContent = 'Add New User';
-  document.getElementById('userModalForm').reset();
+  userForm?.reset();
+  if (userForm) userForm.scrollTop = 0;
   document.getElementById('umPasswordGroup').style.display = 'block'; // Show for new users
 
   // Admins can assign any role; instructors cannot create users (guarded above)
@@ -315,8 +350,10 @@ window._adminEditUser = function (userId) {
   }
 
   state.editingId = userId;
+  const userForm = document.getElementById('userModalForm');
   document.getElementById('userModalTitle').textContent = 'Edit User';
   document.getElementById('umPasswordGroup').style.display = 'none'; // Don't show password when editing
+  if (userForm) userForm.scrollTop = 0;
 
   document.getElementById('umFullName').value = user.full_name || '';
   document.getElementById('umEmail').value = user.email || '';
