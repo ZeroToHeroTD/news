@@ -218,8 +218,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             // A. Load critical data first
             await initProfile(user);
 
-            // B. Parallel Data Loading
-            await Promise.all([
+            // B. Start live presence as early as possible so status stays accurate
+            // even if a later dashboard module fails to load.
+            initializePresence(userId);
+
+            // C. Parallel Data Loading
+            const moduleResults = await Promise.allSettled([
                 loadSmartDashboardData(userId),
                 loadPerformanceChart(userId, 'grades'),
                 loadTodaysSchedule(userId),
@@ -235,10 +239,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                 loadSocialDirectory(userId)
             ]);
 
-            // C. Setup Interactive Features (Messaging & Presence)
+            const failedModules = moduleResults.filter(result => result.status === 'rejected');
+            if (failedModules.length) {
+                console.error('Dashboard module load failures:', failedModules.map(result => result.reason));
+                showToast('Some dashboard sections could not fully load.', 'warning');
+            }
+
+            // D. Setup Interactive Features
             initializeAutocomplete();
             setupMessageActions();
-            initializePresence(userId);
             initializeChartListener(userId);
 
             // Expose these to window so your courses cards can click them
