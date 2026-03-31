@@ -102,7 +102,7 @@ function renderActivityLog() {
   const logs = getActivityLog();
 
   if (!logs.length) {
-    container.innerHTML = `<div style="text-align:center; padding:24px; color:var(--text-muted); font-size:0.85rem;">No activity logged yet.</div>`;
+    container.innerHTML = `<div class="admin-empty-state admin-empty-state-compact">No activity logged yet.</div>`;
     return;
   }
 
@@ -153,6 +153,7 @@ function setupSettingsSave(adminRole, adminId) {
     };
     localStorage.setItem('admin_settings', JSON.stringify(settings));
     logActivity('Updated system settings');
+    renderActivityLog();
     toast('Settings saved successfully!', 'success');
   });
 }

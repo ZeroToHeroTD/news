@@ -7,7 +7,7 @@ import { supabase, can, ROLES } from '../config.js';
 import {
   toast, openModal, closeModal, setupModalClose,
   confirmDelete, formatDate, getTimeAgo,
-  escapeHtml, logActivity
+  escapeHtml, logActivity, filterBySearch, debounce
 } from '../utils.js';
 
 const state = {
@@ -36,6 +36,7 @@ export async function initAnnouncements(adminRole, adminId, adminName = 'Admin')
   document.getElementById('annModalSave')?.addEventListener('click', saveAnnouncement);
 
   document.getElementById('annAudienceFilter')?.addEventListener('change', applyFilters);
+  document.getElementById('annSearchInput')?.addEventListener('input', debounce(applyFilters, 220));
 
   // Instructors cannot broadcast to everyone, restrict audience dropdown
   if (adminRole === ROLES.TEACHER) {
@@ -78,10 +79,15 @@ export async function loadAnnouncements() {
 
 function applyFilters() {
   const audienceFilter = document.getElementById('annAudienceFilter')?.value || 'all';
+  const searchTerm = document.getElementById('annSearchInput')?.value || '';
   let filtered = [...state.allAnnouncements];
 
   if (audienceFilter !== 'all') {
     filtered = filtered.filter(a => (a.audience || 'all') === audienceFilter);
+  }
+
+  if (searchTerm.trim()) {
+    filtered = filterBySearch(filtered, searchTerm, ['subject', 'content', 'sender_name', 'audience']);
   }
 
   renderAnnouncementsGrid(filtered);
@@ -115,7 +121,7 @@ function renderAnnouncementsGrid(announcements) {
     const canDel = can(state.currentRole, 'DELETE_ANY_ANN') || (can(state.currentRole, 'DELETE_OWN_ANN') && isOwn);
 
     return `
-      <div class="admin-ann-card" style="animation: slideInRight 0.35s ease forwards ${idx * 0.04}s; opacity:0;">
+      <div class="admin-ann-card admin-ann-feed-card" data-search="${escapeHtml([ann.subject, ann.content, ann.sender_name, ann.audience].filter(Boolean).join(' '))}" style="animation: slideInRight 0.35s ease forwards ${idx * 0.04}s; opacity:0;">
         <div class="admin-ann-card-top">
           <h4 class="admin-ann-title">${escapeHtml(ann.subject || 'Untitled')}</h4>
           <span class="admin-ann-audience" style="background:${aud.bg}; color:${aud.color}; border-color:${aud.color}33;">

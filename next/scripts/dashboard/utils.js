@@ -50,10 +50,23 @@ export function toast(message, type = 'info') {
 // 2. MODAL SYSTEM
 // =============================================================================
 
+const modalCloseTimers = new WeakMap();
+
+function clearModalCloseTimer(overlay) {
+  const timer = modalCloseTimers.get(overlay);
+  if (timer) {
+    clearTimeout(timer);
+    modalCloseTimers.delete(overlay);
+  }
+}
+
 export function openModal(overlayId) {
   const overlay = document.getElementById(overlayId);
   if (overlay) {
+    clearModalCloseTimer(overlay);
     overlay.style.display = 'flex';
+    overlay.style.pointerEvents = 'auto';
+    overlay.setAttribute('aria-hidden', 'false');
     requestAnimationFrame(() => overlay.classList.add('active'));
   }
 }
@@ -61,9 +74,96 @@ export function openModal(overlayId) {
 export function closeModal(overlayId) {
   const overlay = document.getElementById(overlayId);
   if (overlay) {
+    clearModalCloseTimer(overlay);
     overlay.classList.remove('active');
-    setTimeout(() => { overlay.style.display = ''; }, 200);
+    overlay.style.pointerEvents = 'none';
+    overlay.setAttribute('aria-hidden', 'true');
+    const closeTimer = setTimeout(() => {
+      if (overlay.getAttribute('aria-hidden') === 'true' && !overlay.classList.contains('active')) {
+        overlay.style.display = 'none';
+        overlay.style.pointerEvents = '';
+      }
+      modalCloseTimers.delete(overlay);
+    }, 220);
+    modalCloseTimers.set(overlay, closeTimer);
   }
+}
+
+export function initAdminUIComponents(root = document) {
+  root.querySelectorAll('select').forEach(select => {
+    if (select.dataset.uiSkipWrap === 'true') return;
+
+    select.classList.add('ui-select-input');
+    if (!select.closest('.ui-select')) {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'ui-select';
+      select.parentNode?.insertBefore(wrapper, select);
+      wrapper.appendChild(select);
+    }
+  });
+
+  root.querySelectorAll('.compose-modal-overlay').forEach(overlay => {
+    overlay.classList.add('ui-modal-overlay');
+    if (!overlay.classList.contains('active')) {
+      overlay.style.display = 'none';
+      overlay.style.pointerEvents = 'none';
+      overlay.setAttribute('aria-hidden', 'true');
+    }
+  });
+
+  root.querySelectorAll('.admin-modal').forEach(modal => {
+    modal.classList.add('ui-modal');
+  });
+
+  root.querySelectorAll('.compose-modal-header').forEach(header => {
+    header.classList.add('ui-modal-header');
+  });
+
+  root.querySelectorAll('.compose-modal-actions').forEach(footer => {
+    footer.classList.add('ui-modal-footer');
+  });
+
+  root.querySelectorAll('.modal-scroll-area, .admin-modal form').forEach(body => {
+    body.classList.add('ui-modal-body');
+  });
+
+  root.querySelectorAll('.table-scroll-wrapper').forEach(shell => {
+    shell.classList.add('ui-table-shell');
+  });
+
+  root.querySelectorAll('.admin-table').forEach(table => {
+    table.classList.add('ui-table');
+  });
+
+  root.querySelectorAll('.admin-toggle').forEach(toggle => {
+    toggle.classList.add('ui-toggle');
+    toggle.querySelector('input')?.classList.add('ui-toggle-input');
+    toggle.querySelector('.admin-toggle-track')?.classList.add('ui-toggle-control');
+  });
+
+  root.querySelectorAll('.admin-btn, .btn-send, .btn-cancel, .modal-close-btn, .admin-text-btn, .admin-page-btn').forEach(button => {
+    button.classList.add('ui-button');
+  });
+
+  root.querySelectorAll('.admin-btn-primary, .btn-send').forEach(button => {
+    button.classList.add('ui-button-primary');
+  });
+
+  root.querySelectorAll('.admin-btn-secondary, .btn-cancel, .admin-page-btn').forEach(button => {
+    button.classList.add('ui-button-secondary');
+  });
+
+  root.querySelectorAll('.admin-btn-danger').forEach(button => {
+    button.classList.add('ui-button-danger');
+  });
+
+  root.querySelectorAll('.modal-close-btn').forEach(button => {
+    button.classList.add('ui-button-icon');
+  });
+
+  root.querySelectorAll('.admin-text-btn').forEach(button => {
+    button.classList.add('ui-button-ghost');
+  });
 }
 
 
@@ -85,21 +185,27 @@ export function confirmDelete(title, message) {
 
     openModal('confirmDeleteOverlay');
 
+    let settled = false;
+
     const cleanup = (result) => {
+      if (settled) return;
+      settled = true;
       closeModal('confirmDeleteOverlay');
       okBtn.removeEventListener('click', onOk);
       cancelBtn.removeEventListener('click', onCancel);
+      overlay?.removeEventListener('click', onBg);
       resolve(result);
     };
 
     const onOk = () => cleanup(true);
     const onCancel = () => cleanup(false);
+    const onBg = (e) => {
+      if (e.target === overlay) cleanup(false);
+    };
 
     okBtn.addEventListener('click', onOk);
     cancelBtn.addEventListener('click', onCancel);
-    document.getElementById('confirmDeleteOverlay')?.addEventListener('click', function onBg(e) {
-      if (e.target === this) { cleanup(false); this.removeEventListener('click', onBg); }
-    });
+    overlay?.addEventListener('click', onBg);
   });
 }
 
@@ -165,18 +271,23 @@ export function renderPagination(containerId, paginationData, onPageChange) {
 // =============================================================================
 
 // Keep this one!
-export function filterBySearch(items, term, keys) {
-  if (!term) return items;
-  const lowerTerm = term.toLowerCase().trim();
-  
+export function normalizeSearchTerm(term) {
+  return String(term || '').trim().toLowerCase();
+}
+
+export function filterBySearch(items, term, keys = []) {
+  const normalizedTerm = normalizeSearchTerm(term);
+  if (!normalizedTerm) return items;
+
   return items.filter(item => {
-    // Always check the strict ID first
-    if (item.id && String(item.id).toLowerCase().includes(lowerTerm)) return true;
-    
-    // Check the dynamic keys (name, email, course, etc.)
+    const idMatches = ['id', 'student_id', 'course_id', 'payment_id']
+      .some(key => item?.[key] && String(item[key]).toLowerCase().includes(normalizedTerm));
+
+    if (idMatches) return true;
+
     return keys.some(key => {
-      const val = item[key];
-      return val && String(val).toLowerCase().includes(lowerTerm);
+      const val = key.includes('.') ? getNestedValue(item, key) : item?.[key];
+      return val && String(val).toLowerCase().includes(normalizedTerm);
     });
   });
 }
@@ -355,27 +466,26 @@ export function setupModalClose(overlayId, closeBtnId, cancelBtnId) {
   const overlay = document.getElementById(overlayId);
   const closeBtn = document.getElementById(closeBtnId);
   const cancelBtn = document.getElementById(cancelBtnId);
+  if (!overlay) return;
 
-  const closeModal = () => {
-    if(!overlay) return;
-    // Add slide-out animation class here if desired, then hide
-    overlay.style.display = 'none';
+  if (overlay.dataset.modalCloseBound === 'true') return;
+  overlay.dataset.modalCloseBound = 'true';
+
+  const closeHandler = () => {
+    closeModal(overlayId);
   };
 
-  if (closeBtn) closeBtn.addEventListener('click', closeModal);
-  if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+  if (closeBtn) closeBtn.addEventListener('click', closeHandler);
+  if (cancelBtn) cancelBtn.addEventListener('click', closeHandler);
 
-  // Close on outside click
-  if (overlay) {
-    overlay.addEventListener('mousedown', (e) => {
-      if (e.target === overlay) closeModal();
-    });
-  }
+  overlay.addEventListener('mousedown', (e) => {
+    if (e.target === overlay) closeHandler();
+  });
 
-  // Close on ESC key
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && overlay && overlay.style.display !== 'none') {
-      closeModal();
+    const isVisible = overlay.classList.contains('active') || overlay.style.display === 'flex';
+    if (e.key === 'Escape' && isVisible) {
+      closeHandler();
     }
   });
 }

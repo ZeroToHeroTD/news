@@ -7,7 +7,7 @@ import { supabase, can, ROLES } from '../config.js';
 import {
   toast, openModal, closeModal, setupModalClose,
   confirmDelete, filterBySearch, escapeHtml,
-  avatarUrl, logActivity
+  avatarUrl, logActivity, debounce
 } from '../utils.js';
 
 const state = {
@@ -35,8 +35,12 @@ export async function initCourses(adminRole, adminId) {
 
   document.getElementById('courseModalSave')?.addEventListener('click', saveCourse);
 
+  const debouncedCourseSearch = debounce((value) => {
+    renderCoursesGrid(filterBySearch(state.allCourses, value, ['course_name', 'course_code', 'instructor_name']));
+  }, 220);
+
   document.getElementById('courseSearchInput')?.addEventListener('input', e => {
-    renderCoursesGrid(filterBySearch(state.allCourses, e.target.value, ['course_name', 'course_code', 'instructor_name']));
+    debouncedCourseSearch(e.target.value);
   });
 
   await Promise.all([loadCourses(), loadPeople()]);
@@ -106,7 +110,7 @@ function renderCoursesGrid(courses) {
     const canDel = can(state.currentRole, 'DELETE_COURSE');
 
     return `
-      <div class="course-card" style="animation: slideInRight 0.4s ease forwards ${idx * 0.05}s; opacity:0;">
+      <div class="course-card admin-course-card" data-search="${escapeHtml([course.course_name, course.course_code, course.instructor_name].filter(Boolean).join(' '))}" style="animation: slideInRight 0.4s ease forwards ${idx * 0.05}s; opacity:0;">
         <div class="course-card-top-bar" style="background:${color};"></div>
         <div class="course-card-body">
           <div class="course-card-header">
@@ -195,7 +199,7 @@ function populateStudentEnrollList(enrolledIds = [], course = null) {
   }
 
   container.innerHTML = state.allStudents.map(s => `
-    <div class="admin-enroll-item">
+    <div class="admin-enroll-item" data-student-name="${escapeHtml(s.full_name).toLowerCase()}">
       <input type="checkbox" id="enroll_${s.id}" value="${s.id}" ${enrolledIds.includes(s.id) ? 'checked' : ''}>
       <label for="enroll_${s.id}">${escapeHtml(s.full_name)}</label>
     </div>
@@ -309,10 +313,8 @@ document.getElementById('cmSelectAllBtn')?.addEventListener('click', () => {
     const studentItems = document.querySelectorAll('#cmStudentEnrollList .admin-enroll-item');
     
     studentItems.forEach(item => {
-      // Look at the label text (the student's name) inside each row
-      const studentName = item.querySelector('label').textContent.toLowerCase();
+      const studentName = item.dataset.studentName || item.querySelector('label').textContent.toLowerCase();
       
-      // If the name matches the search, show it (flex). If not, hide it (none).
       if (studentName.includes(searchTerm)) {
         item.style.display = 'flex';
       } else {

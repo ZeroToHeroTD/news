@@ -7,10 +7,15 @@
 
 // TO:
 import { supabase, can, ROLES } from '../config.js';
-import { toast, applyRoleUI, logActivity, avatarUrl } from '../utils.js';
+import {
+  toast, applyRoleUI, logActivity, avatarUrl,
+  debounce, filterBySearch, normalizeSearchTerm, initAdminUIComponents,
+  openModal, closeModal, setupModalClose,
+  getPHNumericalGrade, formatDate
+} from '../utils.js';
 import { initUsers, loadUsers, getUserStats } from './admin-users.js';
 import { initCourses, loadCourses, getCourseStats } from './admin-courses.js';
-import { initAnalytics } from './admin-analytics.js';
+import { initAnalytics, refreshAnalytics } from './admin-analytics.js';
 import { initAnnouncements, loadAnnouncements } from './admin-announcements.js';
 import { initSettings } from './admin-settings.js';
 
@@ -18,11 +23,35 @@ import { initSettings } from './admin-settings.js';
 let adminUser = null;
 let adminProfile = null;
 let currentView = 'view-overview';
+const gradeState = { all: [], filtered: [] };
+const attendanceState = { all: [], filtered: [] };
+const paymentState = { all: [], filtered: [] };
+
+function buildNameMap(items, fallbackKey = 'full_name') {
+  return new Map((items || []).map(item => [item.id, item?.[fallbackKey] || item?.name || '']));
+}
+
+function getUniqueOptions(values) {
+  return [...new Set((values || []).filter(Boolean))].sort((a, b) => String(a).localeCompare(String(b)));
+}
+
+function updateSelectOptions(selectId, options, defaultLabel, selectedValue = '') {
+  const select = document.getElementById(selectId);
+  if (!select) return;
+  select.innerHTML = `<option value="">${defaultLabel}</option>` +
+    options.map(option => `<option value="${option.value}" ${String(option.value) === String(selectedValue) ? 'selected' : ''}>${option.label}</option>`).join('');
+}
+
+async function syncOverviewAnalytics() {
+  await refreshAnalytics(getUserStats());
+}
 
 // =============================================================================
 // BOOT — Auth Guard → Profile Load → Module Init
 // =============================================================================
 document.addEventListener('DOMContentLoaded', async () => {
+  initAdminUIComponents();
+
   // ── 1. Authenticate ──────────────────────────────────────────────────────
   const { data: { session }, error: authError } = await supabase.auth.getSession();
 
@@ -103,14 +132,21 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ── 6. Navigation ─────────────────────────────────────────────────────────
   const sidebar = document.querySelector('.app-sidebar');
   const overlay = document.getElementById('sidebarOverlay');
+  const closeSidebarNav = () => {
+    sidebar?.classList.remove('open');
+    overlay?.classList.remove('active');
+  };
   document.getElementById('hamburgerBtn')?.addEventListener('click', () => {
     sidebar?.classList.toggle('open');
     overlay?.classList.toggle('active');
   });
-  overlay?.addEventListener('click', () => {
-    sidebar?.classList.remove('open');
-    overlay?.classList.remove('active');
+  overlay?.addEventListener('click', closeSidebarNav);
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeSidebarNav();
   });
+  window.addEventListener('resize', debounce(() => {
+    if (window.innerWidth > 900) closeSidebarNav();
+  }, 80));
 
   document.addEventListener('click', e => {
     const target = e.target.closest('[data-target]');
@@ -118,17 +154,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       e.preventDefault();
       const viewId = target.getAttribute('data-target');
       switchView(viewId, role, adminUser.id, fullName);
-      sidebar?.classList.remove('open');
-      overlay?.classList.remove('active');
+      closeSidebarNav();
     }
   });
 
   // ── 7. Global Search ──────────────────────────────────────────────────────
-  let searchDebounce;
-  document.getElementById('adminGlobalSearch')?.addEventListener('input', e => {
-    clearTimeout(searchDebounce);
-    searchDebounce = setTimeout(() => globalSearch(e.target.value, role), 250);
-  });
+  document.getElementById('adminGlobalSearch')?.addEventListener('input', debounce(e => {
+    globalSearch(e.target.value, role);
+  }, 220));
 
   // ── 8. Logout ─────────────────────────────────────────────────────────────
   document.getElementById('adminLogoutBtn')?.addEventListener('click', async () => {
@@ -187,44 +220,35 @@ function switchView(targetId, role, userId, userName) {
 // GLOBAL SEARCH (cross-module)
 // =============================================================================
 function globalSearch(term, role) {
-  if (!term || term.length < 2) return;
+  const normalizedTerm = normalizeSearchTerm(term);
 
-  const lowerTerm = term.toLowerCase();
+  const filterElements = (selector) => {
+    document.querySelectorAll(selector).forEach(el => {
+      const haystack = normalizeSearchTerm(el.dataset.search || el.textContent);
+      el.style.display = !normalizedTerm || haystack.includes(normalizedTerm) ? '' : 'none';
+    });
+  };
 
-  // Search user names in the users table if visible
-  document.querySelectorAll('#usersTableBody tr').forEach(row => {
-    const text = row.textContent.toLowerCase();
-    row.style.display = text.includes(lowerTerm) ? '' : 'none';
-  });
-
-  // Search course cards
-  document.querySelectorAll('.course-card').forEach(card => {
-    const text = card.textContent.toLowerCase();
-    card.style.display = text.includes(lowerTerm) ? '' : 'none';
-  });
-
-  // Search announcement cards
-  document.querySelectorAll('.admin-ann-card').forEach(card => {
-    const text = card.textContent.toLowerCase();
-    card.style.display = text.includes(lowerTerm) ? '' : 'none';
-  });
+  filterElements('#usersTableBody tr');
+  filterElements('.course-card');
+  filterElements('.admin-ann-card');
+  filterElements('#gradesTableBody tr');
+  filterElements('#attendanceTableBody tr');
+  filterElements('#adminPaymentsBody tr');
 }
 
 // =============================================================================
 // GRADES MODULE (inline, uses existing patterns)
 // =============================================================================
 async function initGrades(adminRole, adminId) {
-  await loadGrades(adminRole, adminId);
-
-  setupModalClose_inline('gradeModalOverlay', 'gradeModalClose', 'gradeModalCancel');
-
+  setupModalClose('gradeModalOverlay', 'gradeModalClose', 'gradeModalCancel');
   document.getElementById('addGradeBtn')?.addEventListener('click', () => openGradeModal(null, adminRole));
   document.getElementById('gradeModalSave')?.addEventListener('click', () => saveGrade(adminRole, adminId));
-
   document.getElementById('gradesStudentFilter')?.addEventListener('change', () => loadGrades(adminRole, adminId));
   document.getElementById('gradesCourseFilter')?.addEventListener('change', () => loadGrades(adminRole, adminId));
-
+  document.getElementById('gradesSearchInput')?.addEventListener('input', debounce(() => loadGrades(adminRole, adminId), 220));
   document.getElementById('exportGradesBtn')?.addEventListener('click', exportGradesCsv);
+  await loadGrades(adminRole, adminId);
 }
 
 async function loadGrades(adminRole, adminId) {
@@ -232,52 +256,77 @@ async function loadGrades(adminRole, adminId) {
   if (!tbody) return;
 
   try {
-let query = supabase.from('student_grades').select('*');
+    let query = supabase.from('student_grades').select('*').order('created_at', { ascending: false });
 
     // Instructors see only grades for their students/courses
     if (adminRole === ROLES.TEACHER) {
       query = query.eq('instructor_id', adminId);
     }
 
-    const studentFilter = document.getElementById('gradesStudentFilter')?.value;
-    const courseFilter = document.getElementById('gradesCourseFilter')?.value;
+    const studentFilter = document.getElementById('gradesStudentFilter')?.value || '';
+    const courseFilter = document.getElementById('gradesCourseFilter')?.value || '';
+    const searchTerm = document.getElementById('gradesSearchInput')?.value || '';
     if (studentFilter) query = query.eq('student_id', studentFilter);
     if (courseFilter) query = query.eq('course_name', courseFilter);
 
-    const { data: grades, error } = await query;
+    const [{ data: grades, error }, { data: students }, { data: instructors }, { data: courseRows }] = await Promise.all([
+      query,
+      supabase.from('profiles').select('id, full_name').eq('role', 'student'),
+      supabase.from('profiles').select('id, full_name, role').neq('role', 'student'),
+      supabase.from('student_courses').select('course_name').order('course_name'),
+    ]);
     if (error) throw error;
 
-    // Populate filter dropdowns
-    await populateGradeFilters();
+    const studentMap = buildNameMap(students);
+    const instructorMap = buildNameMap(instructors);
+    populateGradeFilters(students || [], courseRows || []);
 
-    if (!grades?.length) {
+    gradeState.all = (grades || []).map(grade => {
+      const numerical = Number.parseFloat(grade.numerical);
+      return {
+        ...grade,
+        student_name: grade.student_name || studentMap.get(grade.student_id) || 'Student',
+        instructor_name: grade.instructor_name || instructorMap.get(grade.instructor_id) || 'Unassigned',
+        course_name: grade.course_name || 'Untitled Course',
+        numerical: Number.isFinite(numerical) ? numerical : null,
+        status: grade.status || (Number.isFinite(numerical) ? (numerical <= 3 ? 'Passed' : 'Failed') : 'In Progress'),
+      };
+    });
+
+    gradeState.filtered = filterBySearch(gradeState.all, searchTerm, ['student_name', 'course_name', 'instructor_name', 'status']);
+
+    if (!gradeState.filtered.length) {
       tbody.innerHTML = `<tr><td colspan="8" class="admin-loading-cell">No grade records found</td></tr>`;
       return;
     }
 
-    tbody.innerHTML = grades.map((g, idx) => {
-      const numerical = parseFloat(g.numerical) || 0;
-      const passed = numerical > 0 && numerical <= 3.0;
-      const status = g.status || (passed ? 'Passed' : 'In Progress');
-      const statusClass = { Passed: 'status-passed', Failed: 'status-failed', 'In Progress': 'status-inc', Incomplete: 'status-inc' }[status] || 'status-inc';
-
+    tbody.innerHTML = gradeState.filtered.map((g) => {
+      const statusClass = { Passed: 'status-passed', Failed: 'status-failed', 'In Progress': 'status-inc', Incomplete: 'status-inc' }[g.status] || 'status-inc';
       const canEdit = can(adminRole, 'EDIT_ANY_GRADE') || (adminRole === ROLES.TEACHER && g.instructor_id === adminId);
+      const rowSearch = [g.id, g.student_id, g.student_name, g.course_name, g.instructor_name, g.status].join(' ');
+      const numerical = g.numerical;
+      const status = g.status;
+      const midtermScore = g.midterm ?? null;
+      const finalsScore = g.finals ?? null;
+      const midtermMarkup = `<span class="admin-grade-score${midtermScore === null ? ' empty' : ''}">${midtermScore === null ? '—' : `${midtermScore}%`}</span>`;
+      const finalsMarkup = `<span class="admin-grade-score${finalsScore === null ? ' empty' : ''}">${finalsScore === null ? '—' : `${finalsScore}%`}</span>`;
+      const numericalMarkup = `<span class="admin-grade-numerical${numerical ? '' : ' empty'}">${numerical ? numerical.toFixed(2) : '—'}</span>`;
 
       return `
-        <tr style="animation: slideInRight 0.3s ease forwards ${idx * 0.025}s; opacity:0;">
-          <td style="font-weight:700; color:var(--text-main);">${g.student?.full_name || g.student_name || '—'}</td>
-          <td style="color:var(--text-muted); font-size:0.85rem;">${g.course_name || '—'}</td>
-          <td style="color:var(--text-muted); font-size:0.82rem;">${g.instructor_name || '—'}</td>
-          <td style="font-weight:600;">${g.midterm ?? '—'}%</td>
-          <td style="font-weight:600;">${g.finals ?? '—'}%</td>
-          <td style="font-weight:800; font-family:monospace;">${numerical ? numerical.toFixed(2) : '—'}</td>
+        <tr data-search="${rowSearch}">
+          <td><span class="admin-grade-student">${g.student?.full_name || g.student_name || '—'}</span></td>
+          <td><span class="admin-grade-course">${g.course_name || '—'}</span></td>
+          <td><span class="admin-grade-instructor">${g.instructor_name || '—'}</span></td>
+          <td>${midtermMarkup}</td>
+          <td>${finalsMarkup}</td>
+          <td>${numericalMarkup}</td>
           <td><span class="status-badge ${statusClass}">${status.toUpperCase()}</span></td>
           <td>
             <div class="admin-row-actions">
-              ${canEdit ? `<button class="admin-icon-btn edit" title="Edit" onclick="window._adminEditGrade('${g.id}')">
+              ${canEdit ? `<button type="button" class="admin-icon-btn edit" title="Edit" onclick="window._adminEditGrade('${g.id}')">
                 <span class="material-symbols-outlined">edit</span>
               </button>` : ''}
-              ${can(adminRole, 'EDIT_ANY_GRADE') ? `<button class="admin-icon-btn delete" title="Delete" onclick="window._adminDeleteGrade('${g.id}')">
+              ${can(adminRole, 'EDIT_ANY_GRADE') ? `<button type="button" class="admin-icon-btn delete" title="Delete" onclick="window._adminDeleteGrade('${g.id}')">
                 <span class="material-symbols-outlined">delete</span>
               </button>` : ''}
             </div>
@@ -290,27 +339,20 @@ let query = supabase.from('student_grades').select('*');
   }
 }
 
-async function populateGradeFilters() {
-  const [{ data: students }, { data: courses }] = await Promise.all([
-    supabase.from('profiles').select('id, full_name').eq('role', 'student'),
-    supabase.from('student_grades').select('course_name'),
-  ]);
+function populateGradeFilters(students = [], courses = []) {
+  updateSelectOptions(
+    'gradesStudentFilter',
+    (students || []).map(student => ({ value: student.id, label: student.full_name || 'Unnamed Student' })),
+    'All Students',
+    document.getElementById('gradesStudentFilter')?.value || ''
+  );
 
-  const sFilter = document.getElementById('gradesStudentFilter');
-  const cFilter = document.getElementById('gradesCourseFilter');
-
-  if (sFilter && students) {
-    const current = sFilter.value;
-    sFilter.innerHTML = `<option value="">All Students</option>` +
-      (students || []).map(s => `<option value="${s.id}" ${s.id === current ? 'selected' : ''}>${s.full_name}</option>`).join('');
-  }
-
-  if (cFilter && courses) {
-    const unique = [...new Set((courses || []).map(c => c.course_name))];
-    const current = cFilter.value;
-    cFilter.innerHTML = `<option value="">All Courses</option>` +
-      unique.map(c => `<option value="${c}" ${c === current ? 'selected' : ''}>${c}</option>`).join('');
-  }
+  updateSelectOptions(
+    'gradesCourseFilter',
+    getUniqueOptions((courses || []).map(course => course.course_name)).map(courseName => ({ value: courseName, label: courseName })),
+    'All Courses',
+    document.getElementById('gradesCourseFilter')?.value || ''
+  );
 }
 
 let _editingGradeId = null;
@@ -318,12 +360,16 @@ let _editingGradeId = null;
 window._adminEditGrade = async function (gradeId) {
   const { data: grade } = await supabase.from('student_grades').select('*').eq('id', gradeId).single();
   if (!grade) return;
+  await openGradeModal(gradeId, adminProfile?.role || 'admin');
   _editingGradeId = gradeId;
   document.getElementById('gradeModalTitle').textContent = 'Edit Grade Record';
+  document.getElementById('gmStudent').value = grade.student_id || '';
+  document.getElementById('gmCourse').value = grade.course_name || '';
+  document.getElementById('gmStudent').disabled = true;
+  document.getElementById('gmCourse').disabled = true;
   document.getElementById('gmMidterm').value = grade.midterm || '';
   document.getElementById('gmFinals').value = grade.finals || '';
   document.getElementById('gmStatus').value = grade.status || 'In Progress';
-  openModal_inline('gradeModalOverlay');
 };
 
 async function openGradeModal(gradeId, adminRole) {
@@ -337,10 +383,15 @@ async function openGradeModal(gradeId, adminRole) {
 
   const sEl = document.getElementById('gmStudent');
   const cEl = document.getElementById('gmCourse');
+  if (sEl) sEl.disabled = Boolean(gradeId);
+  if (cEl) cEl.disabled = Boolean(gradeId);
   if (sEl) sEl.innerHTML = `<option value="">Select Student...</option>` + (students || []).map(s => `<option value="${s.id}">${s.full_name}</option>`).join('');
   if (cEl) cEl.innerHTML = `<option value="">Select Course...</option>` + [...new Set((courses || []).map(c => c.course_name))].map(c => `<option value="${c}">${c}</option>`).join('');
+  document.getElementById('gmMidterm').value = '';
+  document.getElementById('gmFinals').value = '';
+  document.getElementById('gmStatus').value = 'In Progress';
 
-  openModal_inline('gradeModalOverlay');
+  openModal('gradeModalOverlay');
 }
 
 async function saveGrade(adminRole, adminId) {
@@ -353,8 +404,7 @@ async function saveGrade(adminRole, adminId) {
 
   let numerical = null;
   if (midterm !== null && finals !== null) {
-    const avg = (midterm + finals) / 2;
-    numerical = avg >= 97 ? 1.0 : avg >= 94 ? 1.25 : avg >= 91 ? 1.5 : avg >= 88 ? 1.75 : avg >= 85 ? 2.0 : avg >= 82 ? 2.25 : avg >= 79 ? 2.5 : avg >= 76 ? 2.75 : avg >= 75 ? 3.0 : 5.0;
+    numerical = getPHNumericalGrade((midterm + finals) / 2);
   }
 
   try {
@@ -380,8 +430,9 @@ async function saveGrade(adminRole, adminId) {
       logActivity('Added grade record');
     }
 
-    closeModal_inline('gradeModalOverlay');
+    closeModal('gradeModalOverlay');
     await loadGrades(adminRole, adminId);
+    await syncOverviewAnalytics();
   } catch (err) {
     toast(`Error: ${err.message}`, 'error');
   } finally {
@@ -394,9 +445,9 @@ window._adminDeleteGrade = async function (gradeId) {
   if (error) { toast('Delete failed.', 'error'); return; }
   toast('Grade record deleted.', 'success');
   logActivity('Deleted grade record');
-  // Refresh
   const role = adminProfile?.role || 'admin';
   await loadGrades(role, adminUser?.id);
+  await syncOverviewAnalytics();
 };
 
 function exportGradesCsv() {
@@ -421,8 +472,7 @@ function exportGradesCsv() {
 // ATTENDANCE MODULE
 // =============================================================================
 async function initAttendance(adminRole, adminId) {
-  await loadAttendance(adminRole, adminId);
-  setupModalClose_inline('attendanceModalOverlay', 'attModalClose', 'attModalCancel');
+  setupModalClose('attendanceModalOverlay', 'attModalClose', 'attModalCancel');
 
   document.getElementById('addAttendanceBtn')?.addEventListener('click', () => {
     if (!can(adminRole, 'LOG_ATTENDANCE')) { toast('Permission denied.', 'error'); return; }
@@ -430,6 +480,8 @@ async function initAttendance(adminRole, adminId) {
   });
   document.getElementById('attModalSave')?.addEventListener('click', () => saveAttendance(adminRole, adminId));
   document.getElementById('attendanceStudentFilter')?.addEventListener('change', () => loadAttendance(adminRole, adminId));
+  document.getElementById('attendanceSearchInput')?.addEventListener('input', debounce(() => loadAttendance(adminRole, adminId), 220));
+  await loadAttendance(adminRole, adminId);
 }
 
 async function loadAttendance(adminRole, adminId) {
@@ -437,25 +489,44 @@ async function loadAttendance(adminRole, adminId) {
   if (!tbody) return;
 
   try {
-    // REVERTED: Using select('*') to avoid schema errors
     let query = supabase.from('attendance').select('*').order('date', { ascending: false });
     if (adminRole === ROLES.TEACHER) query = query.eq('instructor_id', adminId);
 
-    const studentFilter = document.getElementById('attendanceStudentFilter')?.value;
+    const studentFilter = document.getElementById('attendanceStudentFilter')?.value || '';
+    const searchTerm = document.getElementById('attendanceSearchInput')?.value || '';
     if (studentFilter) query = query.eq('student_id', studentFilter);
 
-    const { data: records, error } = await query;
+    const [{ data: records, error }, { data: students }, { data: courseRows }] = await Promise.all([
+      query,
+      supabase.from('profiles').select('id, full_name').eq('role', 'student'),
+      supabase.from('student_courses').select('student_id, course_name'),
+    ]);
     if (error) throw error;
 
-    // Refresh KPI row and filters
-    const { data: students } = await supabase.from('profiles').select('id, full_name').eq('role', 'student');
-    const sFilter = document.getElementById('attendanceStudentFilter');
-    if (sFilter && students) {
-      const cur = sFilter.value;
-      sFilter.innerHTML = `<option value="">All Students</option>` + students.map(s => `<option value="${s.id}" ${s.id === cur ? 'selected' : ''}>${s.full_name}</option>`).join('');
-    }
+    updateSelectOptions(
+      'attendanceStudentFilter',
+      (students || []).map(student => ({ value: student.id, label: student.full_name || 'Unnamed Student' })),
+      'All Students',
+      studentFilter
+    );
 
-    if (!records?.length) {
+    const studentMap = buildNameMap(students);
+    const courseByStudent = new Map();
+    (courseRows || []).forEach(course => {
+      if (course.student_id && course.course_name && !courseByStudent.has(course.student_id)) {
+        courseByStudent.set(course.student_id, course.course_name);
+      }
+    });
+
+    attendanceState.all = (records || []).map(record => ({
+      ...record,
+      student_name: record.student_name || studentMap.get(record.student_id) || 'Student',
+      course_name: record.course_name || courseByStudent.get(record.student_id) || 'Unassigned Course',
+    }));
+    attendanceState.filtered = filterBySearch(attendanceState.all, searchTerm, ['student_name', 'course_name', 'status', 'date']);
+    renderAttendanceKpis(attendanceState.filtered);
+
+    if (!attendanceState.filtered.length) {
       tbody.innerHTML = `<tr><td colspan="5" class="admin-loading-cell">No attendance records found</td></tr>`;
       return;
     }
@@ -467,18 +538,18 @@ async function loadAttendance(adminRole, adminId) {
       excused: { class: 'status-pending', label: 'Excused' },
     };
 
-    tbody.innerHTML = records.map((r, idx) => {
+    tbody.innerHTML = attendanceState.filtered.map((r) => {
       const ss = statusStyles[r.status] || statusStyles.present;
       const canEdit = can(adminRole, 'EDIT_ATTENDANCE');
       return `
-        <tr style="animation: slideInRight 0.3s ease forwards ${idx * 0.025}s; opacity:0;">
-          <td style="font-weight:700; color:var(--text-main);">${r.student_name || '—'}</td>
-          <td style="color:var(--text-muted); font-size:0.85rem;">${r.course_name || '—'}</td>
-          <td style="color:var(--text-muted); font-size:0.85rem; font-weight:600;">${r.date || '—'}</td>
+        <tr data-search="${[r.id, r.student_id, r.student_name, r.course_name, r.status, r.date].join(' ')}">
+          <td><span class="admin-attendance-student">${r.student_name || '—'}</span></td>
+          <td><span class="admin-attendance-course">${r.course_name || '—'}</span></td>
+          <td><span class="admin-attendance-date">${r.date || '—'}</span></td>
           <td><span class="deadline-status-badge ${ss.class}">${ss.label}</span></td>
           <td>
             <div class="admin-row-actions">
-              ${canEdit ? `<button class="admin-icon-btn delete" title="Delete" onclick="window._adminDeleteAttendance('${r.id}')">
+              ${canEdit ? `<button type="button" class="admin-icon-btn delete" title="Delete" onclick="window._adminDeleteAttendance('${r.id}')">
                 <span class="material-symbols-outlined">delete</span>
               </button>` : ''}
             </div>
@@ -487,7 +558,40 @@ async function loadAttendance(adminRole, adminId) {
     }).join('');
   } catch (err) {
     console.error('Attendance error:', err.message);
+    toast('Failed to load attendance.', 'error');
   }
+}
+
+function renderAttendanceKpis(records = []) {
+  const row = document.getElementById('attendanceKpiRow');
+  if (!row) return;
+
+  const totals = records.reduce((acc, record) => {
+    acc.total += 1;
+    acc[record.status] = (acc[record.status] || 0) + 1;
+    return acc;
+  }, { total: 0, present: 0, absent: 0, late: 0, excused: 0 });
+
+  const presentRate = totals.total ? Math.round((totals.present / totals.total) * 100) : 0;
+  row.innerHTML = `
+    <div class="pay-summary-card">
+      <div class="pay-card-inner">
+        <div class="pay-card-header"><span class="pay-label">Attendance Records</span></div>
+        <div class="pay-amount">${totals.total}</div>
+      </div>
+    </div>
+    <div class="pay-summary-card green">
+      <div class="pay-card-inner">
+        <div class="pay-card-header"><span class="pay-label">Present Rate</span></div>
+        <div class="pay-amount">${presentRate}%</div>
+      </div>
+    </div>
+    <div class="pay-summary-card red">
+      <div class="pay-card-inner">
+        <div class="pay-card-header"><span class="pay-label">Absent / Late</span></div>
+        <div class="pay-amount">${totals.absent + totals.late}</div>
+      </div>
+    </div>`;
 }
 
 async function openAttendanceModal(adminRole, adminId) {
@@ -503,8 +607,9 @@ async function openAttendanceModal(adminRole, adminId) {
   if (sEl) sEl.innerHTML = `<option value="">Select Student...</option>` + (students || []).map(s => `<option value="${s.id}">${s.full_name}</option>`).join('');
   if (cEl) cEl.innerHTML = `<option value="">Select Course...</option>` + [...new Set((courses || []).map(c => c.course_name))].map(c => `<option value="${c}">${c}</option>`).join('');
   if (dateEl) dateEl.value = new Date().toISOString().split('T')[0];
+  document.getElementById('attStatus').value = 'present';
 
-  openModal_inline('attendanceModalOverlay');
+  openModal('attendanceModalOverlay');
 }
 
 async function saveAttendance(adminRole, adminId) {
@@ -527,8 +632,9 @@ async function saveAttendance(adminRole, adminId) {
     if (error) throw error;
     toast('Attendance logged!', 'success');
     logActivity(`Logged attendance: ${studentProfile?.full_name} - ${status}`);
-    closeModal_inline('attendanceModalOverlay');
+    closeModal('attendanceModalOverlay');
     await loadAttendance(adminRole, adminId);
+    await syncOverviewAnalytics();
   } catch (err) {
     toast(`Error: ${err.message}`, 'error');
   } finally {
@@ -542,14 +648,14 @@ window._adminDeleteAttendance = async function (recordId) {
   toast('Record deleted.', 'success');
   const role = adminProfile?.role || 'admin';
   await loadAttendance(role, adminUser?.id);
+  await syncOverviewAnalytics();
 };
 
 // =============================================================================
 // PAYMENTS MODULE
 // =============================================================================
 async function initPayments(adminRole, adminId) {
-  await loadAdminPayments(adminRole, adminId);
-  setupModalClose_inline('paymentAdminModalOverlay', 'payModalClose', 'payModalCancel');
+  setupModalClose('paymentAdminModalOverlay', 'payModalClose', 'payModalCancel');
 
   document.getElementById('addPaymentBtn')?.addEventListener('click', () => {
     if (!can(adminRole, 'ADD_PAYMENT')) { toast('Only admins can add payment records.', 'error'); return; }
@@ -557,6 +663,8 @@ async function initPayments(adminRole, adminId) {
   });
   document.getElementById('payModalSave')?.addEventListener('click', () => savePayment(adminRole, adminId));
   document.getElementById('paymentStatusFilter')?.addEventListener('change', () => loadAdminPayments(adminRole, adminId));
+  document.getElementById('paymentSearchInput')?.addEventListener('input', debounce(() => loadAdminPayments(adminRole, adminId), 220));
+  await loadAdminPayments(adminRole, adminId);
 }
 
 async function loadAdminPayments(adminRole, adminId) {
@@ -564,18 +672,37 @@ async function loadAdminPayments(adminRole, adminId) {
   if (!tbody) return;
 
   try {
-let query = supabase.from('student_payments').select('*').order('due_date', { ascending: true });
+    let query = supabase.from('student_payments').select('*').order('due_date', { ascending: true });
     const statusFilter = document.getElementById('paymentStatusFilter')?.value || 'all';
-    if (statusFilter !== 'all') query = query.eq('status', statusFilter);
+    const searchTerm = document.getElementById('paymentSearchInput')?.value || '';
 
-    const { data: payments, error } = await query;
+    const [{ data: payments, error }, { data: students }] = await Promise.all([
+      query,
+      supabase.from('profiles').select('id, full_name').eq('role', 'student'),
+    ]);
     if (error) throw error;
 
-    // Summary cards
+    const studentMap = buildNameMap(students);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    paymentState.all = (payments || []).map(payment => {
+      const isOverdue = payment.status !== 'Paid' && payment.due_date && new Date(payment.due_date) < today;
+      return {
+        ...payment,
+        student_name: payment.student_name || studentMap.get(payment.student_id) || 'Student',
+        status_label: payment.status === 'Paid' ? 'Paid' : (isOverdue ? 'Overdue' : 'Pending'),
+      };
+    });
+
+    paymentState.filtered = paymentState.all
+      .filter(payment => statusFilter === 'all' || payment.status_label === statusFilter)
+      .filter(payment => filterBySearch([payment], searchTerm, ['student_name', 'description', 'status_label']).length > 0);
+
     const summaryRow = document.getElementById('adminPaymentSummaryRow');
-    if (summaryRow && payments) {
-      const totalAmount = payments.reduce((s, p) => s + parseFloat(p.amount || 0), 0);
-      const paidAmount = payments.filter(p => p.status === 'Paid').reduce((s, p) => s + parseFloat(p.amount || 0), 0);
+    if (summaryRow) {
+      const totalAmount = paymentState.filtered.reduce((s, p) => s + parseFloat(p.amount || 0), 0);
+      const paidAmount = paymentState.filtered.filter(p => p.status_label === 'Paid').reduce((s, p) => s + parseFloat(p.amount || 0), 0);
       const pendingAmount = totalAmount - paidAmount;
       summaryRow.innerHTML = `
         <div class="pay-summary-card"><div class="pay-card-inner"><div class="pay-card-header"><span class="pay-label">Total Billed</span><span class="pay-card-icon total"><span class="material-symbols-outlined">receipt_long</span></span></div><div class="pay-amount">₱${totalAmount.toLocaleString('en-PH', {minimumFractionDigits:2})}</div></div></div>
@@ -583,32 +710,30 @@ let query = supabase.from('student_payments').select('*').order('due_date', { as
         <div class="pay-summary-card red"><div class="pay-card-inner"><div class="pay-card-header"><span class="pay-label">Outstanding</span><span class="pay-card-icon red"><span class="material-symbols-outlined">pending_actions</span></span></div><div class="pay-amount">₱${pendingAmount.toLocaleString('en-PH', {minimumFractionDigits:2})}</div></div></div>`;
     }
 
-    if (!payments?.length) {
+    if (!paymentState.filtered.length) {
       tbody.innerHTML = `<tr><td colspan="6" class="admin-loading-cell">No payment records</td></tr>`;
       return;
     }
 
-    const today = new Date(); today.setHours(0,0,0,0);
-    tbody.innerHTML = payments.map((p, idx) => {
-      const isOverdue = p.status !== 'Paid' && new Date(p.due_date) < today;
-      const statusLabel = p.status === 'Paid' ? 'Paid' : (isOverdue ? 'Overdue' : 'Pending');
+    tbody.innerHTML = paymentState.filtered.map((p) => {
+      const statusLabel = p.status_label;
       const statusClass = { Paid: 'status-submitted', Overdue: 'status-late', Pending: 'status-pending' }[statusLabel] || 'status-pending';
       const canEdit = can(adminRole, 'EDIT_PAYMENT');
       const canDel = can(adminRole, 'DELETE_PAYMENT');
 
       return `
-        <tr style="animation: slideInRight 0.3s ease forwards ${idx * 0.025}s; opacity:0;">
-          <td style="font-weight:700; color:var(--text-main);">${p.student?.full_name || p.student_name || '—'}</td>
-          <td style="color:var(--text-muted); font-size:0.85rem;">${p.description || '—'}</td>
-          <td style="font-weight:800; font-family:monospace;">₱${parseFloat(p.amount||0).toLocaleString('en-PH',{minimumFractionDigits:2})}</td>
-          <td style="color:var(--text-muted); font-size:0.82rem;">${p.due_date ? new Date(p.due_date).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '—'}</td>
+        <tr data-search="${[p.id, p.student_id, p.student_name, p.description, statusLabel].join(' ')}">
+          <td><span class="admin-payment-student">${p.student?.full_name || p.student_name || '—'}</span></td>
+          <td><span class="admin-payment-description">${p.description || '—'}</span></td>
+          <td><span class="admin-payment-amount">₱${parseFloat(p.amount||0).toLocaleString('en-PH',{minimumFractionDigits:2})}</span></td>
+          <td><span class="admin-payment-date">${p.due_date ? new Date(p.due_date).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '—'}</span></td>
           <td><span class="deadline-status-badge ${statusClass}">${statusLabel}</span></td>
           <td>
             <div class="admin-row-actions">
-              ${canEdit ? `<button class="admin-icon-btn edit" title="Edit" onclick="window._adminEditPayment('${p.id}')">
+              ${canEdit ? `<button type="button" class="admin-icon-btn edit" title="Edit" onclick="window._adminEditPayment('${p.id}')">
                 <span class="material-symbols-outlined">edit</span>
               </button>` : ''}
-              ${canDel ? `<button class="admin-icon-btn delete" title="Delete" onclick="window._adminDeletePayment('${p.id}')">
+              ${canDel ? `<button type="button" class="admin-icon-btn delete" title="Delete" onclick="window._adminDeletePayment('${p.id}')">
                 <span class="material-symbols-outlined">delete</span>
               </button>` : ''}
             </div>
@@ -617,6 +742,7 @@ let query = supabase.from('student_payments').select('*').order('due_date', { as
     }).join('');
   } catch (err) {
     console.error('Payments load error:', err.message);
+    toast('Failed to load payments.', 'error');
   }
 }
 
@@ -624,8 +750,14 @@ async function openPaymentModal(adminRole, adminId) {
   const { data: students } = await supabase.from('profiles').select('id, full_name').eq('role', 'student');
   const sEl = document.getElementById('pmStudent');
   if (sEl) sEl.innerHTML = `<option value="">Select Student...</option>` + (students || []).map(s => `<option value="${s.id}">${s.full_name}</option>`).join('');
+  document.getElementById('payModalTitle').textContent = 'Add Payment Record';
+  document.getElementById('pmStudent').disabled = false;
+  document.getElementById('pmDescription').value = '';
+  document.getElementById('pmAmount').value = '';
   document.getElementById('pmDueDate').value = new Date().toISOString().split('T')[0];
-  openModal_inline('paymentAdminModalOverlay');
+  document.getElementById('pmStatus').value = 'Pending';
+  _editingPaymentId = null;
+  openModal('paymentAdminModalOverlay');
 }
 
 let _editingPaymentId = null;
@@ -633,14 +765,16 @@ window._adminEditPayment = async function (payId) {
   const { data: p } = await supabase.from('student_payments').select('*').eq('id', payId).single();
   if (!p) return;
   _editingPaymentId = payId;
+  document.getElementById('payModalTitle').textContent = 'Edit Payment Record';
   const students = (await supabase.from('profiles').select('id, full_name').eq('role', 'student')).data || [];
   const sEl = document.getElementById('pmStudent');
   if (sEl) { sEl.innerHTML = students.map(s => `<option value="${s.id}" ${s.id === p.student_id ? 'selected' : ''}>${s.full_name}</option>`).join(''); }
+  document.getElementById('pmStudent').disabled = true;
   document.getElementById('pmDescription').value = p.description || '';
   document.getElementById('pmAmount').value = p.amount || '';
   document.getElementById('pmDueDate').value = p.due_date || '';
   document.getElementById('pmStatus').value = p.status || 'Pending';
-  openModal_inline('paymentAdminModalOverlay');
+  openModal('paymentAdminModalOverlay');
 };
 
 async function savePayment(adminRole, adminId) {
@@ -667,8 +801,9 @@ async function savePayment(adminRole, adminId) {
     }
     _editingPaymentId = null;
     logActivity(`Saved payment record for student`);
-    closeModal_inline('paymentAdminModalOverlay');
+    closeModal('paymentAdminModalOverlay');
     await loadAdminPayments(adminRole, adminId);
+    await syncOverviewAnalytics();
   } catch (err) {
     toast(`Error: ${err.message}`, 'error');
   } finally {
@@ -683,23 +818,5 @@ window._adminDeletePayment = async function (payId) {
   logActivity('Deleted payment record');
   const role = adminProfile?.role || 'admin';
   await loadAdminPayments(role, adminUser?.id);
+  await syncOverviewAnalytics();
 };
-
-// =============================================================================
-// INLINE MODAL HELPERS (avoids duplicate module imports)
-// =============================================================================
-function openModal_inline(id) {
-  const el = document.getElementById(id);
-  if (el) { el.style.display = 'flex'; requestAnimationFrame(() => el.classList.add('active')); }
-}
-
-function closeModal_inline(id) {
-  const el = document.getElementById(id);
-  if (el) { el.classList.remove('active'); setTimeout(() => { el.style.display = ''; }, 200); }
-}
-
-function setupModalClose_inline(overlayId, ...closeBtnIds) {
-  const overlay = document.getElementById(overlayId);
-  overlay?.addEventListener('click', e => { if (e.target === overlay) closeModal_inline(overlayId); });
-  closeBtnIds.forEach(id => document.getElementById(id)?.addEventListener('click', () => closeModal_inline(overlayId)));
-}

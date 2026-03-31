@@ -9,10 +9,40 @@ import {
 } from '../utils.js';
 
 let charts = {};
+let analyticsState = {
+  attendanceRoleFilter: 'students',
+};
 
 // ─── Destroy existing charts to prevent leaks ─────────────────────────────────
 function destroyChart(id) {
   if (charts[id]) { charts[id].destroy(); delete charts[id]; }
+}
+
+function getChartContainer(canvas) {
+  return canvas?.closest('[style*="min-height"]') || canvas?.parentElement;
+}
+
+function setChartEmptyState(canvas, emptyClass, message) {
+  const container = getChartContainer(canvas);
+  if (!container) return;
+
+  container.querySelector(`.${emptyClass}`)?.remove();
+  if (canvas) canvas.style.display = 'none';
+
+  const empty = document.createElement('div');
+  empty.className = `admin-empty-state ${emptyClass}`;
+  empty.style.minHeight = '100%';
+  empty.innerHTML = `
+    <span class="material-symbols-outlined" style="font-size:2rem; opacity:0.45;">bar_chart_off</span>
+    <p style="margin:0;">${escapeHtml(message)}</p>
+  `;
+  container.appendChild(empty);
+}
+
+function clearChartEmptyState(canvas, emptyClass) {
+  const container = getChartContainer(canvas);
+  container?.querySelector(`.${emptyClass}`)?.remove();
+  if (canvas) canvas.style.display = '';
 }
 
 // ─── Main Init ────────────────────────────────────────────────────────────────
@@ -20,11 +50,15 @@ export async function initAnalytics(userStats) {
   await Promise.all([
     renderKPIs(userStats),
     renderGradeDistChart(),
-    renderAttendanceTrendChart(),
+    renderAttendanceTrendChart(analyticsState.attendanceRoleFilter),
     renderUserBreakdownChart(userStats),
     renderPaymentStatusChart(),
     renderRecentActivity(),
   ]);
+}
+
+export async function refreshAnalytics(userStats) {
+  await initAnalytics(userStats);
 }
 
 // ─── KPI Cards ────────────────────────────────────────────────────────────────
@@ -73,7 +107,7 @@ async function renderKPIs(userStats) {
     const uniqueCourses = [...new Set(allCourses.map(c => c.course_name))];
     filter.innerHTML = `<option value="all">All Courses</option>` +
       uniqueCourses.map(c => `<option value="${c}">${c}</option>`).join('');
-    filter.addEventListener('change', () => renderGradeDistChart(filter.value === 'all' ? null : filter.value));
+    filter.onchange = () => renderGradeDistChart(filter.value === 'all' ? null : filter.value);
   }
 }
 
@@ -82,11 +116,16 @@ export async function renderGradeDistChart(courseFilter = null) {
   destroyChart('gradeDist');
   const canvas = document.getElementById('gradeDistChart');
   if (!canvas) return;
+  clearChartEmptyState(canvas, 'admin-chart-empty-grade');
 
   const t = getChartTheme();
   let query = supabase.from('student_grades').select('numerical, status, course_name');
   if (courseFilter) query = query.eq('course_name', courseFilter);
-  const { data: grades } = await query;
+  const { data: grades, error } = await query;
+  if (error) {
+    setChartEmptyState(canvas, 'admin-chart-empty-grade', 'Unable to load grade distribution.');
+    return;
+  }
 
   const buckets = { '1.00-1.50': 0, '1.51-2.00': 0, '2.01-2.50': 0, '2.51-3.00': 0, 'Failed (>3.0)': 0 };
   (grades || []).forEach(g => {
@@ -98,6 +137,14 @@ export async function renderGradeDistChart(courseFilter = null) {
     else if (n <= 3.0) buckets['2.51-3.00']++;
     else buckets['Failed (>3.0)']++;
   });
+
+  const bucketValues = Object.values(buckets);
+  if (!grades?.length || bucketValues.every(value => value === 0)) {
+    setChartEmptyState(canvas, 'admin-chart-empty-grade', courseFilter
+      ? `No grade records found for ${courseFilter}.`
+      : 'No grade records available yet.');
+    return;
+  }
 
   charts.gradeDist = new Chart(canvas, {
     type: 'bar',
@@ -123,22 +170,48 @@ export async function renderGradeDistChart(courseFilter = null) {
 }
 
 // ─── Attendance Trend Chart ───────────────────────────────────────────────────
-async function renderAttendanceTrendChart() {
+async function renderAttendanceTrendChart(roleFilter = 'students') {
   destroyChart('attTrend');
   const canvas = document.getElementById('attendanceTrendChart');
   if (!canvas) return;
+  clearChartEmptyState(canvas, 'admin-chart-empty-attendance');
 
   const t = getChartTheme();
-  const { data: att } = await supabase.from('attendance').select('status, date');
+  const { data: att, error } = await supabase.from('attendance').select('student_id, status, date');
+  if (error) {
+    setChartEmptyState(canvas, 'admin-chart-empty-attendance', 'Unable to load attendance trend.');
+    return;
+  }
 
-  // Handle Empty State gracefully
-  if (!att || att.length === 0) {
-    canvas.parentElement.innerHTML = '<div class="admin-empty-state">No attendance data yet</div>';
+  let filteredAttendance = att || [];
+  if (roleFilter && roleFilter !== 'all') {
+    const roleMap = { students: 'student', instructors: 'teacher', admins: 'admin' };
+    const role = roleMap[roleFilter];
+
+    if (role) {
+      const { data: profiles, error: profileError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('role', role);
+
+      if (profileError) {
+        setChartEmptyState(canvas, 'admin-chart-empty-attendance', 'Unable to filter attendance by user type.');
+        return;
+      }
+
+      const allowedIds = new Set((profiles || []).map(profile => profile.id));
+      filteredAttendance = filteredAttendance.filter(record => allowedIds.has(record.student_id));
+    }
+  }
+
+  if (!filteredAttendance.length) {
+    const roleLabel = roleFilter === 'students' ? 'student' : roleFilter.replace(/s$/, '');
+    setChartEmptyState(canvas, 'admin-chart-empty-attendance', `No ${roleLabel} attendance data yet.`);
     return;
   }
 
   const monthly = {};
-  att.forEach(r => {
+  filteredAttendance.forEach(r => {
     const month = r.date ? r.date.substring(0, 7) : 'Unknown';
     if (!monthly[month]) monthly[month] = { present: 0, absent: 0, total: 0 };
     monthly[month].total++;
@@ -208,6 +281,13 @@ function renderUserBreakdownChart(userStats) {
     },
     options: {
       responsive: true, maintainAspectRatio: false,
+      onClick: (_, activeElements) => {
+        if (!activeElements?.length) return;
+        const index = activeElements[0].index;
+        const roleFilters = ['students', 'instructors', 'admins'];
+        analyticsState.attendanceRoleFilter = roleFilters[index] || 'students';
+        renderAttendanceTrendChart(analyticsState.attendanceRoleFilter);
+      },
       plugins: {
         legend: { position: 'bottom', labels: { color: t.text, padding: 16, boxWidth: 12 } },
         tooltip: { backgroundColor: t.bg, titleColor: '#fff', bodyColor: '#e2e8f0', padding: 12, cornerRadius: 8 }
@@ -222,15 +302,25 @@ async function renderPaymentStatusChart() {
   destroyChart('payStatus');
   const canvas = document.getElementById('paymentStatusChart');
   if (!canvas) return;
+  clearChartEmptyState(canvas, 'admin-chart-empty-payments');
 
   const t = getChartTheme();
-  const { data: payments } = await supabase.from('student_payments').select('status, amount');
+  const { data: payments, error } = await supabase.from('student_payments').select('status, amount');
+  if (error) {
+    setChartEmptyState(canvas, 'admin-chart-empty-payments', 'Unable to load payment status.');
+    return;
+  }
 
   const totals = { Paid: 0, Pending: 0, Overdue: 0 };
   (payments || []).forEach(p => {
     const key = p.status in totals ? p.status : 'Pending';
     totals[key] += parseFloat(p.amount || 0);
   });
+
+  if (!payments?.length || Object.values(totals).every(total => total === 0)) {
+    setChartEmptyState(canvas, 'admin-chart-empty-payments', 'No payment records available yet.');
+    return;
+  }
 
   charts.payStatus = new Chart(canvas, {
     type: 'pie',
