@@ -7,6 +7,34 @@ import { escapeAttr } from './utils.js';
 
 // Global state to track online users across renders
 let onlineUsers = new Set();
+let socialPresencePoll = null;
+
+function applyPresenceState(currentUserId, state = {}) {
+    onlineUsers = new Set(Object.keys(state || {}));
+
+    document.querySelectorAll('.social-card-minimal').forEach(card => {
+        const uid = card.getAttribute('data-uid');
+        const dot = document.getElementById(`status-dot-${uid}`);
+        const text = document.getElementById(`status-text-${uid}`);
+        const isOnline = onlineUsers.has(uid);
+
+        if (dot) {
+            dot.className = `status-dot ${isOnline ? 'online' : 'offline'}`;
+        }
+        if (text) {
+            text.textContent = isOnline ? 'Active Now' : 'Offline';
+            text.className = `online-status-text ${isOnline ? 'active' : 'offline'}`;
+        }
+
+        if (uid === currentUserId) {
+            const topbarDot = document.getElementById('myCurrentStatusDot');
+            if (topbarDot) {
+                topbarDot.classList.toggle('online', isOnline);
+            }
+        }
+    });
+}
+
 
 // ==========================================
 // 1. COMPONENT RENDERERS
@@ -152,37 +180,28 @@ function setupDirectorySearch() {
  * Initializes real-time presence and updates the UI markers.
  */
 export function initializePresence(currentUserId) {
+    const existingChannel = typeof supabaseClient.getChannels === 'function'
+        ? supabaseClient.getChannels().find(channel => String(channel?.topic || '').includes('campus_presence'))
+        : null;
+
+    if (existingChannel) {
+        if (socialPresencePoll) clearInterval(socialPresencePoll);
+        const syncFromExisting = () => {
+            try {
+                applyPresenceState(currentUserId, existingChannel.presenceState?.() || {});
+            } catch (_) {
+                // Keep the dashboard stable if another module owns presence lifecycle.
+            }
+        };
+        syncFromExisting();
+        socialPresencePoll = setInterval(syncFromExisting, 1500);
+        return;
+    }
+
     const room = supabaseClient.channel('campus_presence');
 
     room.on('presence', { event: 'sync' }, () => {
-        const state = room.presenceState();
-        
-        // 👉 Update the global Set of IDs
-        onlineUsers = new Set(Object.keys(state));
-
-        // 👉 Loop through every visible card and flip the switch
-        document.querySelectorAll('.social-card-minimal').forEach(card => {
-            const uid = card.getAttribute('data-uid');
-            const dot = document.getElementById(`status-dot-${uid}`);
-            const text = document.getElementById(`status-text-${uid}`);
-            const isOnline = onlineUsers.has(uid);
-
-            if (dot) {
-                dot.className = `status-dot ${isOnline ? 'online' : 'offline'}`;
-            }
-            if (text) {
-                text.textContent = isOnline ? 'Active Now' : 'Offline';
-                text.className = `online-status-text ${isOnline ? 'active' : 'offline'}`;
-            }
-
-            // Sync your own topbar avatar dot if this card is "YOU"
-            if (uid === currentUserId) {
-                const topbarDot = document.getElementById('myCurrentStatusDot');
-                if (topbarDot) {
-                    topbarDot.classList.toggle('online', isOnline);
-                }
-            }
-        });
+        applyPresenceState(currentUserId, room.presenceState());
     })
     .subscribe(async status => {
         if (status === 'SUBSCRIBED') {

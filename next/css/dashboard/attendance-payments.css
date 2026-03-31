@@ -741,6 +741,7 @@
 .pay-legend-item span           { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
 .pay-legend-item.paid span      { background: var(--accent-green, #10b981); }
 .pay-legend-item.pending span   { background: var(--accent-amber, #f59e0b); }
+.pay-legend-item.rejected span  { background: #ef4444; }
 .pay-legend-item.overdue span   { background: var(--accent-red, #ef4444); }
 
 /* --------------------------------------------------------------------------

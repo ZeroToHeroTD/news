@@ -1108,8 +1108,8 @@ async function loadAdminPayments(adminRole, adminId) {
       const statusClass = { Paid: 'status-submitted', Overdue: 'status-late', Pending: 'status-pending', Declined: 'status-failed' }[statusLabel] || 'status-pending';
       const canEdit = can(adminRole, 'EDIT_PAYMENT');
       const canDel = can(adminRole, 'DELETE_PAYMENT');
-      const canApprove = can(adminRole, 'EDIT_PAYMENT') && statusLabel === 'Pending';
       const proof = getPaymentProofRecord(p) || null;
+      const canReviewProof = can(adminRole, 'EDIT_PAYMENT') && statusLabel === 'Pending' && !!proof;
 
       const amountValue = parseFloat(p.amount || 0);
       const dueDate = p.due_date ? new Date(p.due_date).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '—';
@@ -1152,10 +1152,10 @@ async function loadAdminPayments(adminRole, adminId) {
               ${proof ? `<button type="button" class="admin-icon-btn view" title="Review payment proof" onclick="window._adminReviewPaymentProof('${p.id}')">
                 <span class="material-symbols-outlined">image_search</span>
               </button>` : ''}
-              ${canApprove ? `<button type="button" class="admin-icon-btn approve" title="Approve payment" onclick="window._adminApprovePayment('${p.id}')">
+              ${canReviewProof ? `<button type="button" class="admin-icon-btn approve" title="Approve submitted proof" onclick="window._adminApprovePayment('${p.id}')">
                 <span class="material-symbols-outlined">check_circle</span>
               </button>` : ''}
-              ${canApprove ? `<button type="button" class="admin-icon-btn reject" title="Decline payment" onclick="window._adminDeclinePayment('${p.id}')">
+              ${canReviewProof ? `<button type="button" class="admin-icon-btn reject" title="Decline submitted proof" onclick="window._adminDeclinePayment('${p.id}')">
                 <span class="material-symbols-outlined">cancel</span>
               </button>` : ''}
               ${canEdit ? `<button type="button" class="admin-icon-btn edit" title="Edit" onclick="window._adminEditPayment('${p.id}')">

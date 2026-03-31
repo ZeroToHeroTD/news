@@ -66,12 +66,64 @@ const getStatusConfig = (status, dueDate) => {
         return { label: 'PAID', badge: 'status-submitted', icon: 'verified', color: 'var(--accent-green)', rowClass: 'status-is-paid' };
     }
 
+    if (status === 'Declined') {
+        return { label: 'REJECTED', badge: 'status-failed', icon: 'cancel', color: 'var(--accent-red)', rowClass: 'status-is-rejected' };
+    }
+
     if (dateObj < today) {
         return { label: 'OVERDUE', badge: 'status-late', icon: 'error', color: 'var(--accent-red)', rowClass: 'status-is-overdue' };
     }
 
     return { label: 'PENDING', badge: 'status-pending', icon: 'schedule', color: 'var(--accent-amber)', rowClass: 'status-is-pending' };
 };
+
+function normalizeProofDecision(value) {
+    const normalized = String(value || '').trim().toLowerCase();
+    if (normalized === 'approved') return 'Approved';
+    if (normalized === 'declined' || normalized === 'rejected') return 'Declined';
+    if (normalized === 'pending') return 'Pending';
+    return '';
+}
+
+function getLatestSubmissionMap(submissions) {
+    const byPaymentId = new Map();
+    const byReference = new Map();
+
+    submissions.forEach((submission) => {
+        const paymentId = String(submission.payment_id || submission.student_payment_id || '').trim();
+        const referenceNumber = String(submission.reference_number || '').trim();
+
+        if (paymentId && !byPaymentId.has(paymentId)) byPaymentId.set(paymentId, submission);
+        if (referenceNumber && !byReference.has(referenceNumber)) byReference.set(referenceNumber, submission);
+    });
+
+    return { byPaymentId, byReference };
+}
+
+function decoratePaymentsWithReviewState(payments, submissions) {
+    const { byPaymentId, byReference } = getLatestSubmissionMap(submissions);
+
+    return payments.map((payment) => {
+        const referenceNumber = String(payment.reference_number || '').trim();
+        const proof = byPaymentId.get(String(payment.id)) || (referenceNumber ? byReference.get(referenceNumber) : null) || null;
+        const proofDecision = normalizeProofDecision(proof?.review_status || proof?.status);
+        const rawStatus = String(payment.status || '').trim();
+
+        let displayStatus = rawStatus;
+        if (rawStatus === 'Paid') displayStatus = 'Paid';
+        else if (proofDecision === 'Declined') displayStatus = 'Declined';
+        else displayStatus = 'Pending';
+
+        return {
+            ...payment,
+            display_status: displayStatus,
+            proof_decision: proofDecision,
+            proof_reference_number: String(proof?.reference_number || referenceNumber || '').trim(),
+            proof_submitted_at: proof?.submitted_at || proof?.created_at || proof?.updated_at || '',
+            has_proof_submission: !!proof,
+        };
+    });
+}
 
 function animateCurrencyCount(element, targetNum, duration = 900) {
     if (!element || isNaN(targetNum)) return;
@@ -94,21 +146,27 @@ function animateCurrencyCount(element, targetNum, duration = 900) {
 }
 
 function getSmartInsight(stats, paidPct, payments) {
-    if (stats.pending === 0) return '🎓 All balances cleared — you\'re all set for this semester!';
+    if (stats.pending === 0) return "All balances cleared - you're all set for this semester.";
 
-    const today = new Date(); today.setHours(0,0,0,0);
-    const overdueCount = payments.filter(p => p.status !== 'Paid' && new Date(p.due_date) < today).length;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-    if (overdueCount > 0) return `⚠️ ${overdueCount} payment${overdueCount > 1 ? 's are' : ' is'} overdue — late fees may apply.`;
-
-    const nextDue = payments.find(p => p.status !== 'Paid');
-    if (nextDue) {
-        const daysUntil = Math.ceil((new Date(nextDue.due_date) - new Date()) / 86400000);
-        if (daysUntil <= 3) return `🔔 Next payment due in ${daysUntil} day${daysUntil !== 1 ? 's' : ''} — don't miss it.`;
-        if (daysUntil <= 7) return `📅 Payment coming up in ${daysUntil} days. You need ${formatCurrency(stats.pending)} to enroll.`;
+    const rejectedCount = payments.filter(p => p.display_status === 'Declined').length;
+    if (rejectedCount > 0) {
+        return `Payment proof rejected for ${rejectedCount} item${rejectedCount > 1 ? 's' : ''} - resubmit to continue review.`;
     }
 
-    if (paidPct >= 75) return `👍 You're ${Math.round(paidPct)}% through your balance. ${formatCurrency(stats.pending)} remaining.`;
+    const overdueCount = payments.filter(p => p.display_status !== 'Paid' && p.display_status !== 'Declined' && new Date(p.due_date) < today).length;
+    if (overdueCount > 0) return `${overdueCount} payment${overdueCount > 1 ? 's are' : ' is'} overdue - late fees may apply.`;
+
+    const nextDue = payments.find(p => p.display_status !== 'Paid' && p.display_status !== 'Declined');
+    if (nextDue) {
+        const daysUntil = Math.ceil((new Date(nextDue.due_date) - new Date()) / 86400000);
+        if (daysUntil <= 3) return `Next payment due in ${daysUntil} day${daysUntil !== 1 ? 's' : ''} - don't miss it.`;
+        if (daysUntil <= 7) return `Payment coming up in ${daysUntil} days. You need ${formatCurrency(stats.pending)} to enroll.`;
+    }
+
+    if (paidPct >= 75) return `You're ${Math.round(paidPct)}% through your balance. ${formatCurrency(stats.pending)} remaining.`;
 
     return `${formatCurrency(stats.pending)} remaining to complete enrollment.`;
 }
@@ -137,16 +195,27 @@ export async function loadPaymentData(userId) {
     if (!containers.table) return;
 
     try {
-const { data: payments, error } = await supabaseClient
-            .from('student_payments')
-            // Add the new column explicitly to ensure it's fetched
-            .select('id, student_id, description, amount, status, due_date, created_at, reference_number') 
-            .eq('student_id', userId)
-            .order('due_date', { ascending: true });
+        const [{ data: rawPayments, error: paymentsError }, { data: rawSubmissions, error: submissionsError }] = await Promise.all([
+            supabaseClient
+                .from('student_payments')
+                .select('id, student_id, description, amount, status, due_date, created_at, reference_number')
+                .eq('student_id', userId)
+                .order('due_date', { ascending: true }),
+            supabaseClient
+                .from('payment_submissions')
+                .select('id, payment_id, student_id, reference_number, status, review_status, submitted_at, created_at, updated_at')
+                .eq('student_id', userId)
+                .order('created_at', { ascending: false })
+        ]);
 
-        if (error) throw error;
+        if (paymentsError) throw paymentsError;
+        if (submissionsError) {
+            console.warn('Payment submission review state could not be loaded:', submissionsError.message);
+        }
 
-        if (!payments || payments.length === 0) {
+        const payments = decoratePaymentsWithReviewState(rawPayments || [], rawSubmissions || []);
+
+        if (!payments.length) {
             renderEmptyState(containers);
             return;
         }
@@ -154,7 +223,7 @@ const { data: payments, error } = await supabaseClient
         const stats = payments.reduce((acc, p) => {
             const amt = parseFloat(p.amount) || 0;
             acc.total += amt;
-            if (p.status === 'Paid') acc.paid += amt;
+            if (p.display_status === 'Paid') acc.paid += amt;
             else acc.pending += amt;
             return acc;
         }, { total: 0, paid: 0, pending: 0 });
@@ -171,7 +240,7 @@ const { data: payments, error } = await supabaseClient
         containers.table.innerHTML = `
             <tr>
                 <td colspan="5" style="text-align:center; padding:48px; color:var(--accent-red);">
-                    <div style="font-size:1.5rem; margin-bottom:8px;">⚠️</div>
+                    <div style="font-size:1.5rem; margin-bottom:8px;">??</div>
                     <div style="font-weight:700; margin-bottom:4px;">Failed to sync financial data</div>
                     <div style="font-size:0.8rem; color:var(--text-muted);">Please refresh the page or contact support.</div>
                 </td>
@@ -232,20 +301,34 @@ function updateProgressBar(els, stats, pct, payments) {
 function renderFinancialStory(container, remaining, payments) {
     if (!container) return;
 
-    const today = new Date(); today.setHours(0, 0, 0, 0);
-    const overdueItems = payments.filter(p => p.status !== 'Paid' && new Date(p.due_date) < today);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const rejectedItems = payments.filter(p => p.display_status === 'Declined');
+    const overdueItems = payments.filter(p => p.display_status !== 'Paid' && p.display_status !== 'Declined' && new Date(p.due_date) < today);
 
     let storyConfig;
 
     if (remaining === 0) {
         storyConfig = {
             icon: 'verified_user',
-            title: '🎓 Tuition Fully Paid',
+            title: 'Tuition Fully Paid',
             sub: "You're cleared for enrollment. Keep up the great work!",
             class: 'story-success',
             action: `<button class="pay-now-btn" style="background:var(--accent-green);" onclick="window.proceedToEnrollment()">
                         <span class="material-symbols-outlined" style="font-size:1rem">school</span>
                         Proceed to Enrollment
+                    </button>`
+        };
+    } else if (rejectedItems.length > 0) {
+        const rejectedItem = rejectedItems[0];
+        storyConfig = {
+            icon: 'rule',
+            title: 'Payment Proof Needs Resubmission',
+            sub: `${rejectedItem.description || 'A payment item'} was rejected by finance. Upload a clearer receipt or correct reference number to continue.`,
+            class: 'story-danger',
+            action: `<button class="pay-now-btn" style="background:var(--accent-red);" onclick="window.openPaymentGateway('${formatCurrency(parseFloat(rejectedItem.amount || 0))}', '${rejectedItem.id}')">
+                        <span class="material-symbols-outlined" style="font-size:1rem">upload</span>
+                        Resubmit Proof
                     </button>`
         };
     } else if (overdueItems.length > 0) {
@@ -254,7 +337,7 @@ function renderFinancialStory(container, remaining, payments) {
         storyConfig = {
             icon: 'warning',
             title: `${overdueItems.length} Payment${overdueItems.length > 1 ? 's' : ''} Overdue`,
-            sub: `Your account is ${daysLate} day${daysLate !== 1 ? 's' : ''} past due. Late fees may apply — please settle immediately.`,
+            sub: `Your account is ${daysLate} day${daysLate !== 1 ? 's' : ''} past due. Late fees may apply - please settle immediately.`,
             class: 'story-danger',
             action: `<button class="pay-now-btn" style="background:var(--accent-red);" onclick="window.openPaymentGateway()">
                         <span class="material-symbols-outlined" style="font-size:1rem">payments</span>
@@ -262,16 +345,16 @@ function renderFinancialStory(container, remaining, payments) {
                     </button>`
         };
     } else {
-        const nextDue = payments.find(p => p.status !== 'Paid');
+        const nextDue = payments.find(p => p.display_status !== 'Paid' && p.display_status !== 'Declined');
         const daysUntil = nextDue ? Math.ceil((new Date(nextDue.due_date) - today) / 86400000) : null;
         const urgencyText = daysUntil !== null
-            ? (daysUntil <= 3 ? `⚠️ Due in ${daysUntil} day${daysUntil !== 1 ? 's' : ''}!` : `Due by ${new Date(nextDue.due_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`)
+            ? (daysUntil <= 3 ? `Due in ${daysUntil} day${daysUntil !== 1 ? 's' : ''}!` : `Due by ${new Date(nextDue.due_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`)
             : 'Check your schedule for upcoming dues.';
 
         storyConfig = {
             icon: 'account_balance_wallet',
             title: `${formatCurrency(remaining)} Remaining`,
-            sub: `${urgencyText} — complete your payment to secure enrollment.`,
+            sub: `${urgencyText} - complete your payment to secure enrollment.`,
             class: 'story-warning',
             action: `<button class="pay-now-btn" onclick="window.openPaymentGateway()">
                         <span class="material-symbols-outlined" style="font-size:1rem">payments</span>
@@ -295,21 +378,26 @@ function renderFinancialStory(container, remaining, payments) {
 }
 
 function updatePaymentsTable(container, payments) {
-    // 👉 FIX: Save the raw data globally so the PDF generator can access the itemized list!
     window.cachedPaymentsData = payments;
 
     container.innerHTML = payments.map((p, idx) => {
-        const config = getStatusConfig(p.status, p.due_date);
+        const effectiveStatus = p.display_status || p.status;
+        const config = getStatusConfig(effectiveStatus, p.due_date);
         const dateStr = new Date(p.due_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
-        const today = new Date(); today.setHours(0,0,0,0);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
         const daysUntil = Math.ceil((new Date(p.due_date) - today) / 86400000);
-        const isUrgent = p.status !== 'Paid' && daysUntil >= 0 && daysUntil <= 3;
+        const isUrgent = effectiveStatus !== 'Paid' && effectiveStatus !== 'Declined' && daysUntil >= 0 && daysUntil <= 3;
 
-        // Uses real reference_number if it exists in Supabase, else falls back to the ID
-        const realRef = p.reference_number ? p.reference_number.toString().trim() : p.id.slice(0,8).toUpperCase();
-        const descSafe = (p.description || 'Unknown Fee').replace(/'/g, "\\'");
+        const realRef = p.proof_reference_number || (p.reference_number ? p.reference_number.toString().trim() : p.id.slice(0, 8).toUpperCase());
+        const descSafe = (p.description || 'Unknown Fee').replace(/'/g, "\'");
         const amtRaw = parseFloat(p.amount) || 0;
+        const proofMeta = effectiveStatus === 'Declined'
+            ? `<div style="font-size:0.68rem; color:var(--accent-red); font-weight:800; letter-spacing:0.04em; margin-top:3px;">Proof rejected - resubmit receipt</div>`
+            : (p.has_proof_submission && effectiveStatus === 'Pending'
+                ? `<div style="font-size:0.68rem; color:var(--accent-amber); font-weight:800; letter-spacing:0.04em; margin-top:3px;">Proof under finance review</div>`
+                : '');
 
         return `
             <tr class="payment-row ${config.rowClass}" style="animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards ${idx * 0.06}s; opacity: 0;">
@@ -321,6 +409,7 @@ function updatePaymentsTable(container, payments) {
                             <div style="font-size:0.68rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; margin-top:2px;">
                                 Ref: #${realRef}
                             </div>
+                            ${proofMeta}
                         </div>
                     </div>
                 </td>
@@ -335,12 +424,12 @@ function updatePaymentsTable(container, payments) {
                     <span class="deadline-status-badge ${config.badge}">${config.label}</span>
                 </td>
                 <td style="text-align:right; padding-right:16px;">
-                    ${p.status === 'Paid'
-                        ? `<button class="pay-action-btn" title="Download Official Receipt" onclick="window.downloadDocument('Official Receipt', '${realRef}', '${descSafe}', ${amtRaw}, '${dateStr}', '${p.status}')">
+                    ${effectiveStatus === 'Paid'
+                        ? `<button class="pay-action-btn" title="Download Official Receipt" onclick="window.downloadDocument('Official Receipt', '${realRef}', '${descSafe}', ${amtRaw}, '${dateStr}', '${effectiveStatus}')">
                                 <span class="material-symbols-outlined" style="font-size:1rem;">download</span>
                             </button>`
-                        : `<button class="pay-action-btn" title="Pay this item" onclick="window.openPaymentGateway('${formatCurrency(amtRaw)}', '${p.id}')">
-                                <span class="material-symbols-outlined" style="font-size:1rem;">payment</span>
+                        : `<button class="pay-action-btn" title="${effectiveStatus === 'Declined' ? 'Resubmit payment proof' : 'Pay this item'}" onclick="window.openPaymentGateway('${formatCurrency(amtRaw)}', '${p.id}')">
+                                <span class="material-symbols-outlined" style="font-size:1rem;">${effectiveStatus === 'Declined' ? 'upload' : 'payment'}</span>
                             </button>`
                     }
                 </td>
