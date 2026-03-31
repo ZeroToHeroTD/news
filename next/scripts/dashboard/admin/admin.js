@@ -1239,13 +1239,39 @@ async function savePayment(adminRole, adminId) {
 }
 
 window._adminDeletePayment = async function (payId) {
-  const { error } = await supabase.from('student_payments').delete().eq('id', payId);
-  if (error) { toast('Delete failed.', 'error'); return; }
-  toast('Payment record deleted.', 'success');
-  logActivity('Deleted payment record');
-  const role = adminProfile?.role || 'admin';
-  await loadAdminPayments(role, adminUser?.id);
-  await syncOverviewAnalytics();
+  const payment = paymentState.all.find(item => String(item.id) === String(payId)) || null;
+  try {
+    const proof = getPaymentProofRecord(payment || payId);
+
+    if (proof?.id) {
+      const { error: proofDeleteError } = await supabase.from('payment_submissions').delete().eq('id', proof.id);
+      if (proofDeleteError) throw proofDeleteError;
+    } else {
+      const referenceNumber = String(payment?.reference_number || '').trim();
+      const deleteFilters = [];
+
+      deleteFilters.push(supabase.from('payment_submissions').delete().eq('payment_id', payId));
+      if (referenceNumber) {
+        deleteFilters.push(supabase.from('payment_submissions').delete().eq('reference_number', referenceNumber));
+      }
+
+      for (const request of deleteFilters) {
+        const { error: linkedDeleteError } = await request;
+        if (linkedDeleteError) throw linkedDeleteError;
+      }
+    }
+
+    const { error } = await supabase.from('student_payments').delete().eq('id', payId);
+    if (error) throw error;
+
+    toast('Payment record deleted.', 'success');
+    logActivity('Deleted payment record');
+    const role = adminProfile?.role || 'admin';
+    await loadAdminPayments(role, adminUser?.id);
+    await syncOverviewAnalytics();
+  } catch (err) {
+    toast(`Delete failed: ${err.message}`, 'error');
+  }
 };
 
 window._adminReviewPaymentProof = function (payId) {

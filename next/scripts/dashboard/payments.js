@@ -203,7 +203,7 @@ export async function loadPaymentData(userId) {
                 .order('due_date', { ascending: true }),
             supabaseClient
                 .from('payment_submissions')
-                .select('id, payment_id, student_id, reference_number, status, review_status, submitted_at, created_at, updated_at')
+                .select('id, payment_id, student_id, reference_number, review_status, submitted_at, created_at, updated_at')
                 .eq('student_id', userId)
                 .order('created_at', { ascending: false })
         ]);
