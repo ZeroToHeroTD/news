@@ -144,21 +144,26 @@ body.auth-page {
 /* --- FIXED: Added missing layout and matte checkbox styles --- */
 
 .form-actions {
-    display: flex; /* Added back to put them on one line */
+    display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 25px;
+    gap: 14px;
     user-select: none;
+    flex-wrap: wrap;
 }
 
 /* 1. The Wrapper */
 .remember-label {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 10px;
     font-size: 0.85rem;
-    color: #6b7280; /* Matches your text-muted color */
+    font-weight: 500;
+    line-height: 1;
+    color: #6b7280;
     cursor: pointer;
+    min-height: 22px;
 }
 
 /* 2. Hide the default browser checkbox */
@@ -168,9 +173,10 @@ body.auth-page {
 
 /* 3. The Matte Box itself (This was missing!) */
 .custom-checkbox {
-    width: 20px;
-    height: 20px;
-    background-color: #f9fafb; /* Matches your input background */
+    width: 18px;
+    height: 18px;
+    flex: 0 0 18px;
+    background-color: #f9fafb;
     border: 2px solid #f3f4f6;
     border-radius: 6px;
     position: relative;
@@ -198,17 +204,23 @@ body.auth-page {
     height: 10px;
     border: solid white;
     border-width: 0 2px 2px 0;
-    left: 6px; /* Adjusted slightly for centering */
-    top: 2px;
+    left: 5px;
+    top: 1px;
     transform: rotate(45deg);
     display: block;
 }
 
 .forgot-link {
+    display: inline-flex;
+    align-items: center;
     font-size: 0.85rem;
     color: #4f46e5;
     text-decoration: none;
     font-weight: 600;
+}
+
+.forgot-link:hover {
+    text-decoration: underline;
 }
 
 .auth-btn {
