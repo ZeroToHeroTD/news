@@ -9,8 +9,8 @@
    DESIGN TOKENS
    ───────────────────────────────────────────────────────────────────────── */
 body.admin-dashboard-page {
-  --adm-sidebar-width: 248px;
-  --adm-shell-gap: 20px;
+  --adm-sidebar-width: 236px;
+  --adm-shell-gap: 16px;
   --adm-space-1: 4px;
   --adm-space-2: 8px;
   --adm-space-3: 12px;
@@ -146,11 +146,12 @@ body.admin-dashboard-page .app-container {
    SIDEBAR
    ───────────────────────────────────────────────────────────────────────── */
 body.admin-dashboard-page .app-sidebar {
-  min-width: 0;
+  width: var(--adm-sidebar-width);
+  min-width: var(--adm-sidebar-width);
   height: 100vh;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
-  padding: 18px 14px 16px;
+  padding: 16px 12px 14px;
   background: linear-gradient(180deg,
     rgba(4, 9, 20, 0.99),
     rgba(7, 13, 26, 0.99));
@@ -389,7 +390,7 @@ body.admin-dashboard-page .app-main {
   display: flex;
   flex-direction: column;
   gap: var(--adm-shell-gap);
-  padding: 20px 28px 28px;      /* wider horizontal padding */
+  padding: 10px 14px 16px;
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-gutter: stable;
@@ -403,8 +404,8 @@ body.admin-dashboard-page .topbar {
   display: grid;
   grid-template-columns: minmax(280px, 1fr) auto;
   align-items: center;
-  gap: 14px;
-  padding: 10px 16px;
+  gap: 10px;
+  padding: 6px 12px;
   background: linear-gradient(180deg,
     rgba(18, 28, 48, 0.97),
     rgba(14, 24, 42, 0.94));
@@ -427,7 +428,7 @@ body.admin-dashboard-page .hamburger-btn {
 
 body.admin-dashboard-page .search-bar {
   min-width: 0;
-  max-width: 480px;
+  max-width: 620px;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────
@@ -604,6 +605,8 @@ body.admin-dashboard-page .view-content.active {
   flex-direction: column;
   gap: 20px;
   min-width: 0;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 
 body.admin-dashboard-page .view-content > * { min-width: 0; }
@@ -2067,51 +2070,404 @@ body.admin-dashboard-page .sidebar-overlay.active {
 /* ─────────────────────────────────────────────────────────────────────────
    RESPONSIVE BREAKPOINTS
    ───────────────────────────────────────────────────────────────────────── */
-@media (max-width: 1400px) {
-  body.admin-dashboard-page .smart-action-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+body.admin-dashboard-page .app-main {
+  gap: 22px;
+  padding: 18px 22px 24px;
+}
+
+body.admin-dashboard-page .view-content.active {
+  gap: 22px;
+  animation: adm-view-fade 220ms ease;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+@keyframes adm-view-fade {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-@media (max-width: 1280px) {
-  body.admin-dashboard-page .dashboard-grid {
+body.admin-dashboard-page .topbar,
+body.admin-dashboard-page .section-card,
+body.admin-dashboard-page .action-card,
+body.admin-dashboard-page .admin-table-card,
+body.admin-dashboard-page .admin-modal,
+body.admin-dashboard-page .compose-modal-overlay {
+  position: relative;
+  isolation: isolate;
+}
+
+body.admin-dashboard-page .topbar {
+  position: static;
+  grid-template-columns: minmax(320px, 1fr) auto;
+  gap: 10px;
+  padding: 8px 12px;
+  backdrop-filter: blur(18px);
+}
+
+body.admin-dashboard-page .search-bar {
+  max-width: 680px;
+}
+
+body.admin-dashboard-page .section-card {
+  padding: 16px 18px;
+  overflow: hidden;
+}
+
+body.admin-dashboard-page .dashboard-hero.admin-overview-hero {
+  grid-template-columns: minmax(0, 1.7fr) minmax(280px, 0.78fr);
+  align-items: stretch;
+  gap: 14px;
+  padding: 16px 18px;
+}
+
+body.admin-dashboard-page .welcome-mini h1 {
+  font-size: clamp(1.55rem, 2.1vw, 1.92rem);
+  line-height: 1.06;
+}
+
+body.admin-dashboard-page .today-focus-container {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-content: stretch;
+  gap: 10px;
+}
+
+body.admin-dashboard-page .focus-card {
+  min-height: 82px;
+  padding: 14px 16px;
+}
+
+body.admin-dashboard-page .smart-action-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+body.admin-dashboard-page .action-card {
+  min-height: 74px;
+  padding: 14px 16px;
+}
+
+body.admin-dashboard-page .action-card:hover,
+body.admin-dashboard-page .section-card:hover {
+  transform: translateY(-3px);
+}
+
+body.admin-dashboard-page .dashboard-grid {
+  grid-template-columns: minmax(0, 1.58fr) minmax(260px, 0.7fr);
+  align-items: start;
+  gap: 14px;
+}
+
+body.admin-dashboard-page .grid-left,
+body.admin-dashboard-page .grid-right {
+  min-width: 0;
+  gap: 14px;
+}
+
+body.admin-dashboard-page .admin-card-header-split {
+  margin-bottom: 10px;
+}
+
+body.admin-dashboard-page .admin-chart-frame {
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+body.admin-dashboard-page .admin-chart-frame-lg { min-height: clamp(220px, 27vh, 290px); }
+body.admin-dashboard-page .admin-chart-frame-md { min-height: clamp(180px, 22vh, 230px); }
+body.admin-dashboard-page .admin-chart-frame-sm { min-height: clamp(180px, 22vh, 230px); }
+body.admin-dashboard-page .admin-chart-frame-xs { min-height: clamp(150px, 18vh, 190px); }
+
+body.admin-dashboard-page .admin-view-header {
+  grid-template-columns: minmax(220px, max-content) minmax(0, 1fr);
+  align-items: start;
+  gap: 18px 22px;
+}
+
+body.admin-dashboard-page .admin-header-actions,
+body.admin-dashboard-page .admin-users-toolbar,
+body.admin-dashboard-page .admin-courses-toolbar,
+body.admin-dashboard-page .admin-attendance-toolbar,
+body.admin-dashboard-page .admin-announcements-toolbar,
+body.admin-dashboard-page .admin-payments-toolbar {
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+body.admin-dashboard-page .admin-grades-toolbar {
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px 18px;
+}
+
+body.admin-dashboard-page .admin-filter-bar {
+  padding: 12px;
+  border-radius: 18px;
+  gap: 12px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+body.admin-dashboard-page .admin-filter-bar > .admin-search-input {
+  flex: 1 1 260px;
+}
+
+body.admin-dashboard-page .admin-filter-bar > .chart-select,
+body.admin-dashboard-page .admin-filter-bar > .ui-select,
+body.admin-dashboard-page .admin-filter-bar > .ui-select-input {
+  flex: 0 1 188px;
+  width: auto;
+  min-width: 170px;
+}
+
+body.admin-dashboard-page .table-scroll-wrapper,
+body.admin-dashboard-page .admin-table-shell,
+body.admin-dashboard-page .ui-table-shell {
+  border-radius: 18px;
+}
+
+body.admin-dashboard-page .admin-table tbody tr {
+  transition: background-color 160ms ease, transform 160ms ease;
+}
+
+body.admin-dashboard-page .admin-table tbody tr:hover {
+  transform: translateX(2px);
+}
+
+body.admin-dashboard-page .admin-stats-strip,
+body.admin-dashboard-page .payment-summary-row,
+body.admin-dashboard-page .admin-payments-summary,
+body.admin-dashboard-page .admin-attendance-kpis,
+body.admin-dashboard-page .admin-announcements-feed,
+body.admin-dashboard-page .admin-courses-grid,
+body.admin-dashboard-page .admin-settings-grid {
+  gap: 18px;
+}
+
+body.admin-dashboard-page .compose-modal-overlay {
+  z-index: 3000;
+  padding: 32px 24px;
+  background: rgba(2, 6, 23, 0.74);
+  backdrop-filter: blur(18px) saturate(140%);
+  overflow: auto;
+}
+
+body.admin-dashboard-page .admin-modal,
+body.admin-dashboard-page .ui-modal {
+  width: min(92vw, 760px) !important;
+  max-height: min(88vh, 920px) !important;
+  border-radius: 30px !important;
+  box-shadow:
+    0 32px 80px rgba(2, 6, 23, 0.54),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+body.admin-dashboard-page .admin-modal-sm           { width: min(92vw, 620px) !important; }
+body.admin-dashboard-page .admin-modal-md           { width: min(92vw, 760px) !important; }
+body.admin-dashboard-page .admin-modal-announcement { width: min(92vw, 860px) !important; }
+body.admin-dashboard-page .admin-course-modal       { width: min(94vw, 1020px) !important; }
+body.admin-dashboard-page .admin-modal-confirm      { width: min(92vw, 500px) !important; }
+
+body.admin-dashboard-page .compose-modal-header {
+  padding: 24px 26px 20px;
+}
+
+body.admin-dashboard-page .compose-modal-header h3 {
+  font-size: 1.24rem;
+}
+
+body.admin-dashboard-page .modal-close-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+}
+
+body.admin-dashboard-page .admin-modal form,
+body.admin-dashboard-page .modal-scroll-area {
+  gap: 18px;
+  padding: 22px 26px !important;
+}
+
+body.admin-dashboard-page .compose-field,
+body.admin-dashboard-page .compose-field + .compose-field {
+  margin: 0;
+}
+
+body.admin-dashboard-page .compose-field label {
+  margin-bottom: 10px;
+}
+
+body.admin-dashboard-page .admin-form-grid-two {
+  gap: 18px;
+}
+
+body.admin-dashboard-page #userModalForm .admin-form-grid-two {
+  grid-template-columns: 1fr;
+}
+
+body.admin-dashboard-page .admin-role-picker {
+  gap: 14px;
+}
+
+body.admin-dashboard-page .admin-role-option {
+  min-height: 116px;
+  padding: 16px;
+}
+
+body.admin-dashboard-page .admin-course-form {
+  display: grid !important;
+  grid-template-rows: minmax(0, 1fr) auto;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+body.admin-dashboard-page .admin-course-form-body {
+  grid-template-columns: minmax(0, 0.9fr) minmax(340px, 1.1fr);
+  gap: 22px;
+  padding: 24px 26px 0;
+  overflow: auto;
+}
+
+body.admin-dashboard-page .admin-course-form-section {
+  display: grid;
+  align-content: start;
+  gap: 16px;
+}
+
+body.admin-dashboard-page .admin-course-enrollment {
+  min-height: 420px;
+  align-self: stretch;
+}
+
+body.admin-dashboard-page .admin-enroll-list {
+  max-height: none;
+  min-height: 280px;
+}
+
+body.admin-dashboard-page .compose-modal-actions {
+  gap: 12px;
+  padding: 18px 26px 22px;
+  background: linear-gradient(180deg, rgba(8, 14, 24, 0.16), rgba(4, 10, 18, 0.82));
+}
+
+body.admin-dashboard-page .chart-select,
+body.admin-dashboard-page .ui-select-input,
+body.admin-dashboard-page .admin-modal select {
+  color-scheme: dark;
+  background:
+    linear-gradient(180deg, rgba(11, 18, 32, 0.96), rgba(15, 24, 42, 0.94));
+  border-color: rgba(148, 163, 184, 0.14);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
+}
+
+body.admin-dashboard-page .ui-select::after {
+  right: 16px;
+}
+
+body.admin-dashboard-page .chart-select option,
+body.admin-dashboard-page .ui-select-input option,
+body.admin-dashboard-page .admin-modal select option,
+body.admin-dashboard-page .chart-select optgroup,
+body.admin-dashboard-page .ui-select-input optgroup,
+body.admin-dashboard-page .admin-modal select optgroup {
+  background: #0c1524;
+  color: #f8fafc;
+}
+
+body.admin-dashboard-page .chart-select:disabled,
+body.admin-dashboard-page .ui-select-input:disabled,
+body.admin-dashboard-page .admin-modal select:disabled,
+body.admin-dashboard-page .admin-modal input:disabled,
+body.admin-dashboard-page .admin-modal textarea:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+@media (max-width: 1380px) {
+  body.admin-dashboard-page .dashboard-hero.admin-overview-hero {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  body.admin-dashboard-page .dashboard-grid,
+  body.admin-dashboard-page .admin-settings-grid {
     grid-template-columns: minmax(0, 1fr);
   }
 }
 
 @media (max-width: 1180px) {
   body.admin-dashboard-page {
-    --adm-sidebar-width: 232px;
+    --adm-sidebar-width: 228px;
   }
 
   body.admin-dashboard-page .app-main {
-    padding: 16px 20px 22px;
+    padding: 16px 16px 20px;
+    gap: 18px;
   }
 
   body.admin-dashboard-page .topbar,
-  body.admin-dashboard-page .admin-settings-grid,
+  body.admin-dashboard-page .admin-view-header,
+  body.admin-dashboard-page .admin-grades-toolbar,
   body.admin-dashboard-page .admin-course-form-body {
     grid-template-columns: 1fr;
   }
 
-  body.admin-dashboard-page .search-bar { max-width: none; }
+  body.admin-dashboard-page .search-bar {
+    max-width: none;
+  }
 
-  body.admin-dashboard-page .smart-action-grid {
+  body.admin-dashboard-page .smart-action-grid,
+  body.admin-dashboard-page .payment-summary-row,
+  body.admin-dashboard-page .admin-payments-summary,
+  body.admin-dashboard-page .admin-attendance-kpis {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  body.admin-dashboard-page .admin-header-actions,
+  body.admin-dashboard-page .admin-toolbar-action-group {
+    justify-content: stretch;
+  }
+
+  body.admin-dashboard-page .admin-header-actions > *,
+  body.admin-dashboard-page .admin-toolbar-action-group > * {
+    flex: 1 1 auto;
   }
 }
 
 @media (max-width: 980px) {
-  body.admin-dashboard-page .admin-view-header,
-  body.admin-dashboard-page .admin-grades-toolbar {
-    grid-template-columns: 1fr;
-    align-items: start;
+  body.admin-dashboard-page .admin-filter-bar,
+  body.admin-dashboard-page .admin-header-actions,
+  body.admin-dashboard-page .admin-toolbar-action-group,
+  body.admin-dashboard-page .compose-modal-actions,
+  body.admin-dashboard-page .admin-confirm-actions {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
   }
 
-  body.admin-dashboard-page .admin-header-actions { justify-content: stretch; }
+  body.admin-dashboard-page .admin-filter-bar > .chart-select,
+  body.admin-dashboard-page .admin-filter-bar > .ui-select,
+  body.admin-dashboard-page .admin-filter-bar > .ui-select-input,
+  body.admin-dashboard-page .admin-filter-bar > .admin-search-input {
+    width: 100%;
+    min-width: 0;
+    flex-basis: auto;
+  }
 
-  body.admin-dashboard-page .admin-toolbar-action-group,
-  body.admin-dashboard-page .admin-filter-bar { width: 100%; }
+  body.admin-dashboard-page .admin-form-grid-two,
+  body.admin-dashboard-page .today-focus-container,
+  body.admin-dashboard-page .admin-role-picker {
+    grid-template-columns: 1fr;
+  }
+
+  body.admin-dashboard-page .admin-course-modal,
+  body.admin-dashboard-page .admin-modal-md,
+  body.admin-dashboard-page .admin-modal-announcement {
+    width: min(96vw, 720px) !important;
+  }
 }
 
 @media (max-width: 900px) {

@@ -7,6 +7,8 @@ CORE PRINCIPLES:
 - Avoid unnecessary complexity
 - Write code that is readable and well-structured
 
+
+
 THINKING RULES:
 - Always analyze before acting
 - Break problems into clear parts
@@ -46,3 +48,8 @@ COMMUNICATION:
 SELF-IMPROVEMENT:
 - If a better pattern, rule, or workflow is discovered, propose an update
 - The system may refine or expand these rules when necessary
+
+Prefer replacing bad implementations over preserving them.
+Prefer consolidation over layering.
+Remove redundant, duplicate, conflicting, or dead code when a cleaner solution exists.
+Do not use additive-only refactoring when the architecture is already messy.
